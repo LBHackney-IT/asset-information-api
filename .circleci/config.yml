@@ -185,7 +185,10 @@ workflows:
               only: master
   check-and-deploy-staging-and-production:
       jobs:
-      - check-code-formatting
+      - check-code-formatting:
+          filters:
+            branches:
+              only: release
       - build-and-test:
           filters:
             branches:
