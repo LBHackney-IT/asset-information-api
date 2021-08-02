@@ -1,10 +1,10 @@
 version: "3.2"
 
 services:
-  base-api:
-    image: base-api
+  asset-information-api:
+    image: asset-information-api
     build:
-      context: BaseApi/
+      context: AssetInformationApi/
       dockerfile: ./Dockerfile
     ports:
       - 3000:3000
@@ -25,11 +25,11 @@ services:
     volumes:
       - ./database:/docker-entrypoint-initdb.d
 
-  base-api-test:
-    image: base-api-test
+  asset-information-api-test:
+    image: asset-information-api-test
     build:
       context: .
-      dockerfile: BaseApi.Tests/Dockerfile
+      dockerfile: AssetInformationApi.Tests/Dockerfile
     environment:
       - DB_HOST=test-database
       - DB_PORT=5432

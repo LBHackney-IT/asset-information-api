@@ -32,7 +32,7 @@ terraform {
     bucket  = "terraform-state-development-apis"
     encrypt = true
     region  = "eu-west-2"
-    key     = services/YOUR API NAME/state #e.g. "services/transactions-api/state"
+    key     = services/asset-information-api/state
   }
 }
 
