@@ -16,7 +16,7 @@ shell:
 
 .PHONY: test
 test:
-	docker-compose up test-database & docker-compose build asset-information-api-test && docker-compose up asset-information-api-test
+	docker-compose up dynamodb-database & docker-compose build asset-information-api-test && docker-compose up asset-information-api-test
 
 .PHONY: lint
 lint:
@@ -26,7 +26,7 @@ lint:
 
 .PHONY: restart-db
 restart-db:
-	docker stop $$(docker ps -q --filter ancestor=test-database -a)
-	-docker rm $$(docker ps -q --filter ancestor=test-database -a)
-	docker rmi test-database
-	docker-compose up -d test-database
+	docker stop $$(docker ps -q --filter ancestor=dynamodb-database -a)
+	-docker rm $$(docker ps -q --filter ancestor=dynamodb-database -a)
+	docker rmi dynamodb-database
+	docker-compose up -d dynamodb-database

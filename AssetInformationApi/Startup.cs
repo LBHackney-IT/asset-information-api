@@ -41,6 +41,7 @@ namespace AssetInformationApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
             services
                 .AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
@@ -112,9 +113,7 @@ namespace AssetInformationApi
 
             ConfigureLogging(services, Configuration);
 
-            ConfigureDbContext(services);
-            //TODO: For DynamoDb, remove the line above and uncomment the line below.
-            // services.ConfigureDynamoDB();
+            services.ConfigureDynamoDB();
 
             RegisterGateways(services);
             RegisterUseCases(services);
@@ -150,10 +149,7 @@ namespace AssetInformationApi
 
         private static void RegisterGateways(IServiceCollection services)
         {
-            services.AddScoped<IExampleGateway, ExampleGateway>();
-
-            //TODO: For DynamoDb, remove the line above and uncomment the line below.
-            //services.AddScoped<IExampleGateway, DynamoDbGateway>();
+            services.AddScoped<IExampleGateway, DynamoDbGateway>();
         }
 
         private static void RegisterUseCases(IServiceCollection services)
@@ -165,6 +161,11 @@ namespace AssetInformationApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseCors(builder => builder
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod());
+            
             app.UseCorrelation();
 
             if (env.IsDevelopment())
@@ -176,8 +177,6 @@ namespace AssetInformationApi
                 app.UseHsts();
             }
 
-            // TODO
-            // If you DON'T use the renaming script, PLEASE replace with your own API name manually
             app.UseXRay("asset-information-api");
 
 
