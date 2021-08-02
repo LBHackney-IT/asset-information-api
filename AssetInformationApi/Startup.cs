@@ -165,7 +165,7 @@ namespace AssetInformationApi
                 .AllowAnyOrigin()
                 .AllowAnyHeader()
                 .AllowAnyMethod());
-            
+
             app.UseCorrelation();
 
             if (env.IsDevelopment())
