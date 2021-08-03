@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Routing;
 using NUnit.Framework;
+using Hackney.Core.Middleware;
 
 namespace AssetInformationApi.Tests.V1.Controllers
 {
@@ -40,7 +41,7 @@ namespace AssetInformationApi.Tests.V1.Controllers
         public void GetCorrelationShouldReturnCorrelationIdWhenExists()
         {
             // Arrange
-            _stubHttpContext.Request.Headers.Add(Constants.CorrelationId, "123");
+            _stubHttpContext.Request.Headers.Add(HeaderConstants.CorrelationId, "123");
 
             // Act
             var result = _sut.GetCorrelationId();

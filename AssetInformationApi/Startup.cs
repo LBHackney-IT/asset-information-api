@@ -4,24 +4,38 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using AssetInformationApi.V1.Controllers;
+using Amazon;
+using Amazon.XRay.Recorder.Core;
 using Amazon.XRay.Recorder.Handlers.AwsSdk;
+using FluentValidation.AspNetCore;
+using Hackney.Core.DI;
+using Hackney.Core.DynamoDb;
+using Hackney.Core.HealthCheck;
+using Hackney.Core.Http;
+using Hackney.Core.JWT;
+using Hackney.Core.Logging;
+using Hackney.Core.Middleware;
+using Hackney.Core.Middleware.CorrelationId;
+using Hackney.Core.Middleware.Exception;
+using Hackney.Core.Middleware.Logging;
 using AssetInformationApi.V1.Gateways;
 using AssetInformationApi.V1.Infrastructure;
 using AssetInformationApi.V1.UseCase;
 using AssetInformationApi.V1.UseCase.Interfaces;
 using AssetInformationApi.Versioning;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Text.Json.Serialization;
 
 namespace AssetInformationApi
 {
@@ -44,6 +58,11 @@ namespace AssetInformationApi
             services.AddCors();
             services
                 .AddMvc()
+                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly()))
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddApiVersioning(o =>
             {
@@ -53,6 +72,9 @@ namespace AssetInformationApi
             });
 
             services.AddSingleton<IApiVersionDescriptionProvider, DefaultApiVersionDescriptionProvider>();
+
+            // TODO: Uncomment once DB entity is implemented
+            //services.AddDynamoDbHealthCheck<AssetDbEntity>();
 
             services.AddSwaggerGen(c =>
             {
@@ -111,40 +133,19 @@ namespace AssetInformationApi
                     c.IncludeXmlComments(xmlPath);
             });
 
-            ConfigureLogging(services, Configuration);
+            services.ConfigureLambdaLogging(Configuration);
 
+            AWSXRayRecorder.InitializeInstance(Configuration);
+            AWSXRayRecorder.RegisterLogger(LoggingOptions.SystemDiagnostics);
+
+            services.AddLogCallAspect();
             services.ConfigureDynamoDB();
+            services.AddTokenFactory();
 
             RegisterGateways(services);
             RegisterUseCases(services);
-        }
 
-        private static void ConfigureDbContext(IServiceCollection services)
-        {
-            var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
-
-            services.AddDbContext<DatabaseContext>(
-                opt => opt.UseNpgsql(connectionString).AddXRayInterceptor(true));
-        }
-
-        private static void ConfigureLogging(IServiceCollection services, IConfiguration configuration)
-        {
-            // We rebuild the logging stack so as to ensure the console logger is not used in production.
-            // See here: https://weblog.west-wind.com/posts/2018/Dec/31/Dont-let-ASPNET-Core-Default-Console-Logging-Slow-your-App-down
-            services.AddLogging(config =>
-            {
-                // clear out default configuration
-                config.ClearProviders();
-
-                config.AddConfiguration(configuration.GetSection("Logging"));
-                config.AddDebug();
-                config.AddEventSourceLogger();
-
-                if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == Environments.Development)
-                {
-                    config.AddConsole();
-                }
-            });
+            services.AddSingleton<IConfiguration>(Configuration);
         }
 
         private static void RegisterGateways(IServiceCollection services)
@@ -159,14 +160,13 @@ namespace AssetInformationApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             app.UseCors(builder => builder
                 .AllowAnyOrigin()
                 .AllowAnyHeader()
-                .AllowAnyMethod());
-
-            app.UseCorrelation();
+                .AllowAnyMethod()
+                .WithExposedHeaders("ETag", "If-Match"));
 
             if (env.IsDevelopment())
             {
@@ -177,6 +177,9 @@ namespace AssetInformationApi
                 app.UseHsts();
             }
 
+            app.UseCorrelationId();
+            app.UseLoggingScope();
+            app.UseCustomExceptionHandler(logger);
             app.UseXRay("asset-information-api");
 
 
@@ -200,7 +203,13 @@ namespace AssetInformationApi
             {
                 // SwaggerGen won't find controllers that are routed via this technique.
                 endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+
+                endpoints.MapHealthChecks("/api/v1/healthcheck/ping", new HealthCheckOptions()
+                {
+                    ResponseWriter = HealthCheckResponseWriter.WriteResponse
+                });
             });
+            app.UseLogCall();
         }
     }
 }
