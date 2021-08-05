@@ -1,25 +1,24 @@
-# resource "aws_dynamodb_table" "assetinformationapi_dynamodb_table" {
-#     name                  = "Assets"
-#     billing_mode          = "PROVISIONED"
-#     read_capacity         = 10
-#     write_capacity        = 10
-#     hash_key              = "id"
+resource "aws_dynamodb_table" "assetinformationapi_dynamodb_table" {
+    name                  = "Assets"
+    billing_mode          = "PROVISIONED"
+    read_capacity         = 10
+    write_capacity        = 10
+    hash_key              = "id"
 
-#     attribute {
-#         name              = "id"
-#         type              = "S"
-#     }
+    attribute {
+        name              = "id"
+        type              = "S"
+    }
 
-#     tags = {
-#         Name              = "asset-information-api-${var.environment_name}"
-#         Environment       = var.environment_name
-#         terraform-managed = true
-#         project_name      = var.project_name
-#         backup_policy     = "Stg"
-#     }
+    tags = {
+        Name              = "asset-information-api-${var.environment_name}"
+        Environment       = var.environment_name
+        terraform-managed = true
+        project_name      = var.project_name
+        backup_policy     = "Stg"
+    }
 
-#     point_in_time_recovery {
-#         enabled           = true
-#     }
-# }
-# TBD 
+    point_in_time_recovery {
+        enabled           = true
+    }
+}
