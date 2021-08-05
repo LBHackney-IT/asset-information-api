@@ -10,6 +10,25 @@ resource "aws_dynamodb_table" "assetinformationapi_dynamodb_table" {
         type              = "S"
     }
 
+    attribute {
+        name              = "parentAssetIds"
+        type              = "S"
+    }
+
+    attribute {
+        name              = "rootAsset"
+        type              = "S"
+    }
+
+    global_secondary_index {
+        name              = "AssetParentsAndChilds"
+        hash_key          = "rootAsset"
+        range_key         = "parentAssetIds"
+        write_capacity    = 10
+        read_capacity     = 10
+        projection_type   = "ALL"
+    }
+
     tags = {
         Name              = "asset-information-api-${var.environment_name}"
         Environment       = var.environment_name
