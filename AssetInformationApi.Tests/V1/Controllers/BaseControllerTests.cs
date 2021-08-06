@@ -1,25 +1,27 @@
-using System.Collections.Generic;
 using AssetInformationApi.V1.Controllers;
-using AssetInformationApi.V1.Infrastructure;
 using FluentAssertions;
+using Hackney.Core.Middleware;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Routing;
-using NUnit.Framework;
-using Hackney.Core.Middleware;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using System.Collections.Generic;
+using Xunit;
 
 namespace AssetInformationApi.Tests.V1.Controllers
 {
-    [TestFixture]
     public class BaseControllerTests
     {
         private BaseController _sut;
         private ControllerContext _controllerContext;
         private HttpContext _stubHttpContext;
 
-        [SetUp]
-        public void Init()
+        public BaseControllerTests()
+        { }
+
+        private void ConstructController()
         {
             _stubHttpContext = new DefaultHttpContext();
             _controllerContext = new ControllerContext(new ActionContext(_stubHttpContext, new RouteData(), new ControllerActionDescriptor()));
@@ -28,18 +30,22 @@ namespace AssetInformationApi.Tests.V1.Controllers
             _sut.ControllerContext = _controllerContext;
         }
 
-        [Test]
+        [Fact]
         public void GetCorrelationShouldThrowExceptionIfCorrelationHeaderUnavailable()
         {
+            ConstructController();
+
             // Arrange + Act + Assert
             _sut.Invoking(x => x.GetCorrelationId())
                 .Should().Throw<KeyNotFoundException>()
                 .WithMessage("Request is missing a correlationId");
         }
 
-        [Test]
+        [Fact]
         public void GetCorrelationShouldReturnCorrelationIdWhenExists()
         {
+            ConstructController();
+
             // Arrange
             _stubHttpContext.Request.Headers.Add(HeaderConstants.CorrelationId, "123");
 
@@ -48,6 +54,19 @@ namespace AssetInformationApi.Tests.V1.Controllers
 
             // Assert
             result.Should().BeEquivalentTo("123");
+        }
+
+        [Fact]
+        public void ConfigureJsonSerializerTest()
+        {
+            BaseController.ConfigureJsonSerializer();
+
+            JsonConvert.DefaultSettings.Should().NotBeNull();
+            var settings = JsonConvert.DefaultSettings();
+            settings.Formatting.Should().Be(Formatting.Indented);
+            settings.ContractResolver.GetType().Should().Be(typeof(CamelCasePropertyNamesContractResolver));
+            settings.DateTimeZoneHandling.Should().Be(DateTimeZoneHandling.Utc);
+            settings.DateFormatHandling.Should().Be(DateFormatHandling.IsoDateFormat);
         }
     }
 }

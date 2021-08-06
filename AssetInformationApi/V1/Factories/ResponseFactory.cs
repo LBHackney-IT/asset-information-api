@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using AssetInformationApi.V1.Boundary.Response;
 using AssetInformationApi.V1.Domain;
 
@@ -7,16 +5,36 @@ namespace AssetInformationApi.V1.Factories
 {
     public static class ResponseFactory
     {
-        //TODO: Map the fields in the domain object(s) to fields in the response object(s).
-        // More information on this can be found here https://github.com/LBHackney-IT/lbh-asset-information-api/wiki/Factory-object-mappings
-        public static ResponseObject ToResponse(this Entity domain)
+        public static AssetResponseObject ToResponse(this Asset domain)
         {
-            return new ResponseObject();
+            if (domain == null) return null;
+            return new AssetResponseObject()
+            {
+                Id = domain.Id,
+                AssetId = domain.AssetId,
+                AssetType = domain.AssetType,
+                RootAsset = domain.RootAsset,
+                ParentAssetIds = domain.ParentAssetIds,
+                AssetLocation = domain.AssetLocation,
+                AssetAddress = domain.AssetAddress,
+                AssetManagement = domain.AssetManagement,
+                AssetCharacteristics = domain.AssetCharacteristics,
+                Tenure = domain.Tenure.ToResponse()
+            };
         }
 
-        public static List<ResponseObject> ToResponse(this IEnumerable<Entity> domainList)
+        public static AssetTenureResponseObject ToResponse(this AssetTenure domain)
         {
-            return domainList.Select(domain => domain.ToResponse()).ToList();
+            if (domain == null) return null;
+            return new AssetTenureResponseObject()
+            {
+                Id = domain.Id,
+                PaymentReference = domain.PaymentReference,
+                Type = domain.Type,
+                StartOfTenureDate = domain.StartOfTenureDate,
+                EndOfTenureDate = domain.EndOfTenureDate,
+                IsActive = domain.IsActive
+            };
         }
     }
 }

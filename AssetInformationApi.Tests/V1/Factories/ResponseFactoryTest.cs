@@ -1,19 +1,47 @@
 using AssetInformationApi.V1.Domain;
 using AssetInformationApi.V1.Factories;
-using NUnit.Framework;
+using AutoFixture;
+using FluentAssertions;
+using Xunit;
 
 namespace AssetInformationApi.Tests.V1.Factories
 {
     public class ResponseFactoryTest
     {
-        //TODO: add assertions for all the fields being mapped in `ResponseFactory.ToResponse()`. Also be sure to add test cases for
-        // any edge cases that might exist.
-        [Test]
-        public void CanMapADatabaseEntityToADomainObject()
+        private readonly Fixture _fixture = new Fixture();
+
+        [Fact]
+        public void CanMapANullAssetToAResponseObject()
         {
-            var domain = new Entity();
+            Asset domain = null;
             var response = domain.ToResponse();
-            //TODO: check here that all of the fields have been mapped correctly. i.e. response.fieldOne.Should().Be("one")
+
+            response.Should().BeNull();
+        }
+
+        [Fact]
+        public void CanMapAnAssetToAResponseObject()
+        {
+            var domain = _fixture.Create<Asset>();
+            var response = domain.ToResponse();
+            domain.Should().BeEquivalentTo(response);
+        }
+
+        [Fact]
+        public void CanMapANullAssetTenureToAResponseObject()
+        {
+            AssetTenure domain = null;
+            var response = domain.ToResponse();
+
+            response.Should().BeNull();
+        }
+
+        [Fact]
+        public void CanMapAnAssetTenureToAResponseObject()
+        {
+            var domain = _fixture.Create<AssetTenure>();
+            var response = domain.ToResponse();
+            domain.Should().BeEquivalentTo(response);
         }
     }
 }

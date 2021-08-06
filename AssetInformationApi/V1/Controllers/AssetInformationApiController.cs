@@ -1,51 +1,44 @@
+using AssetInformationApi.V1.Boundary.Request;
 using AssetInformationApi.V1.Boundary.Response;
 using AssetInformationApi.V1.UseCase.Interfaces;
+using Hackney.Core.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace AssetInformationApi.V1.Controllers
 {
     [ApiController]
-    //TODO: Rename to match the APIs endpoint
-    [Route("api/v1/residents")]
+    [Route("api/v1/assets")]
     [Produces("application/json")]
     [ApiVersion("1.0")]
-    //TODO: rename class to match the API name
     public class AssetInformationApiController : BaseController
     {
-        private readonly IGetAllUseCase _getAllUseCase;
-        private readonly IGetByIdUseCase _getByIdUseCase;
-        public AssetInformationApiController(IGetAllUseCase getAllUseCase, IGetByIdUseCase getByIdUseCase)
+        private readonly IGetAssetByIdUseCase _getAssetByIdUseCase;
+        public AssetInformationApiController(IGetAssetByIdUseCase getAssetByIdUseCase)
         {
-            _getAllUseCase = getAllUseCase;
-            _getByIdUseCase = getByIdUseCase;
-        }
-
-        //TODO: add xml comments containing information that will be included in the auto generated swagger docs (https://github.com/LBHackney-IT/lbh-asset-information-api/wiki/Controllers-and-Response-Objects)
-        /// <summary>
-        /// ...
-        /// </summary>
-        /// <response code="200">...</response>
-        /// <response code="400">Invalid Query Parameter.</response>
-        [ProducesResponseType(typeof(ResponseObjectList), StatusCodes.Status200OK)]
-        [HttpGet]
-        public IActionResult ListContacts()
-        {
-            return Ok(_getAllUseCase.Execute());
+            _getAssetByIdUseCase = getAssetByIdUseCase;
         }
 
         /// <summary>
-        /// ...
+        /// Retrieves the asset with the supplied id
         /// </summary>
-        /// <response code="200">...</response>
-        /// <response code="404">No ? found for the specified ID</response>
-        [ProducesResponseType(typeof(ResponseObject), StatusCodes.Status200OK)]
+        /// <response code="200">Successfully retrieved details for the specified ID</response>
+        /// <response code="404">No tenure information found for the specified ID</response>
+        /// <response code="500">Internal server error</response>
+        [ProducesResponseType(typeof(AssetResponseObject), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet]
-        //TODO: rename to match the identifier that will be used
-        [Route("{yourId}")]
-        public IActionResult ViewRecord(int yourId)
+        [Route("{id}")]
+        [LogCall(LogLevel.Information)]
+        public async Task<IActionResult> GetAssetById([FromRoute] GetAssetByIdRequest query)
         {
-            return Ok(_getByIdUseCase.Execute(yourId));
+            var result = await _getAssetByIdUseCase.ExecuteAsync(query).ConfigureAwait(false);
+            if (result == null) return NotFound(query.Id);
+            return Ok(result);
         }
     }
 }

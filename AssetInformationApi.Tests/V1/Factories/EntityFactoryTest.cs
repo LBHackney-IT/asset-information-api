@@ -3,37 +3,99 @@ using AssetInformationApi.V1.Domain;
 using AssetInformationApi.V1.Factories;
 using AssetInformationApi.V1.Infrastructure;
 using FluentAssertions;
-using NUnit.Framework;
+using Xunit;
 
 namespace AssetInformationApi.Tests.V1.Factories
 {
-    [TestFixture]
     public class EntityFactoryTest
     {
         private readonly Fixture _fixture = new Fixture();
 
-        //TODO: add assertions for all the fields being mapped in `EntityFactory.ToDomain()`. Also be sure to add test cases for
-        // any edge cases that might exist.
-        [Test]
-        public void CanMapADatabaseEntityToADomainObject()
+        [Fact]
+        public void CanMapANullAssetDbToAnAsset()
         {
-            var databaseEntity = _fixture.Create<DatabaseEntity>();
+            AssetDb databaseEntity = null;
             var entity = databaseEntity.ToDomain();
-
-            databaseEntity.Id.Should().Be(entity.Id);
-            databaseEntity.CreatedAt.Should().BeSameDateAs(entity.CreatedAt);
+            entity.Should().BeNull();
         }
 
-        //TODO: add assertions for all the fields being mapped in `EntityFactory.ToDatabase()`. Also be sure to add test cases for
-        // any edge cases that might exist.
-        [Test]
-        public void CanMapADomainEntityToADatabaseObject()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void CanMapAnAssetDbToAnAsset(bool nullEndDate)
         {
-            var entity = _fixture.Create<Entity>();
+            var databaseEntity = _fixture.Create<AssetDb>();
+            if (nullEndDate)
+                databaseEntity.Tenure.EndOfTenureDate = null;
+
+            var entity = databaseEntity.ToDomain();
+            databaseEntity.Should().BeEquivalentTo(entity, config => config.Excluding(x => x.Tenure.IsActive));
+        }
+
+        [Fact]
+        public void CanMapANullAssetToAnAssetDb()
+        {
+            Asset entity = null;
+            var databaseEntity = entity.ToDatabase();
+            databaseEntity.Should().BeNull();
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void CanMapAnAssetToAnAssetDb(bool nullEndDate)
+        {
+            var entity = _fixture.Create<Asset>();
+            if (nullEndDate)
+                entity.Tenure.EndOfTenureDate = null;
+
             var databaseEntity = entity.ToDatabase();
 
-            entity.Id.Should().Be(databaseEntity.Id);
-            entity.CreatedAt.Should().BeSameDateAs(databaseEntity.CreatedAt);
+            entity.Should().BeEquivalentTo(databaseEntity);
+        }
+
+
+        [Fact]
+        public void CanMapANullAssetTenureDbToAnAssetTenure()
+        {
+            AssetTenureDb databaseEntity = null;
+            var entity = databaseEntity.ToDomain();
+            entity.Should().BeNull();
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void CanMapAnAssetTenureDbToAnAssetTenure(bool nullEndDate)
+        {
+            var databaseEntity = _fixture.Create<AssetTenureDb>();
+            if (nullEndDate)
+                databaseEntity.EndOfTenureDate = null;
+
+            var entity = databaseEntity.ToDomain();
+            databaseEntity.Should().BeEquivalentTo(entity, config => config.Excluding(x => x.IsActive));
+        }
+
+        [Fact]
+        public void CanMapANullAssetTenureToAnAssetTenureDb()
+        {
+            AssetTenure entity = null;
+            var databaseEntity = entity.ToDatabase();
+            databaseEntity.Should().BeNull();
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void CanMapAnAssetTenureToAnAssetTenureDb(bool nullEndDate)
+        {
+            var entity = _fixture.Create<AssetTenure>();
+            if (nullEndDate)
+                entity.EndOfTenureDate = null;
+
+            var databaseEntity = entity.ToDatabase();
+
+            entity.Should().BeEquivalentTo(databaseEntity);
         }
     }
 }

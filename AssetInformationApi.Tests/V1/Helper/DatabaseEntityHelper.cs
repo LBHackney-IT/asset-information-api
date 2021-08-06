@@ -1,25 +1,22 @@
 using AutoFixture;
 using AssetInformationApi.V1.Domain;
 using AssetInformationApi.V1.Infrastructure;
+using AssetInformationApi.V1.Factories;
 
 namespace AssetInformationApi.Tests.V1.Helper
 {
     public static class DatabaseEntityHelper
     {
-        public static DatabaseEntity CreateDatabaseEntity()
+        public static AssetDb CreateDatabaseEntity()
         {
-            var entity = new Fixture().Create<Entity>();
+            var entity = new Fixture().Create<Asset>();
 
             return CreateDatabaseEntityFrom(entity);
         }
 
-        public static DatabaseEntity CreateDatabaseEntityFrom(Entity entity)
+        public static AssetDb CreateDatabaseEntityFrom(Asset entity)
         {
-            return new DatabaseEntity
-            {
-                Id = entity.Id,
-                CreatedAt = entity.CreatedAt,
-            };
+            return entity.ToDatabase();
         }
     }
 }

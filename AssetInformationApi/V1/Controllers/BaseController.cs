@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Linq;
-using AssetInformationApi.V1.Infrastructure;
+using Hackney.Core.Middleware;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using Hackney.Core.Middleware;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AssetInformationApi.V1.Controllers
 {

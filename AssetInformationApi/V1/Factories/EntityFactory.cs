@@ -5,26 +5,65 @@ namespace AssetInformationApi.V1.Factories
 {
     public static class EntityFactory
     {
-        public static Entity ToDomain(this DatabaseEntity databaseEntity)
+        public static Asset ToDomain(this AssetDb databaseEntity)
         {
-            //TODO: Map the rest of the fields in the domain object.
-            // More information on this can be found here https://github.com/LBHackney-IT/lbh-asset-information-api/wiki/Factory-object-mappings
-
-            return new Entity
+            if (databaseEntity == null) return null;
+            return new Asset
             {
                 Id = databaseEntity.Id,
-                CreatedAt = databaseEntity.CreatedAt
+                AssetId = databaseEntity.AssetId,
+                AssetType = databaseEntity.AssetType,
+                RootAsset = databaseEntity.RootAsset,
+                ParentAssetIds = databaseEntity.ParentAssetIds,
+                AssetLocation = databaseEntity.AssetLocation,
+                AssetAddress = databaseEntity.AssetAddress,
+                AssetManagement = databaseEntity.AssetManagement,
+                AssetCharacteristics = databaseEntity.AssetCharacteristics,
+                Tenure = databaseEntity.Tenure
             };
         }
 
-        public static DatabaseEntity ToDatabase(this Entity entity)
+        public static AssetTenure ToDomain(this AssetTenureDb databaseEntity)
         {
-            //TODO: Map the rest of the fields in the database object.
-
-            return new DatabaseEntity
+            if (databaseEntity == null) return null;
+            return new AssetTenure
             {
-                Id = entity.Id,
-                CreatedAt = entity.CreatedAt
+                Id = databaseEntity.Id,
+                Type = databaseEntity.Type,
+                PaymentReference = databaseEntity.PaymentReference,
+                StartOfTenureDate = databaseEntity.StartOfTenureDate,
+                EndOfTenureDate = databaseEntity.EndOfTenureDate
+            };
+        }
+
+        public static AssetDb ToDatabase(this Asset domain)
+        {
+            if (domain == null) return null;
+            return new AssetDb
+            {
+                Id = domain.Id,
+                AssetId = domain.AssetId,
+                AssetType = domain.AssetType,
+                RootAsset = domain.RootAsset,
+                ParentAssetIds = domain.ParentAssetIds,
+                AssetLocation = domain.AssetLocation,
+                AssetAddress = domain.AssetAddress,
+                AssetManagement = domain.AssetManagement,
+                AssetCharacteristics = domain.AssetCharacteristics,
+                Tenure = domain.Tenure
+            };
+        }
+
+        public static AssetTenureDb ToDatabase(this AssetTenure domain)
+        {
+            if (domain == null) return null;
+            return new AssetTenureDb
+            {
+                Id = domain.Id,
+                Type = domain.Type,
+                PaymentReference = domain.PaymentReference,
+                StartOfTenureDate = domain.StartOfTenureDate,
+                EndOfTenureDate = domain.EndOfTenureDate
             };
         }
     }

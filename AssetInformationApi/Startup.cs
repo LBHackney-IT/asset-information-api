@@ -1,30 +1,22 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using AssetInformationApi.V1.Controllers;
 using Amazon;
 using Amazon.XRay.Recorder.Core;
 using Amazon.XRay.Recorder.Handlers.AwsSdk;
-using FluentValidation.AspNetCore;
-using Hackney.Core.DI;
-using Hackney.Core.DynamoDb;
-using Hackney.Core.HealthCheck;
-using Hackney.Core.Http;
-using Hackney.Core.JWT;
-using Hackney.Core.Logging;
-using Hackney.Core.Middleware;
-using Hackney.Core.Middleware.CorrelationId;
-using Hackney.Core.Middleware.Exception;
-using Hackney.Core.Middleware.Logging;
 using AssetInformationApi.V1.Gateways;
 using AssetInformationApi.V1.Infrastructure;
 using AssetInformationApi.V1.UseCase;
 using AssetInformationApi.V1.UseCase.Interfaces;
 using AssetInformationApi.Versioning;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using FluentValidation.AspNetCore;
+using Hackney.Core.DI;
+using Hackney.Core.DynamoDb;
+using Hackney.Core.DynamoDb.HealthCheck;
+using Hackney.Core.HealthCheck;
+using Hackney.Core.Logging;
+using Hackney.Core.Middleware.CorrelationId;
+using Hackney.Core.Middleware.Exception;
+using Hackney.Core.Middleware.Logging;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -35,10 +27,17 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text.Json.Serialization;
 
 namespace AssetInformationApi
 {
+    [ExcludeFromCodeCoverage]
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -64,6 +63,7 @@ namespace AssetInformationApi
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+
             services.AddApiVersioning(o =>
             {
                 o.DefaultApiVersion = new ApiVersion(1, 0);
@@ -73,8 +73,7 @@ namespace AssetInformationApi
 
             services.AddSingleton<IApiVersionDescriptionProvider, DefaultApiVersionDescriptionProvider>();
 
-            // TODO: Uncomment once DB entity is implemented
-            //services.AddDynamoDbHealthCheck<AssetDbEntity>();
+            services.AddDynamoDbHealthCheck<AssetDb>();
 
             services.AddSwaggerGen(c =>
             {
@@ -150,13 +149,12 @@ namespace AssetInformationApi
 
         private static void RegisterGateways(IServiceCollection services)
         {
-            services.AddScoped<IExampleGateway, DynamoDbGateway>();
+            services.AddScoped<IAssetGateway, DynamoDbGateway>();
         }
 
         private static void RegisterUseCases(IServiceCollection services)
         {
-            services.AddScoped<IGetAllUseCase, GetAllUseCase>();
-            services.AddScoped<IGetByIdUseCase, GetByIdUseCase>();
+            services.AddScoped<IGetAssetByIdUseCase, GetAssetByIdUseCase>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
