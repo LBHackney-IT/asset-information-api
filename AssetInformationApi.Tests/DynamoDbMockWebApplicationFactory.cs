@@ -1,13 +1,13 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.Model;
-using AssetInformationApi.V1.Infrastructure;
+using Hackney.Core.DynamoDb;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Hackney.Core.DynamoDb;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AssetInformationApi.Tests
 {
@@ -46,10 +46,38 @@ namespace AssetInformationApi.Tests
             {
                 try
                 {
+                    var keySchema = new List<KeySchemaElement> { new KeySchemaElement(table.KeyName, KeyType.HASH) };
+                    var attributes = new List<AttributeDefinition> { new AttributeDefinition(table.KeyName, table.KeyType) };
+                    if (!string.IsNullOrEmpty(table.RangeKeyName))
+                    {
+                        keySchema.Add(new KeySchemaElement(table.RangeKeyName, KeyType.RANGE));
+                        attributes.Add(new AttributeDefinition(table.RangeKeyName, table.RangeKeyType));
+                    }
+
+                    foreach (var localIndex in table.LocalSecondaryIndexes)
+                    {
+                        var indexRangeKey = localIndex.KeySchema.FirstOrDefault(y => y.KeyType == KeyType.RANGE);
+                        if ((null != indexRangeKey) && (!attributes.Any(x => x.AttributeName == indexRangeKey.AttributeName)))
+                            attributes.Add(new AttributeDefinition(indexRangeKey.AttributeName, ScalarAttributeType.S)); // Assume a string for now.
+                    }
+
+                    foreach (var globalIndex in table.GlobalSecondaryIndexes)
+                    {
+                        foreach (var key in globalIndex.KeySchema)
+                        {
+                            if (!attributes.Any(x => x.AttributeName == key.AttributeName))
+                                attributes.Add(new AttributeDefinition(key.AttributeName, ScalarAttributeType.S)); // Assume a string for now.
+                        }
+                    }
+
                     var request = new CreateTableRequest(table.Name,
-                        new List<KeySchemaElement> { new KeySchemaElement(table.KeyName, KeyType.HASH) },
-                        new List<AttributeDefinition> { new AttributeDefinition(table.KeyName, table.KeyType) },
-                        new ProvisionedThroughput(3, 3));
+                        keySchema,
+                        attributes,
+                        new ProvisionedThroughput(3, 3))
+                    {
+                        LocalSecondaryIndexes = table.LocalSecondaryIndexes,
+                        GlobalSecondaryIndexes = table.GlobalSecondaryIndexes
+                    };
                     _ = dynamoDb.CreateTableAsync(request).GetAwaiter().GetResult();
                 }
                 catch (ResourceInUseException)

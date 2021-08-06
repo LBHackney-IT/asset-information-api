@@ -1,55 +1,89 @@
 using Amazon.DynamoDBv2.DataModel;
-using AutoFixture;
-using AssetInformationApi.Tests.V1.Helper;
+using AssetInformationApi.V1.Boundary.Request;
 using AssetInformationApi.V1.Domain;
+using AssetInformationApi.V1.Factories;
 using AssetInformationApi.V1.Gateways;
 using AssetInformationApi.V1.Infrastructure;
+using AutoFixture;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
-using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace AssetInformationApi.Tests.V1.Gateways
 {
-    //TODO: Remove this file if DynamoDb gateway not being used
-    //TODO: Rename Tests to match gateway name
-    //For instruction on how to run tests please see the wiki: https://github.com/LBHackney-IT/lbh-asset-information-api/wiki/Running-the-test-suite.
-    [TestFixture]
-    public class DynamoDbGatewayTests
+    [Collection("DynamoDb collection")]
+    public class DynamoDbGatewayTests : IDisposable
     {
         private readonly Fixture _fixture = new Fixture();
-        private Mock<IDynamoDBContext> _dynamoDb;
-        private DynamoDbGateway _classUnderTest;
+        private readonly IDynamoDBContext _dynamoDb;
+        private readonly Mock<ILogger<DynamoDbGateway>> _logger;
+        private readonly DynamoDbGateway _classUnderTest;
+        private readonly List<Action> _cleanup = new List<Action>();
 
-        [SetUp]
-        public void Setup()
+        public DynamoDbGatewayTests(DynamoDbIntegrationTests<Startup> dbTestFixture)
         {
-            _dynamoDb = new Mock<IDynamoDBContext>();
-            _classUnderTest = new DynamoDbGateway(_dynamoDb.Object);
+            _dynamoDb = dbTestFixture.DynamoDbContext;
+            _logger = new Mock<ILogger<DynamoDbGateway>>();
+            _classUnderTest = new DynamoDbGateway(_dynamoDb, _logger.Object);
         }
 
-        [Test]
-        public void GetEntityByIdReturnsNullIfEntityDoesntExist()
+        public void Dispose()
         {
-            var response = _classUnderTest.GetEntityById(123);
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private bool _disposed;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing && !_disposed)
+            {
+                foreach (var action in _cleanup)
+                    action();
+
+                _disposed = true;
+            }
+        }
+
+        private static GetAssetByIdRequest ConstructRequest(Guid? id = null)
+        {
+            return new GetAssetByIdRequest() { Id = id ?? Guid.NewGuid() };
+        }
+
+        private async Task InsertDataIntoDynamoDB(AssetDb entity)
+        {
+            await _dynamoDb.SaveAsync(entity).ConfigureAwait(false);
+            _cleanup.Add(async () => await _dynamoDb.DeleteAsync(entity).ConfigureAwait(false));
+        }
+
+        [Fact]
+        public async Task GetAssetByIdReturnsNullIfEntityDoesntExist()
+        {
+            var request = ConstructRequest();
+            var response = await _classUnderTest.GetAssetByIdAsync(request).ConfigureAwait(false);
 
             response.Should().BeNull();
+            _logger.VerifyExact(LogLevel.Debug, $"Calling IDynamoDBContext.LoadAsync for id {request.Id}", Times.Once());
         }
 
-        [Test]
-        public void GetEntityByIdReturnsTheEntityIfItExists()
+        [Fact]
+        public async Task GetAssetByIdReturnsTheEntityIfItExists()
         {
-            var entity = _fixture.Create<Entity>();
-            var dbEntity = DatabaseEntityHelper.CreateDatabaseEntityFrom(entity);
+            var entity = _fixture.Create<Asset>();
+            entity.Tenure.StartOfTenureDate = DateTime.UtcNow;
+            entity.Tenure.EndOfTenureDate = DateTime.UtcNow;
 
-            _dynamoDb.Setup(x => x.LoadAsync<DatabaseEntity>(entity.Id, default))
-                     .ReturnsAsync(dbEntity);
+            await InsertDataIntoDynamoDB(entity.ToDatabase()).ConfigureAwait(false);
 
-            var response = _classUnderTest.GetEntityById(entity.Id);
+            var request = ConstructRequest(entity.Id);
+            var response = await _classUnderTest.GetAssetByIdAsync(request).ConfigureAwait(false);
 
-            _dynamoDb.Verify(x => x.LoadAsync<DatabaseEntity>(entity.Id, default), Times.Once);
-
-            entity.Id.Should().Be(response.Id);
-            entity.CreatedAt.Should().BeSameDateAs(response.CreatedAt);
+            response.Should().BeEquivalentTo(entity);
+            _logger.VerifyExact(LogLevel.Debug, $"Calling IDynamoDBContext.LoadAsync for id {request.Id}", Times.Once());
         }
     }
 }
