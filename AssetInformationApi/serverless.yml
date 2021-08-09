@@ -109,6 +109,12 @@ resources:
                           - Ref: 'AWS::Region'
                           - Ref: 'AWS::AccountId'
                           - 'table/Assets'
+                    - 'Fn::Join':
+                        - ':'
+                        - - 'arn:aws:dynamodb'
+                          - Ref: 'AWS::Region'
+                          - Ref: 'AWS::AccountId'
+                          - 'table/Assets/index/*'
 custom:
   vpc:
     development:
