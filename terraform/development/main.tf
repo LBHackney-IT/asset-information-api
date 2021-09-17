@@ -44,7 +44,7 @@ terraform {
 }
 
 module "asset_information_api_cloudwatch_dashboard" {
-  source              = "github.com/LBHackney-IT/aws-hackney-common-terraform.git?ref=dahboard-fix//modules/cloudwatch/dashboards/api-dashboard"
+  source              = "github.com/LBHackney-IT/aws-hackney-common-terraform.git//modules/cloudwatch/dashboards/api-dashboard"
   environment_name    = var.environment_name
   api_name            = "asset-information-api"
   dynamodb_table_name = aws_dynamodb_table.assetinformationapi_dynamodb_table.name
