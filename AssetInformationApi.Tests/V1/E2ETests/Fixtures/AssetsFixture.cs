@@ -1,6 +1,6 @@
 using Amazon.DynamoDBv2.DataModel;
-using AssetInformationApi.V1.Infrastructure;
 using AutoFixture;
+using Hackney.Shared.Asset.Infrastructure;
 using System;
 
 namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
