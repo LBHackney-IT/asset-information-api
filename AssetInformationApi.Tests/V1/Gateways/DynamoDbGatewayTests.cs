@@ -1,11 +1,11 @@
 using Amazon.DynamoDBv2.DataModel;
 using AssetInformationApi.V1.Boundary.Request;
+using AssetInformationApi.V1.Domain;
+using AssetInformationApi.V1.Factories;
 using AssetInformationApi.V1.Gateways;
+using AssetInformationApi.V1.Infrastructure;
 using AutoFixture;
 using FluentAssertions;
-using Hackney.Shared.Asset.Domain;
-using Hackney.Shared.Asset.Factories;
-using Hackney.Shared.Asset.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
@@ -73,14 +73,11 @@ namespace AssetInformationApi.Tests.V1.Gateways
         [Fact]
         public async Task GetAssetByIdReturnsTheEntityIfItExists()
         {
-            var entity = _fixture.Build<AssetDb>()
-                .With(x => x.VersionNumber, (int?) null)
-                .Create();
-
+            var entity = _fixture.Create<Asset>();
             entity.Tenure.StartOfTenureDate = DateTime.UtcNow;
             entity.Tenure.EndOfTenureDate = DateTime.UtcNow;
 
-            await InsertDataIntoDynamoDB(entity).ConfigureAwait(false);
+            await InsertDataIntoDynamoDB(entity.ToDatabase()).ConfigureAwait(false);
 
             var request = ConstructRequest(entity.Id);
             var response = await _classUnderTest.GetAssetByIdAsync(request).ConfigureAwait(false);

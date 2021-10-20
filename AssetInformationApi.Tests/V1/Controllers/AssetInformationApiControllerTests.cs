@@ -1,9 +1,9 @@
 using AssetInformationApi.V1.Boundary.Request;
+using AssetInformationApi.V1.Boundary.Response;
 using AssetInformationApi.V1.Controllers;
 using AssetInformationApi.V1.UseCase.Interfaces;
 using AutoFixture;
 using FluentAssertions;
-using Hackney.Shared.Asset.Boundary.Response;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using System;
