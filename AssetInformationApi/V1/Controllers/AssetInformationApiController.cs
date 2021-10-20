@@ -5,9 +5,8 @@ using Hackney.Core.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
-
-//
 
 namespace AssetInformationApi.V1.Controllers
 {
@@ -38,6 +37,9 @@ namespace AssetInformationApi.V1.Controllers
         [LogCall(LogLevel.Information)]
         public async Task<IActionResult> GetAssetById([FromRoute] GetAssetByIdRequest query)
         {
+            // fake change to trigger rebuild. Can be removed
+            Console.WriteLine("test");
+
             var result = await _getAssetByIdUseCase.ExecuteAsync(query).ConfigureAwait(false);
             if (result == null) return NotFound(query.Id);
             return Ok(result);
