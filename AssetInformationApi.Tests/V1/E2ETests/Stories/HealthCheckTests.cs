@@ -12,13 +12,11 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
     [Collection("DynamoDb collection")]
     public class HealthCheckTests : IDisposable
     {
-        private readonly DynamoDbIntegrationTests<Startup> _dbFixture;
         private readonly HealthCheckSteps _steps;
 
-        public HealthCheckTests(DynamoDbIntegrationTests<Startup> dbFixture)
+        public HealthCheckTests(MockWebApplicationFactory<Startup> appFactory)
         {
-            _dbFixture = dbFixture;
-            _steps = new HealthCheckSteps(_dbFixture.Client);
+            _steps = new HealthCheckSteps(appFactory.Client);
         }
 
         public void Dispose()

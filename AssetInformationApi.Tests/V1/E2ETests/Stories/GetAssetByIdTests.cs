@@ -1,5 +1,6 @@
 using AssetInformationApi.Tests.V1.E2ETests.Fixtures;
 using AssetInformationApi.Tests.V1.E2ETests.Steps;
+using Hackney.Core.Testing.DynamoDb;
 using System;
 using TestStack.BDDfy;
 using Xunit;
@@ -13,15 +14,15 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
     [Collection("DynamoDb collection")]
     public class GetAssetByIdTests : IDisposable
     {
-        private readonly DynamoDbIntegrationTests<Startup> _dbFixture;
+        private readonly IDynamoDbFixture _dbFixture;
         private readonly GetAssetByIdSteps _steps;
         private readonly AssetsFixture _assetsFixture;
 
-        public GetAssetByIdTests(DynamoDbIntegrationTests<Startup> dbFixture)
+        public GetAssetByIdTests(MockWebApplicationFactory<Startup> appFactory)
         {
-            _dbFixture = dbFixture;
-            _assetsFixture = new AssetsFixture(_dbFixture.DynamoDbContext);
-            _steps = new GetAssetByIdSteps(_dbFixture.Client);
+            _dbFixture = appFactory.DynamoDbFixture;
+            _assetsFixture = new AssetsFixture(_dbFixture);
+            _steps = new GetAssetByIdSteps(appFactory.Client);
         }
 
         public void Dispose()
