@@ -11,7 +11,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         AsA = "Service",
         IWant = "an endpoint to return asset details",
         SoThat = "it is possible to view the details of an asset.")]
-    [Collection("DynamoDb collection")]
+    [Collection("AppTest collection")]
     public class GetAssetByIdTests : IDisposable
     {
         private readonly IDynamoDbFixture _dbFixture;
