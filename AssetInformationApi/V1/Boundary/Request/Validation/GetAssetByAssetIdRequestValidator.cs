@@ -1,4 +1,6 @@
 using FluentValidation;
+using Hackney.Core.Validation;
+using Hackney.Shared.Tenure.Boundary.Requests.Validation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +15,9 @@ namespace AssetInformationApi.V1.Boundary.Request.Validation
             RuleFor(x => x.AssetId)
                 .NotNull()
                 .NotEmpty();
+
+            RuleFor(x => x.AssetId).NotXssString()
+                .WithErrorCode(ErrorCodes.XssCheckFailure);
         }
     }
 }

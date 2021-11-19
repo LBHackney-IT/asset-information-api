@@ -23,7 +23,9 @@ namespace AssetInformationApi.V1.UseCase
         [LogCall]
         public async Task<AssetResponseObject> ExecuteAsync(GetAssetByAssetIdRequest query)
         {
-            return (await _gateway.GetAssetByAssetId(query).ConfigureAwait(false)).ToResponse();
+            var asset = await _gateway.GetAssetByAssetId(query).ConfigureAwait(false);
+
+            return asset?.ToResponse();
         }
     }
 }

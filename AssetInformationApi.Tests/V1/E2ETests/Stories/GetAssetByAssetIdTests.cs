@@ -63,5 +63,16 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
                 .Then(t => _steps.ThenTheAssetDetailsAreReturned(_assetsFixture.Asset))
                 .BDDfy();
         }
+
+        [Fact]
+        public void ServiceReturnsBadRequestWhenAssetIdContainsTags()
+        {
+            var stringWithTags = "Some string with <tag> in it.";
+
+            this.Given(g => _assetsFixture.GivenAnAssetThatDoesntExist())
+                .When(w => _steps.WhenTheGetApiIsCalled(stringWithTags))
+                .Then(t => _steps.ThenBadRequestIsReturned())
+                .BDDfy();
+        }
     }
 }

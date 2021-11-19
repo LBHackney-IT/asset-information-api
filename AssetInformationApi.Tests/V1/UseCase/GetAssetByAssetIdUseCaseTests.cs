@@ -26,8 +26,9 @@ namespace AssetInformationApi.Tests.V1.UseCase
             _classUnderTest = new GetAssetByAssetIdUseCase(_mockGateway.Object);
         }
 
+
         [Fact]
-        public async Task WhenCalledCallsGateway()
+        public async Task WhenResponseIsNullReturnsNull()
         {
             // Arrange
             var query = new GetAssetByAssetIdRequest
@@ -35,11 +36,39 @@ namespace AssetInformationApi.Tests.V1.UseCase
                 AssetId = _fixture.Create<string>()
             };
 
+            Asset gatewayResponse = null;
+
+            _mockGateway
+                .Setup(x => x.GetAssetByAssetId(It.IsAny<GetAssetByAssetIdRequest>()))
+                .ReturnsAsync(gatewayResponse);
+
             // Act
-            await _classUnderTest.ExecuteAsync(query).ConfigureAwait(false);
+            var response = await _classUnderTest.ExecuteAsync(query).ConfigureAwait(false);
 
             // Assert
-            _mockGateway.Verify(x => x.GetAssetByAssetId(query), Times.Once);
+            response.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task WhenEntityReturnedReturnsResponseObject()
+        {
+            // Arrange
+            Asset gatewayResponse = _fixture.Create<Asset>();
+
+            _mockGateway
+                .Setup(x => x.GetAssetByAssetId(It.IsAny<GetAssetByAssetIdRequest>()))
+                .ReturnsAsync(gatewayResponse);
+
+            var query = new GetAssetByAssetIdRequest
+            {
+                AssetId = gatewayResponse.AssetId
+            };
+
+            // Act
+            var response = await _classUnderTest.ExecuteAsync(query).ConfigureAwait(false);
+
+            // Assert
+            response.Should().BeEquivalentTo(gatewayResponse.ToResponse());
         }
     }
 }
