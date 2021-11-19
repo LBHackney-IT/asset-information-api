@@ -29,6 +29,14 @@ resource "aws_dynamodb_table" "assetinformationapi_dynamodb_table" {
     projection_type = "ALL"
   }
 
+  global_secondary_index {
+    name            = "AssetId"
+    hash_key        = "assetId"
+    write_capacity  = 0
+    read_capacity   = 10
+    projection_type = "ALL"
+  }
+
   tags = merge(
     local.default_tags,
     { BackupPolicy = "Stg" }
