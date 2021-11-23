@@ -8,5 +8,6 @@ namespace AssetInformationApi.V1.Gateways
     public interface IAssetGateway
     {
         Task<Asset> GetAssetByIdAsync(GetAssetByIdRequest query);
+        Task<Asset> GetAssetByAssetId(GetAssetByAssetIdRequest query);
     }
 }

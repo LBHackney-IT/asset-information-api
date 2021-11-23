@@ -33,6 +33,16 @@ namespace AssetInformationApi.Tests
                         }),
                         Projection = new Projection { ProjectionType = ProjectionType.ALL },
                         ProvisionedThroughput = new ProvisionedThroughput(10 , 10)
+                    },
+                    new GlobalSecondaryIndex
+                    {
+                        IndexName = "AssetId",
+                        KeySchema = new List<KeySchemaElement>(new[]
+                        {
+                            new KeySchemaElement("assetId", KeyType.HASH)
+                        }),
+                        Projection = new Projection { ProjectionType = ProjectionType.ALL },
+                        ProvisionedThroughput = new ProvisionedThroughput(10 , 10)
                     }
                 })
             }
