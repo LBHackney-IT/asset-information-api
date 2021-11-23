@@ -16,9 +16,14 @@ namespace AssetInformationApi.V1.Controllers
     public class AssetInformationApiController : BaseController
     {
         private readonly IGetAssetByIdUseCase _getAssetByIdUseCase;
-        public AssetInformationApiController(IGetAssetByIdUseCase getAssetByIdUseCase)
+        private readonly IGetAssetByAssetIdUseCase _getAssetByAssetIdUseCase;
+
+        public AssetInformationApiController(
+            IGetAssetByIdUseCase getAssetByIdUseCase,
+            IGetAssetByAssetIdUseCase getAssetByAssetIdUseCase)
         {
             _getAssetByIdUseCase = getAssetByIdUseCase;
+            _getAssetByAssetIdUseCase = getAssetByAssetIdUseCase;
         }
 
         /// <summary>
@@ -38,6 +43,27 @@ namespace AssetInformationApi.V1.Controllers
         {
             var result = await _getAssetByIdUseCase.ExecuteAsync(query).ConfigureAwait(false);
             if (result == null) return NotFound(query.Id);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Retrieves the asset with the supplied assetId. Endpoint intended for RepairsAPI
+        /// </summary>
+        /// <response code="200">Successfully retrieved details for the specified AssetId</response>
+        /// <response code="404">No tenure information found for the specified AssetId</response>
+        /// <response code="500">Internal server error</response>
+        [ProducesResponseType(typeof(AssetResponseObject), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpGet]
+        [Route("assetId/{assetId}")]
+        [LogCall(LogLevel.Information)]
+        public async Task<IActionResult> GetAssetByAssetId([FromRoute] GetAssetByAssetIdRequest query)
+        {
+            var result = await _getAssetByAssetIdUseCase.ExecuteAsync(query).ConfigureAwait(false);
+            if (result == null) return NotFound(query.AssetId);
+
             return Ok(result);
         }
     }

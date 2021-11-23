@@ -17,12 +17,17 @@ namespace AssetInformationApi.Tests.V1.Controllers
     {
         private readonly AssetInformationApiController _classUnderTest;
         private readonly Mock<IGetAssetByIdUseCase> _mockGetAssetByIdUseCase;
+        private readonly Mock<IGetAssetByAssetIdUseCase> _mockGetAssetByAssetIdUseCase;
         private readonly Fixture _fixture = new Fixture();
 
         public AssetInformationApiControllerTests()
         {
             _mockGetAssetByIdUseCase = new Mock<IGetAssetByIdUseCase>();
-            _classUnderTest = new AssetInformationApiController(_mockGetAssetByIdUseCase.Object);
+            _mockGetAssetByAssetIdUseCase = new Mock<IGetAssetByAssetIdUseCase>();
+
+            _classUnderTest = new AssetInformationApiController(
+                _mockGetAssetByIdUseCase.Object,
+                _mockGetAssetByAssetIdUseCase.Object);
         }
 
         private static GetAssetByIdRequest ConstructRequest(Guid? id = null)
@@ -51,6 +56,48 @@ namespace AssetInformationApi.Tests.V1.Controllers
             var response = await _classUnderTest.GetAssetById(request).ConfigureAwait(false);
             response.Should().BeOfType(typeof(OkObjectResult));
             (response as OkObjectResult).Value.Should().Be(tenureResponse);
+        }
+
+        [Fact]
+        public async Task GetAssetByAssetIdWhenEntityDoesntExistReturns404()
+        {
+            // Arrange
+            var query = new GetAssetByAssetIdRequest
+            {
+                AssetId = _fixture.Create<string>()
+            };
+
+            // Act
+            var response = await _classUnderTest.GetAssetByAssetId(query).ConfigureAwait(false);
+
+            // Assert
+            response.Should().BeOfType(typeof(NotFoundObjectResult));
+            (response as NotFoundObjectResult).Value.Should().Be(query.AssetId);
+        }
+
+        [Fact]
+        public async Task GetAssetByAssetIdWhenEntityExistsReturnsEntity()
+        {
+            // Arrange
+            var useCaseResponse = _fixture.Create<AssetResponseObject>();
+
+            _mockGetAssetByAssetIdUseCase
+                .Setup(x => x.ExecuteAsync(It.IsAny<GetAssetByAssetIdRequest>()))
+                .ReturnsAsync(useCaseResponse);
+
+            var query = new GetAssetByAssetIdRequest
+            {
+                AssetId = useCaseResponse.AssetId
+            };
+
+            // Act
+            var response = await _classUnderTest.GetAssetByAssetId(query).ConfigureAwait(false);
+
+            // Assert
+            response.Should().BeOfType(typeof(OkObjectResult));
+            (response as OkObjectResult).Value.Should().BeOfType(typeof(AssetResponseObject));
+
+            ((response as OkObjectResult).Value as AssetResponseObject).Should().BeEquivalentTo(useCaseResponse);
         }
     }
 }

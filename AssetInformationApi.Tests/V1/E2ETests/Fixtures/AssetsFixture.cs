@@ -12,6 +12,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
 
         public AssetDb Asset { get; private set; }
         public Guid AssetId { get; private set; }
+        public string PropertyReference { get; set; }
         public string InvalidAssetId { get; private set; }
 
         public AssetsFixture(IDynamoDbFixture dbFixture)
@@ -44,6 +45,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
                 .Create();
 
             AssetId = Asset.Id;
+            PropertyReference = Asset.AssetId;
 
             _dbFixture.DynamoDbContext.SaveAsync(Asset).GetAwaiter().GetResult();
         }
@@ -51,6 +53,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
         public void GivenAnAssetThatDoesntExist()
         {
             AssetId = Guid.NewGuid();
+            PropertyReference = _fixture.Create<string>();
         }
 
         public void GivenAnInvalidAssetId()

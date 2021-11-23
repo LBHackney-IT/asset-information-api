@@ -4,6 +4,7 @@ using AutoFixture;
 using FluentAssertions;
 using Hackney.Core.Testing.DynamoDb;
 using Hackney.Core.Testing.Shared;
+using Hackney.Shared.Asset.Factories;
 using Hackney.Shared.Asset.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -80,6 +81,47 @@ namespace AssetInformationApi.Tests.V1.Gateways
 
             response.Should().BeEquivalentTo(entity);
             _logger.VerifyExact(LogLevel.Debug, $"Calling IDynamoDBContext.LoadAsync for id {request.Id}", Times.Once());
+        }
+
+        [Fact]
+        public async Task GetAssetByAssetIdWhenEntityDoesntExistReturnsNull()
+        {
+            // Arrange
+            var query = new GetAssetByAssetIdRequest
+            {
+                AssetId = _fixture.Create<string>()
+            };
+
+            // Act
+            var response = await _classUnderTest.GetAssetByAssetId(query).ConfigureAwait(false);
+
+            // Assert
+            response.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task GetAssetByAssetIdWhenEntityExistsReturnsEntity()
+        {
+            // Arrange
+            var entity = _fixture.Build<AssetDb>()
+                .With(x => x.VersionNumber, (int?) null)
+                .Create();
+
+            await InsertDataIntoDynamoDB(entity).ConfigureAwait(false);
+
+            var query = new GetAssetByAssetIdRequest
+            {
+                AssetId = entity.AssetId
+            };
+
+            // Act
+            var response = await _classUnderTest.GetAssetByAssetId(query).ConfigureAwait(false);
+
+            // Assert
+            response.Should().NotBeNull();
+            response.Should().BeEquivalentTo(entity.ToDomain());
+
+            _logger.VerifyExact(LogLevel.Debug, $"Calling IDynamoDBContext.QueryAsync for AssetId {query.AssetId}", Times.Once());
         }
     }
 }
