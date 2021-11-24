@@ -1,9 +1,7 @@
 using AssetInformationApi.Tests.V1.E2ETests.Fixtures;
 using AssetInformationApi.Tests.V1.E2ETests.Steps;
+using Hackney.Core.Testing.DynamoDb;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using TestStack.BDDfy;
 using Xunit;
 
@@ -13,18 +11,18 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         AsA = "Service",
         IWant = "an endpoint to return asset details",
         SoThat = "it is possible to view the details of an asset.")]
-    [Collection("DynamoDb collection")]
+    [Collection("AppTest collection")]
     public class GetAssetByAssetIdTests : IDisposable
     {
-        private readonly DynamoDbIntegrationTests<Startup> _dbFixture;
+        private readonly IDynamoDbFixture _dbFixture;
         private readonly GetAssetByAssetIdSteps _steps;
         private readonly AssetsFixture _assetsFixture;
 
-        public GetAssetByAssetIdTests(DynamoDbIntegrationTests<Startup> dbFixture)
+        public GetAssetByAssetIdTests(MockWebApplicationFactory<Startup> appFactory)
         {
-            _dbFixture = dbFixture;
-            _assetsFixture = new AssetsFixture(_dbFixture.DynamoDbContext);
-            _steps = new GetAssetByAssetIdSteps(_dbFixture.Client);
+            _dbFixture = appFactory.DynamoDbFixture;
+            _assetsFixture = new AssetsFixture(_dbFixture);
+            _steps = new GetAssetByAssetIdSteps(appFactory.Client);
         }
 
         public void Dispose()

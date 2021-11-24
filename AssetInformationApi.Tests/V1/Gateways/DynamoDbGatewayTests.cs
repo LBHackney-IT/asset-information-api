@@ -1,34 +1,32 @@
-using Amazon.DynamoDBv2.DataModel;
 using AssetInformationApi.V1.Boundary.Request;
 using AssetInformationApi.V1.Gateways;
 using AutoFixture;
 using FluentAssertions;
-using Hackney.Shared.Asset.Domain;
+using Hackney.Core.Testing.DynamoDb;
+using Hackney.Core.Testing.Shared;
 using Hackney.Shared.Asset.Factories;
 using Hackney.Shared.Asset.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace AssetInformationApi.Tests.V1.Gateways
 {
-    [Collection("DynamoDb collection")]
+    [Collection("AppTest collection")]
     public class DynamoDbGatewayTests : IDisposable
     {
         private readonly Fixture _fixture = new Fixture();
-        private readonly IDynamoDBContext _dynamoDb;
+        private readonly IDynamoDbFixture _dbFixture;
         private readonly Mock<ILogger<DynamoDbGateway>> _logger;
         private readonly DynamoDbGateway _classUnderTest;
-        private readonly List<Action> _cleanup = new List<Action>();
 
-        public DynamoDbGatewayTests(DynamoDbIntegrationTests<Startup> dbTestFixture)
+        public DynamoDbGatewayTests(MockWebApplicationFactory<Startup> appFactory)
         {
-            _dynamoDb = dbTestFixture.DynamoDbContext;
+            _dbFixture = appFactory.DynamoDbFixture;
             _logger = new Mock<ILogger<DynamoDbGateway>>();
-            _classUnderTest = new DynamoDbGateway(_dynamoDb, _logger.Object);
+            _classUnderTest = new DynamoDbGateway(_dbFixture.DynamoDbContext, _logger.Object);
         }
 
         public void Dispose()
@@ -42,9 +40,6 @@ namespace AssetInformationApi.Tests.V1.Gateways
         {
             if (disposing && !_disposed)
             {
-                foreach (var action in _cleanup)
-                    action();
-
                 _disposed = true;
             }
         }
@@ -56,8 +51,7 @@ namespace AssetInformationApi.Tests.V1.Gateways
 
         private async Task InsertDataIntoDynamoDB(AssetDb entity)
         {
-            await _dynamoDb.SaveAsync(entity).ConfigureAwait(false);
-            _cleanup.Add(async () => await _dynamoDb.DeleteAsync(entity).ConfigureAwait(false));
+            await _dbFixture.SaveEntityAsync(entity).ConfigureAwait(false);
         }
 
         [Fact]

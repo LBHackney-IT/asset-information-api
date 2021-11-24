@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Hackney.Core.Testing.Shared.E2E;
 using Hackney.Shared.Asset.Boundary.Response;
 using Hackney.Shared.Asset.Factories;
 using Hackney.Shared.Asset.Infrastructure;
