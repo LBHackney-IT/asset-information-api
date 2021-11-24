@@ -37,7 +37,7 @@ resource "aws_dynamodb_table" "assetinformationapi_dynamodb_table" {
   global_secondary_index {
     name            = "AssetId"
     hash_key        = "assetId"
-    write_capacity  = 0
+    write_capacity  = 10
     read_capacity   = 10
     projection_type = "ALL"
   }
