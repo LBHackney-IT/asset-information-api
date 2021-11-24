@@ -20,6 +20,11 @@ resource "aws_dynamodb_table" "assetinformationapi_dynamodb_table" {
     type = "S"
   }
 
+  attribute {
+    name = "assetId"
+    type = "S"
+  }
+
   global_secondary_index {
     name            = "AssetParentsAndChilds"
     hash_key        = "rootAsset"
