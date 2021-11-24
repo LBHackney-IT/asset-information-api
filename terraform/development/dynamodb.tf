@@ -40,11 +40,11 @@ resource "aws_dynamodb_table" "assetinformationapi_dynamodb_table" {
     write_capacity  = 10
     read_capacity   = 10
     projection_type = "ALL"
+  }
 
-    timeouts {
-      create = "60m"
-      update = "60m"
-    }
+  timeouts {
+    create = "60m"
+    update = "60m"
   }
 
   tags = merge(
