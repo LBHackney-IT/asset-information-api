@@ -1,3 +1,6 @@
+using AssetInformationApi.V1.Boundary.Response;
+using AssetInformationApi.V1.Factories;
+using AssetInformationApi.V1.Infrastructure;
 using FluentAssertions;
 using Hackney.Core.Testing.Shared.E2E;
 using Hackney.Shared.Asset.Boundary.Response;

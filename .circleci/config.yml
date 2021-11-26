@@ -184,7 +184,7 @@ workflows:
             branches:
               only: master
   check-and-deploy-staging-and-production:
-    jobs:
+      jobs:
       - check-code-formatting:
           filters:
             branches:
@@ -196,10 +196,10 @@ workflows:
       - assume-role-staging:
           context: api-assume-role-housing-staging-context
           requires:
-            - build-and-test
+              - build-and-test
           filters:
-            branches:
-              only: release
+             branches:
+               only: release
       - terraform-init-and-apply-to-staging:
           requires:
             - assume-role-staging
@@ -219,10 +219,10 @@ workflows:
       - assume-role-production:
           context: api-assume-role-housing-production-context
           requires:
-            - permit-production-terraform-release
+              - permit-production-terraform-release
           filters:
-            branches:
-              only: release
+             branches:
+               only: release
       - terraform-init-and-apply-to-production:
           requires:
             - assume-role-production
