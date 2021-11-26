@@ -1,5 +1,5 @@
 using AssetInformationApi.V1.Boundary.Request;
-using Hackney.Shared.Asset.Boundary.Response;
+using AssetInformationApi.V1.Boundary.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;

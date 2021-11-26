@@ -1,8 +1,8 @@
 using Amazon.DynamoDBv2.DataModel;
 using AssetInformationApi.V1.Boundary.Request;
-using AssetInformationApi.V1.Domain;
 using AssetInformationApi.V1.Factories;
 using AssetInformationApi.V1.Infrastructure;
+using AssetInformationApi.V1.Domain;
 using Hackney.Core.Logging;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
