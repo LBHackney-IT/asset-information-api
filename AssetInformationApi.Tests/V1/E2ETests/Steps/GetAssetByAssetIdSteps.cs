@@ -11,14 +11,14 @@ using System.Threading.Tasks;
 
 namespace AssetInformationApi.Tests.V1.E2ETests.Steps
 {
-    public class GetAssetByIdSteps : BaseSteps
+    public class GetAssetByAssetIdSteps : BaseSteps
     {
-        public GetAssetByIdSteps(HttpClient httpClient) : base(httpClient)
+        public GetAssetByAssetIdSteps(HttpClient httpClient) : base(httpClient)
         { }
 
         public async Task WhenTheGetApiIsCalled(string id)
         {
-            var route = $"api/v1/assets/{id}";
+            var route = $"api/v1/assets/assetId/{id}";
             var uri = new Uri(route, UriKind.Relative);
             _lastResponse = await _httpClient.GetAsync(uri).ConfigureAwait(false);
         }

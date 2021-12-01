@@ -1,5 +1,6 @@
-using Amazon.DynamoDBv2.DataModel;
+using Hackney.Core.Testing.DynamoDb;
 using AssetInformationApi.V1.Infrastructure;
+using Amazon.DynamoDBv2.DataModel;
 using AutoFixture;
 using System;
 
@@ -8,15 +9,16 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
     public class AssetsFixture : IDisposable
     {
         private readonly Fixture _fixture = new Fixture();
-        private readonly IDynamoDBContext _dbContext;
+        private readonly IDynamoDbFixture _dbFixture;
 
         public AssetDb Asset { get; private set; }
         public Guid AssetId { get; private set; }
+        public string PropertyReference { get; set; }
         public string InvalidAssetId { get; private set; }
 
-        public AssetsFixture(IDynamoDBContext dbContext)
+        public AssetsFixture(IDynamoDbFixture dbFixture)
         {
-            _dbContext = dbContext;
+            _dbFixture = dbFixture;
         }
 
         public void Dispose()
@@ -31,7 +33,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
             if (disposing && !_disposed)
             {
                 if (Asset != null)
-                    _dbContext.DeleteAsync(Asset).GetAwaiter().GetResult();
+                    _dbFixture.DynamoDbContext.DeleteAsync(Asset).GetAwaiter().GetResult();
 
                 _disposed = true;
             }
@@ -41,12 +43,15 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
         {
             Asset = _fixture.Create<AssetDb>();
             AssetId = Asset.Id;
-            _dbContext.SaveAsync(Asset).GetAwaiter().GetResult();
+            PropertyReference = Asset.AssetId;
+
+            _dbFixture.DynamoDbContext.SaveAsync(Asset).GetAwaiter().GetResult();
         }
 
         public void GivenAnAssetThatDoesntExist()
         {
             AssetId = Guid.NewGuid();
+            PropertyReference = _fixture.Create<string>();
         }
 
         public void GivenAnInvalidAssetId()

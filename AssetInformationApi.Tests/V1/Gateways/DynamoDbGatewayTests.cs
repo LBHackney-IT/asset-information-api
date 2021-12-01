@@ -1,34 +1,33 @@
-using Amazon.DynamoDBv2.DataModel;
-using AssetInformationApi.V1.Boundary.Request;
 using AssetInformationApi.V1.Domain;
 using AssetInformationApi.V1.Factories;
-using AssetInformationApi.V1.Gateways;
-using AssetInformationApi.V1.Infrastructure;
 using AutoFixture;
 using FluentAssertions;
+using Hackney.Core.Testing.DynamoDb;
+using Hackney.Core.Testing.Shared;
+using AssetInformationApi.V1.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
+using AssetInformationApi.V1.Boundary.Request;
+using AssetInformationApi.V1.Gateways;
 
 namespace AssetInformationApi.Tests.V1.Gateways
 {
-    [Collection("DynamoDb collection")]
+    [Collection("AppTest collection")]
     public class DynamoDbGatewayTests : IDisposable
     {
         private readonly Fixture _fixture = new Fixture();
-        private readonly IDynamoDBContext _dynamoDb;
+        private readonly IDynamoDbFixture _dbFixture;
         private readonly Mock<ILogger<DynamoDbGateway>> _logger;
         private readonly DynamoDbGateway _classUnderTest;
-        private readonly List<Action> _cleanup = new List<Action>();
 
-        public DynamoDbGatewayTests(DynamoDbIntegrationTests<Startup> dbTestFixture)
+        public DynamoDbGatewayTests(MockWebApplicationFactory<Startup> appFactory)
         {
-            _dynamoDb = dbTestFixture.DynamoDbContext;
+            _dbFixture = appFactory.DynamoDbFixture;
             _logger = new Mock<ILogger<DynamoDbGateway>>();
-            _classUnderTest = new DynamoDbGateway(_dynamoDb, _logger.Object);
+            _classUnderTest = new DynamoDbGateway(_dbFixture.DynamoDbContext, _logger.Object);
         }
 
         public void Dispose()
@@ -42,9 +41,6 @@ namespace AssetInformationApi.Tests.V1.Gateways
         {
             if (disposing && !_disposed)
             {
-                foreach (var action in _cleanup)
-                    action();
-
                 _disposed = true;
             }
         }
@@ -56,8 +52,7 @@ namespace AssetInformationApi.Tests.V1.Gateways
 
         private async Task InsertDataIntoDynamoDB(AssetDb entity)
         {
-            await _dynamoDb.SaveAsync(entity).ConfigureAwait(false);
-            _cleanup.Add(async () => await _dynamoDb.DeleteAsync(entity).ConfigureAwait(false));
+            await _dbFixture.SaveEntityAsync(entity).ConfigureAwait(false);
         }
 
         [Fact]
@@ -84,6 +79,45 @@ namespace AssetInformationApi.Tests.V1.Gateways
 
             response.Should().BeEquivalentTo(entity);
             _logger.VerifyExact(LogLevel.Debug, $"Calling IDynamoDBContext.LoadAsync for id {request.Id}", Times.Once());
+        }
+
+        [Fact]
+        public async Task GetAssetByAssetIdWhenEntityDoesntExistReturnsNull()
+        {
+            // Arrange
+            var query = new GetAssetByAssetIdRequest
+            {
+                AssetId = _fixture.Create<string>()
+            };
+
+            // Act
+            var response = await _classUnderTest.GetAssetByAssetId(query).ConfigureAwait(false);
+
+            // Assert
+            response.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task GetAssetByAssetIdWhenEntityExistsReturnsEntity()
+        {
+            // Arrange
+            var entity = _fixture.Create<AssetDb>();
+
+            await InsertDataIntoDynamoDB(entity).ConfigureAwait(false);
+
+            var query = new GetAssetByAssetIdRequest
+            {
+                AssetId = entity.AssetId
+            };
+
+            // Act
+            var response = await _classUnderTest.GetAssetByAssetId(query).ConfigureAwait(false);
+
+            // Assert
+            response.Should().NotBeNull();
+            response.Should().BeEquivalentTo(entity.ToDomain());
+
+            _logger.VerifyExact(LogLevel.Debug, $"Calling IDynamoDBContext.QueryAsync for AssetId {query.AssetId}", Times.Once());
         }
     }
 }

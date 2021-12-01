@@ -20,6 +20,11 @@ resource "aws_dynamodb_table" "assetinformationapi_dynamodb_table" {
     type = "S"
   }
 
+  attribute {
+    name = "assetId"
+    type = "S"
+  }
+
   global_secondary_index {
     name            = "AssetParentsAndChilds"
     hash_key        = "rootAsset"
@@ -27,6 +32,19 @@ resource "aws_dynamodb_table" "assetinformationapi_dynamodb_table" {
     write_capacity  = 10
     read_capacity   = 10
     projection_type = "ALL"
+  }
+
+  global_secondary_index {
+    name            = "AssetId"
+    hash_key        = "assetId"
+    write_capacity  = 10
+    read_capacity   = 10
+    projection_type = "ALL"
+  }
+
+  timeouts {
+    create = "60m"
+    update = "60m"
   }
 
   tags = merge(
