@@ -196,7 +196,9 @@ workflows:
             branches:
               only: release
       - build-and-test:
-          context: api-nuget-token-context
+          context: 
+              - api-nuget-token-context
+              - SonarCloud
           filters:
             branches:
               only: release
