@@ -8,7 +8,6 @@ provider:
     apiGateway: true
   vpc: ${self:custom.vpc.${opt:stage}}
   stage: ${opt:stage}
-  account: ${opt:account}
   region: eu-west-2
 
 package:
@@ -28,7 +27,7 @@ functions:
             type: request
             resultTtlInSeconds: 0
             identitySource: method.request.header.Authorization
-            managedExternally: true       
+            managedExternally: true
           cors:
             origin: '*'
             headers:
