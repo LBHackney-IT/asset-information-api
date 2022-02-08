@@ -130,7 +130,7 @@ resources:
                           - 'table/Assets/index/*'
 custom:
   associateWaf:
-    name: ReferenceApiWafAcl
+    name: AssetInformationApiWafAcl
     version: V2
   vpc:
     development:
