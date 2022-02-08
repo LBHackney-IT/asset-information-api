@@ -130,7 +130,7 @@ resources:
                           - 'table/Assets/index/*'
 custom:
   associateWaf:
-    name: AssetInformationApiWafAcl
+    name: Platform_APIs_Web_ACL
     version: V2
   vpc:
     development:
