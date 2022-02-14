@@ -12,6 +12,7 @@ provider:
 
 plugins:
   - serverless-associate-waf
+  - '@serverless/safeguards-plugin'
 
 package:
   artifact: ./bin/release/netcoreapp3.1/asset-information-api.zip
@@ -129,6 +130,10 @@ resources:
                           - Ref: 'AWS::AccountId'
                           - 'table/Assets/index/*'
 custom:
+  safeguards:
+    - title: Require authorizer
+      safeguard: require-authorizer
+      path: ./policies
   associateWaf:
     name: Platform_APIs_Web_ACL
     version: V2
