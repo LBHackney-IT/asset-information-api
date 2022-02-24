@@ -1,13 +1,13 @@
 using FluentAssertions;
 using Hackney.Core.Testing.Shared.E2E;
-using AssetInformationApi.V1.Boundary.Response;
-using AssetInformationApi.V1.Factories;
-using AssetInformationApi.V1.Infrastructure;
 using System;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Hackney.Shared.Asset.Boundary.Response;
+using Hackney.Shared.Asset.Factories;
+using Hackney.Shared.Asset.Infrastructure;
 
 namespace AssetInformationApi.Tests.V1.E2ETests.Steps
 {

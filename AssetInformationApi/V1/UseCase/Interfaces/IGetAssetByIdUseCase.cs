@@ -1,6 +1,6 @@
 using AssetInformationApi.V1.Boundary.Request;
-using AssetInformationApi.V1.Boundary.Response;
 using System.Threading.Tasks;
+using Hackney.Shared.Asset.Boundary.Response;
 
 namespace AssetInformationApi.V1.UseCase.Interfaces
 {
