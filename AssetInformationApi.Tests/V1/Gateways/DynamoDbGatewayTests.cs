@@ -68,11 +68,14 @@ namespace AssetInformationApi.Tests.V1.Gateways
         [Fact]
         public async Task GetAssetByIdReturnsTheEntityIfItExists()
         {
-            var entity = _fixture.Create<Asset>();
+            var entity = _fixture.Build<AssetDb>()
+                .With(x => x.VersionNumber, (int?) null)
+                .Create();
+
             entity.Tenure.StartOfTenureDate = DateTime.UtcNow;
             entity.Tenure.EndOfTenureDate = DateTime.UtcNow;
 
-            await InsertDataIntoDynamoDB(entity.ToDatabase()).ConfigureAwait(false);
+            await InsertDataIntoDynamoDB(entity).ConfigureAwait(false);
 
             var request = ConstructRequest(entity.Id);
             var response = await _classUnderTest.GetAssetByIdAsync(request).ConfigureAwait(false);
@@ -101,7 +104,9 @@ namespace AssetInformationApi.Tests.V1.Gateways
         public async Task GetAssetByAssetIdWhenEntityExistsReturnsEntity()
         {
             // Arrange
-            var entity = _fixture.Create<AssetDb>();
+            var entity = _fixture.Build<AssetDb>()
+                .With(x => x.VersionNumber, (int?) null)
+                .Create();
 
             await InsertDataIntoDynamoDB(entity).ConfigureAwait(false);
 
