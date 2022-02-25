@@ -2,12 +2,9 @@ using AssetInformationApi.V1.Boundary.Request;
 using AssetInformationApi.V1.Gateways;
 using AssetInformationApi.V1.UseCase.Interfaces;
 using Hackney.Core.Logging;
+using System.Threading.Tasks;
 using Hackney.Shared.Asset.Boundary.Response;
 using Hackney.Shared.Asset.Factories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AssetInformationApi.V1.UseCase
 {

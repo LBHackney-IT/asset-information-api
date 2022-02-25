@@ -1,7 +1,7 @@
 using AutoFixture;
 using Hackney.Shared.Asset.Domain;
-using Hackney.Shared.Asset.Infrastructure;
 using Hackney.Shared.Asset.Factories;
+using Hackney.Shared.Asset.Infrastructure;
 
 namespace AssetInformationApi.Tests.V1.Helper
 {

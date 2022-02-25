@@ -1,16 +1,17 @@
-using AssetInformationApi.V1.Boundary.Request;
-using AssetInformationApi.V1.Gateways;
 using AutoFixture;
 using FluentAssertions;
 using Hackney.Core.Testing.DynamoDb;
 using Hackney.Core.Testing.Shared;
-using Hackney.Shared.Asset.Factories;
-using Hackney.Shared.Asset.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Threading.Tasks;
 using Xunit;
+using AssetInformationApi.V1.Boundary.Request;
+using AssetInformationApi.V1.Gateways;
+using Hackney.Shared.Asset.Domain;
+using Hackney.Shared.Asset.Factories;
+using Hackney.Shared.Asset.Infrastructure;
 
 namespace AssetInformationApi.Tests.V1.Gateways
 {

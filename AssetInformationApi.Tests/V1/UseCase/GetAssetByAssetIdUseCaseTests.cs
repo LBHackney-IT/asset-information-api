@@ -3,12 +3,10 @@ using AssetInformationApi.V1.Gateways;
 using AssetInformationApi.V1.UseCase;
 using AutoFixture;
 using FluentAssertions;
-using Hackney.Shared.Asset.Boundary.Response;
+using Moq;
+using System.Threading.Tasks;
 using Hackney.Shared.Asset.Domain;
 using Hackney.Shared.Asset.Factories;
-using Moq;
-using System;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace AssetInformationApi.Tests.V1.UseCase

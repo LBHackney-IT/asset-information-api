@@ -1,13 +1,14 @@
 using Amazon.DynamoDBv2.DataModel;
 using AssetInformationApi.V1.Boundary.Request;
+using AssetInformationApi.V1.Domain;
 using Hackney.Core.Logging;
-using Hackney.Shared.Asset.Domain;
-using Hackney.Shared.Asset.Factories;
-using Hackney.Shared.Asset.Infrastructure;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hackney.Shared.Asset.Domain;
+using Hackney.Shared.Asset.Factories;
+using Hackney.Shared.Asset.Infrastructure;
 
 namespace AssetInformationApi.V1.Gateways
 {
