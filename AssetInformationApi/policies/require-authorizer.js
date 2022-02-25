@@ -14,7 +14,7 @@ module.exports = function authorizerPolicy(policy, service) {
 
         functionConfig.events.forEach((eventConfig) => {
             if (!eventConfig.http) return;
-            if (!eventConfig.http.authorizer & !eventConfig.http.path=="/swagger/{proxy+}") {
+            if (!eventConfig.http.authorizer & eventConfig.http.path!="swagger/{proxy+}") {
                 failed = true;
                 policy.fail(
                     `Function "${functionName}" does not have an authorizer attached to it. `
