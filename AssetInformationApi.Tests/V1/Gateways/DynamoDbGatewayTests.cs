@@ -1,10 +1,7 @@
-using AssetInformationApi.V1.Domain;
-using AssetInformationApi.V1.Factories;
 using AutoFixture;
 using FluentAssertions;
 using Hackney.Core.Testing.DynamoDb;
 using Hackney.Core.Testing.Shared;
-using AssetInformationApi.V1.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
@@ -12,6 +9,9 @@ using System.Threading.Tasks;
 using Xunit;
 using AssetInformationApi.V1.Boundary.Request;
 using AssetInformationApi.V1.Gateways;
+using Hackney.Shared.Asset.Domain;
+using Hackney.Shared.Asset.Factories;
+using Hackney.Shared.Asset.Infrastructure;
 
 namespace AssetInformationApi.Tests.V1.Gateways
 {
@@ -68,11 +68,14 @@ namespace AssetInformationApi.Tests.V1.Gateways
         [Fact]
         public async Task GetAssetByIdReturnsTheEntityIfItExists()
         {
-            var entity = _fixture.Create<Asset>();
+            var entity = _fixture.Build<AssetDb>()
+                .With(x => x.VersionNumber, (int?) null)
+                .Create();
+
             entity.Tenure.StartOfTenureDate = DateTime.UtcNow;
             entity.Tenure.EndOfTenureDate = DateTime.UtcNow;
 
-            await InsertDataIntoDynamoDB(entity.ToDatabase()).ConfigureAwait(false);
+            await InsertDataIntoDynamoDB(entity).ConfigureAwait(false);
 
             var request = ConstructRequest(entity.Id);
             var response = await _classUnderTest.GetAssetByIdAsync(request).ConfigureAwait(false);
@@ -101,7 +104,9 @@ namespace AssetInformationApi.Tests.V1.Gateways
         public async Task GetAssetByAssetIdWhenEntityExistsReturnsEntity()
         {
             // Arrange
-            var entity = _fixture.Create<AssetDb>();
+            var entity = _fixture.Build<AssetDb>()
+                .With(x => x.VersionNumber, (int?) null)
+                .Create();
 
             await InsertDataIntoDynamoDB(entity).ConfigureAwait(false);
 

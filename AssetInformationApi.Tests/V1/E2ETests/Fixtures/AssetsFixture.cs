@@ -1,8 +1,7 @@
 using Hackney.Core.Testing.DynamoDb;
-using AssetInformationApi.V1.Infrastructure;
-using Amazon.DynamoDBv2.DataModel;
 using AutoFixture;
 using System;
+using Hackney.Shared.Asset.Infrastructure;
 
 namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
 {
@@ -41,7 +40,10 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
 
         public void GivenAnAssetAlreadyExists()
         {
-            Asset = _fixture.Create<AssetDb>();
+            Asset = _fixture.Build<AssetDb>()
+                .With(x => x.VersionNumber, (int?) null)
+                .Create();
+
             AssetId = Asset.Id;
             PropertyReference = Asset.AssetId;
 

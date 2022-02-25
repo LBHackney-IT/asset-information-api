@@ -2,7 +2,6 @@ using Amazon;
 using Amazon.XRay.Recorder.Core;
 using Amazon.XRay.Recorder.Handlers.AwsSdk;
 using AssetInformationApi.V1.Gateways;
-using AssetInformationApi.V1.Infrastructure;
 using AssetInformationApi.V1.UseCase;
 using AssetInformationApi.V1.UseCase.Interfaces;
 using AssetInformationApi.Versioning;
@@ -34,6 +33,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
+using Hackney.Shared.Asset.Infrastructure;
 
 namespace AssetInformationApi
 {
