@@ -33,6 +33,8 @@ RUN dotnet restore ./AssetInformationApi.Tests/AssetInformationApi.Tests.csproj
 # Copy everything else and build
 COPY . .
 
+RUN dotnet build -c Release -o out AssetInformationApi/AssetInformationApi.csproj
 RUN dotnet build -c debug -o out AssetInformationApi.Tests/AssetInformationApi.Tests.csproj
 
 CMD dotnet test
+RUN dotnet sonarscanner end /d:sonar.login="${SONAR_TOKEN}"
