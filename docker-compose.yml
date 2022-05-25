@@ -4,8 +4,8 @@ services:
   asset-information-api:
     image: asset-information-api
     build:
-      context: AssetInformationApi/
-      dockerfile: ./Dockerfile
+      context: .
+      dockerfile: AssetInformationApi/Dockerfile
       args:
         - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
     ports:
@@ -39,5 +39,6 @@ services:
 
   dynamodb-database:
     image: amazon/dynamodb-local
+    command: "-jar DynamoDBLocal.jar -sharedDb"
     ports:
       - 8000:8000

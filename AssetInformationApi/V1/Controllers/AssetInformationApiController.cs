@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Hackney.Shared.Asset.Boundary.Response;
+using Hackney.Shared.Asset.Domain;
 
 namespace AssetInformationApi.V1.Controllers
 {
@@ -17,13 +18,16 @@ namespace AssetInformationApi.V1.Controllers
     {
         private readonly IGetAssetByIdUseCase _getAssetByIdUseCase;
         private readonly IGetAssetByAssetIdUseCase _getAssetByAssetIdUseCase;
+        private readonly ISaveAssetUseCase _saveAssetUseCase;
+
 
         public AssetInformationApiController(
             IGetAssetByIdUseCase getAssetByIdUseCase,
-            IGetAssetByAssetIdUseCase getAssetByAssetIdUseCase)
+            IGetAssetByAssetIdUseCase getAssetByAssetIdUseCase, ISaveAssetUseCase saveAssetUseCase)
         {
             _getAssetByIdUseCase = getAssetByIdUseCase;
             _getAssetByAssetIdUseCase = getAssetByAssetIdUseCase;
+            _saveAssetUseCase = saveAssetUseCase;
         }
 
         /// <summary>
@@ -63,6 +67,20 @@ namespace AssetInformationApi.V1.Controllers
         {
             var result = await _getAssetByAssetIdUseCase.ExecuteAsync(query).ConfigureAwait(false);
             if (result == null) return NotFound(query.AssetId);
+
+            return Ok(result);
+        }
+
+        [ProducesResponseType(typeof(AssetResponseObject), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPost]
+        [Route("save")]
+        [LogCall(LogLevel.Information)]
+        public async Task<IActionResult> SaveAsset([FromBody] Asset asset)
+        {
+            var result = await _saveAssetUseCase.PostAsync(asset).ConfigureAwait(false);
 
             return Ok(result);
         }

@@ -9,12 +9,14 @@ ENV LBHPACKAGESTOKEN=$LBHPACKAGESTOKEN
 WORKDIR /app
 
 # Copy csproj and restore as distinct layers
-COPY *.csproj ./
-RUN dotnet restore
+COPY ./AssetInformationApi.sln ./
+COPY ./AssetInformationApi/AssetInformationApi.csproj ./AssetInformationApi/
+COPY /NuGet.Config /root/.nuget/NuGet/NuGet.Config
+RUN dotnet restore ./AssetInformationApi/AssetInformationApi.csproj  #--configfile /NuGet.Config
 
 # Copy everything else and build
 COPY . ./
-COPY /NuGet.Config /root/.nuget/NuGet/NuGet.Config
+
 RUN dotnet build -c Release -o out
 RUN dotnet publish -c Release -o out
 
