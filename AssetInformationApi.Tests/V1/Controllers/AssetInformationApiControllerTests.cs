@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using Hackney.Shared.Asset.Boundary.Response;
 using Xunit;
+using Hackney.Shared.Asset.Domain;
 
 namespace AssetInformationApi.Tests.V1.Controllers
 {
@@ -18,16 +19,19 @@ namespace AssetInformationApi.Tests.V1.Controllers
         private readonly AssetInformationApiController _classUnderTest;
         private readonly Mock<IGetAssetByIdUseCase> _mockGetAssetByIdUseCase;
         private readonly Mock<IGetAssetByAssetIdUseCase> _mockGetAssetByAssetIdUseCase;
+        private readonly Mock<ISaveAssetUseCase> _mockSaveAssetUseCase;
         private readonly Fixture _fixture = new Fixture();
 
         public AssetInformationApiControllerTests()
         {
             _mockGetAssetByIdUseCase = new Mock<IGetAssetByIdUseCase>();
             _mockGetAssetByAssetIdUseCase = new Mock<IGetAssetByAssetIdUseCase>();
+            _mockSaveAssetUseCase = new Mock<ISaveAssetUseCase>();
 
             _classUnderTest = new AssetInformationApiController(
                 _mockGetAssetByIdUseCase.Object,
-                _mockGetAssetByAssetIdUseCase.Object);
+                _mockGetAssetByAssetIdUseCase.Object,
+                _mockSaveAssetUseCase.Object);
         }
 
         private static GetAssetByIdRequest ConstructRequest(Guid? id = null)
@@ -92,6 +96,35 @@ namespace AssetInformationApi.Tests.V1.Controllers
 
             // Act
             var response = await _classUnderTest.GetAssetByAssetId(query).ConfigureAwait(false);
+
+            // Assert
+            response.Should().BeOfType(typeof(OkObjectResult));
+            (response as OkObjectResult).Value.Should().BeOfType(typeof(AssetResponseObject));
+
+            ((response as OkObjectResult).Value as AssetResponseObject).Should().BeEquivalentTo(useCaseResponse);
+        }
+
+        [Fact]
+        public async Task SaveAssetReturnsEntity()
+        {
+            // Arrange
+            var useCaseResponse = _fixture.Create<AssetResponseObject>();
+            _mockGetAssetByIdUseCase
+                .Setup(x => x.ExecuteAsync(It.IsAny<GetAssetByIdRequest>()))
+                .ReturnsAsync(useCaseResponse);
+
+
+            var useCase = _fixture.Create<Asset>();
+            var Id = Guid.NewGuid();
+            useCase.Id = Id;
+            var query = new GetAssetByIdRequest
+            {
+                Id = Id
+            };
+
+            // Act
+            await _classUnderTest.SaveAsset(useCase).ConfigureAwait(false);
+            var response = await _classUnderTest.GetAssetById(query).ConfigureAwait(false);
 
             // Assert
             response.Should().BeOfType(typeof(OkObjectResult));
