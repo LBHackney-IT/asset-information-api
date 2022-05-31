@@ -19,14 +19,14 @@ namespace AssetInformationApi.Tests.V1.Controllers
         private readonly AssetInformationApiController _classUnderTest;
         private readonly Mock<IGetAssetByIdUseCase> _mockGetAssetByIdUseCase;
         private readonly Mock<IGetAssetByAssetIdUseCase> _mockGetAssetByAssetIdUseCase;
-        private readonly Mock<ISaveAssetUseCase> _mockSaveAssetUseCase;
+        private readonly Mock<INewAssetUseCase> _mockSaveAssetUseCase;
         private readonly Fixture _fixture = new Fixture();
 
         public AssetInformationApiControllerTests()
         {
             _mockGetAssetByIdUseCase = new Mock<IGetAssetByIdUseCase>();
             _mockGetAssetByAssetIdUseCase = new Mock<IGetAssetByAssetIdUseCase>();
-            _mockSaveAssetUseCase = new Mock<ISaveAssetUseCase>();
+            _mockSaveAssetUseCase = new Mock<INewAssetUseCase>();
 
             _classUnderTest = new AssetInformationApiController(
                 _mockGetAssetByIdUseCase.Object,

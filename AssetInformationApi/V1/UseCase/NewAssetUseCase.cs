@@ -6,11 +6,11 @@ using Hackney.Shared.Asset.Domain;
 
 namespace AssetInformationApi.V1.UseCase
 {
-    public class SaveAssetUseCase : ISaveAssetUseCase
+    public class NewAssetUseCase : INewAssetUseCase
     {
         private readonly IAssetGateway _gateway;
 
-        public SaveAssetUseCase(IAssetGateway gateway)
+        public NewAssetUseCase(IAssetGateway gateway)
         {
             _gateway = gateway;
         }

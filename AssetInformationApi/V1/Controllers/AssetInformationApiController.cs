@@ -18,12 +18,12 @@ namespace AssetInformationApi.V1.Controllers
     {
         private readonly IGetAssetByIdUseCase _getAssetByIdUseCase;
         private readonly IGetAssetByAssetIdUseCase _getAssetByAssetIdUseCase;
-        private readonly ISaveAssetUseCase _saveAssetUseCase;
+        private readonly INewAssetUseCase _saveAssetUseCase;
 
 
         public AssetInformationApiController(
             IGetAssetByIdUseCase getAssetByIdUseCase,
-            IGetAssetByAssetIdUseCase getAssetByAssetIdUseCase, ISaveAssetUseCase saveAssetUseCase)
+            IGetAssetByAssetIdUseCase getAssetByAssetIdUseCase, INewAssetUseCase saveAssetUseCase)
         {
             _getAssetByIdUseCase = getAssetByIdUseCase;
             _getAssetByAssetIdUseCase = getAssetByAssetIdUseCase;

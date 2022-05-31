@@ -3,7 +3,7 @@ using Hackney.Shared.Asset.Domain;
 
 namespace AssetInformationApi.V1.UseCase.Interfaces
 {
-    public interface ISaveAssetUseCase
+    public interface INewAssetUseCase
     {
         Task<Asset> PostAsync(Asset request);
     }

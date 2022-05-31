@@ -9,9 +9,6 @@
         <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
-        <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
-        <UserSecretsId>991ae381-65c7-4396-8b23-b697c95ecbc8</UserSecretsId>
-        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
   <ItemGroup>
