@@ -18,19 +18,19 @@
         "DynamoDb_LocalServiceUrl": "http://localhost:8000",
         "DynamoDb_LocalMode": "true"
       },
-      "applicationUrl": "http://localhost:5000"
+      "applicationUrl": "http://localhost:3000"
 
     },
     "Docker": {
       "commandName": "Docker",
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/api/v1/healthcheck/ping",
-      "httpPort": 5000,
+      "httpPort": 3000,
       "useSSL": false,
-      "applicationUrl": "http://localhost:5000",
+      "applicationUrl": "http://localhost:3000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_URLS": "http://+:5000"
+        "ASPNETCORE_URLS": "http://+:3000"
       }
     }
   }
