@@ -19,19 +19,19 @@ namespace AssetInformationApi.Tests.V1.Controllers
         private readonly AssetInformationApiController _classUnderTest;
         private readonly Mock<IGetAssetByIdUseCase> _mockGetAssetByIdUseCase;
         private readonly Mock<IGetAssetByAssetIdUseCase> _mockGetAssetByAssetIdUseCase;
-        private readonly Mock<INewAssetUseCase> _mockSaveAssetUseCase;
+        private readonly Mock<INewAssetUseCase> _mockAddNewAssetUseCase;
         private readonly Fixture _fixture = new Fixture();
 
         public AssetInformationApiControllerTests()
         {
             _mockGetAssetByIdUseCase = new Mock<IGetAssetByIdUseCase>();
             _mockGetAssetByAssetIdUseCase = new Mock<IGetAssetByAssetIdUseCase>();
-            _mockSaveAssetUseCase = new Mock<INewAssetUseCase>();
+            _mockAddNewAssetUseCase = new Mock<INewAssetUseCase>();
 
             _classUnderTest = new AssetInformationApiController(
                 _mockGetAssetByIdUseCase.Object,
                 _mockGetAssetByAssetIdUseCase.Object,
-                _mockSaveAssetUseCase.Object);
+                _mockAddNewAssetUseCase.Object);
         }
 
         private static GetAssetByIdRequest ConstructRequest(Guid? id = null)
@@ -123,7 +123,7 @@ namespace AssetInformationApi.Tests.V1.Controllers
             };
 
             // Act
-            await _classUnderTest.SaveAsset(useCase).ConfigureAwait(false);
+            await _classUnderTest.AddAsset(useCase).ConfigureAwait(false);
             var response = await _classUnderTest.GetAssetById(query).ConfigureAwait(false);
 
             // Assert

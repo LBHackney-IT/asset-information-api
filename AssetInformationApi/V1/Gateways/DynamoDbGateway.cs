@@ -50,7 +50,7 @@ namespace AssetInformationApi.V1.Gateways
         }
 
         [LogCall]
-        public async Task<Asset> SaveAsset(AssetDb asset)
+        public async Task<Asset> AddAsset(AssetDb asset)
         {
             _logger.LogDebug($"Calling IDynamoDBContext.SaveAsync for id {asset.Id}");
             _dynamoDbContext.SaveAsync(asset).GetAwaiter().GetResult();

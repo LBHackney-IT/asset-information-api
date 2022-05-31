@@ -38,7 +38,7 @@ namespace AssetInformationApi.V1.UseCase
                 AssetManagement = request.AssetManagement
             };
 
-           return await _gateway.SaveAsset(asset).ConfigureAwait(false);
+           return await _gateway.AddAsset(asset).ConfigureAwait(false);
         }
     }
 }

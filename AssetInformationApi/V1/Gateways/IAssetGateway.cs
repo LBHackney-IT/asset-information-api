@@ -9,6 +9,6 @@ namespace AssetInformationApi.V1.Gateways
     {
         Task<Asset> GetAssetByIdAsync(GetAssetByIdRequest query);
         Task<Asset> GetAssetByAssetId(GetAssetByAssetIdRequest query);
-        Task<Asset> SaveAsset(AssetDb asset);
+        Task<Asset> AddAsset(AssetDb asset);
     }
 }

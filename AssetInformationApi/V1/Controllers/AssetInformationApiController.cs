@@ -18,16 +18,16 @@ namespace AssetInformationApi.V1.Controllers
     {
         private readonly IGetAssetByIdUseCase _getAssetByIdUseCase;
         private readonly IGetAssetByAssetIdUseCase _getAssetByAssetIdUseCase;
-        private readonly INewAssetUseCase _saveAssetUseCase;
+        private readonly INewAssetUseCase _newAssetUseCase;
 
 
         public AssetInformationApiController(
             IGetAssetByIdUseCase getAssetByIdUseCase,
-            IGetAssetByAssetIdUseCase getAssetByAssetIdUseCase, INewAssetUseCase saveAssetUseCase)
+            IGetAssetByAssetIdUseCase getAssetByAssetIdUseCase, INewAssetUseCase newAssetUseCase)
         {
             _getAssetByIdUseCase = getAssetByIdUseCase;
             _getAssetByAssetIdUseCase = getAssetByAssetIdUseCase;
-            _saveAssetUseCase = saveAssetUseCase;
+            _newAssetUseCase = newAssetUseCase;
         }
 
         /// <summary>
@@ -76,11 +76,11 @@ namespace AssetInformationApi.V1.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
-        [Route("save")]
+        [Route("add")]
         [LogCall(LogLevel.Information)]
-        public async Task<IActionResult> SaveAsset([FromBody] Asset asset)
+        public async Task<IActionResult> AddAsset([FromBody] Asset asset)
         {
-            var result = await _saveAssetUseCase.PostAsync(asset).ConfigureAwait(false);
+            var result = await _newAssetUseCase.PostAsync(asset).ConfigureAwait(false);
 
             return Ok(result);
         }
