@@ -17,7 +17,7 @@ namespace AssetInformationApi.V1.UseCase
 
         public async Task<Asset> PostAsync(Asset request)
         {
-           return await _gateway.AddAsset(request.ToDatabase()).ConfigureAwait(false);
+            return await _gateway.AddAsset(request.ToDatabase()).ConfigureAwait(false);
         }
     }
 }
