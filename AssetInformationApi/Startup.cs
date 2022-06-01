@@ -156,6 +156,7 @@ namespace AssetInformationApi
         {
             services.AddScoped<IGetAssetByIdUseCase, GetAssetByIdUseCase>();
             services.AddScoped<IGetAssetByAssetIdUseCase, GetAssetByAssetIdUseCase>();
+            services.AddScoped<INewAssetUseCase, NewAssetUseCase>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
