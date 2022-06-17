@@ -82,7 +82,7 @@ namespace AssetInformationApi.V1.Controllers
         {
             var result = await _newAssetUseCase.PostAsync(asset).ConfigureAwait(false);
 
-            return Ok(result);
+            return StatusCode(StatusCodes.Status201Created, result);
         }
     }
 }

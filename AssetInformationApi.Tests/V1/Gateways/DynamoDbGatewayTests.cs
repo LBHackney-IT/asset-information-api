@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Xunit;
 using AssetInformationApi.V1.Boundary.Request;
 using AssetInformationApi.V1.Gateways;
-using Hackney.Shared.Asset.Domain;
 using Hackney.Shared.Asset.Factories;
 using Hackney.Shared.Asset.Infrastructure;
 
@@ -123,6 +122,29 @@ namespace AssetInformationApi.Tests.V1.Gateways
             response.Should().BeEquivalentTo(entity.ToDomain());
 
             _logger.VerifyExact(LogLevel.Debug, $"Calling IDynamoDBContext.QueryAsync for AssetId {query.AssetId}", Times.Once());
+        }
+
+        [Fact]
+        public async Task AddAssetToDatabaseAndReturnEntity()
+        {
+            // Arrange
+            var entity = _fixture.Build<AssetDb>()
+                .With(x => x.VersionNumber, (int?) null)
+                .Create();
+
+            var query = new GetAssetByIdRequest()
+            {
+                Id = entity.Id
+            };
+
+            // Act
+            var response = await _classUnderTest.AddAsset(entity).ConfigureAwait(false);
+
+            // Assert
+            response.Should().NotBeNull();
+            response.Should().BeEquivalentTo(entity.ToDomain());
+
+            await _dbFixture.DynamoDbContext.DeleteAsync<AssetDb>(query.Id).ConfigureAwait(false);
         }
     }
 }
