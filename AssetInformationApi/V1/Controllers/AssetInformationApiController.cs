@@ -79,7 +79,7 @@ namespace AssetInformationApi.V1.Controllers
         [HttpPost]
         [Route("add")]
         [LogCall(LogLevel.Information)]
-        public async Task<IActionResult> AddAsset([FromBody] Asset asset)
+        public async Task<IActionResult> AddAsset([FromBody] AddAssetRequest asset)
         {
             var result = await _newAssetUseCase.PostAsync(asset.ToDatabase()).ConfigureAwait(false);
 
