@@ -9,6 +9,7 @@ using System.Net.Http.Formatting;
 using Newtonsoft.Json;
 using Hackney.Core.Testing.DynamoDb;
 using System;
+using Hackney.Shared.Asset.Factories;
 
 namespace AssetInformationApi.Tests.V1.E2ETests.Steps
 {
@@ -42,7 +43,10 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
 
             dbRecord.Id.Should().Be(request.Id);
             dbRecord.AssetId.Should().Be(request.AssetId);
-
+            dbRecord.AssetType.Should().Be(request.AssetType);
+            dbRecord.AssetLocation.FloorNo.Should().Be(request.AssetLocation.FloorNo);
+            dbRecord.AssetManagement.Agent.Should().Be(request.AssetManagement.Agent);
+            dbRecord.AssetCharacteristics.BathroomFloor.Should().Be(request.AssetCharacteristics.BathroomFloor);
             // Cleanup
             await _dbFixture.DynamoDbContext.DeleteAsync<AssetDb>(dbRecord.Id).ConfigureAwait(false);
         }

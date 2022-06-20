@@ -56,7 +56,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         [Fact]
         public void ServiceReturnsBadRequestIfIdInvalid()
         {
-            this.Given(g => _assetsFixture.GivenAnInvalidAssetId())
+            this.Given(g => _assetsFixture.GivenAnEmptyAssetId())
                 .When(w => _steps.WhenTheAddAssetApiIsCalled(_assetsFixture.AssetRequest))
                 .Then(t => _steps.ThenBadRequestIsReturned())
                 .BDDfy();

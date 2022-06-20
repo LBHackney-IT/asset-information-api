@@ -68,7 +68,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
             PropertyReference = _fixture.Create<string>();
         }
 
-        public void GivenAnInvalidAssetId()
+        public void GivenAnEmptyAssetId()
         {
             var asset = _fixture.Build<Asset>()
                .With(x => x.VersionNumber, (int?) null)
@@ -76,6 +76,11 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
             asset.Id = Guid.Empty;
 
             AssetRequest = asset;
+        }
+
+        public void GivenAnInvalidAssetId()
+        {
+            InvalidAssetId = "12345667890";
         }
     }
 }
