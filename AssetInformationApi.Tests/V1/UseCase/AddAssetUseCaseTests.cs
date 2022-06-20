@@ -33,8 +33,20 @@ namespace AssetInformationApi.Tests.V1.UseCase
             var request = asset.ToDatabase();
             _mockGateway.Setup(x => x.AddAsset(request)).ReturnsAsync(asset);
 
-            var response = await _classUnderTest.PostAsync(asset).ConfigureAwait(false);
-            //response.Should().BeEquivalentTo(asset.ToResponse());
+            var response = await _classUnderTest.PostAsync(request).ConfigureAwait(false);
+            response.Should().BeEquivalentTo(asset.ToResponse());
+        }
+
+        [Fact]
+        public async Task AddAssetUsecaseShouldReturnNull()
+        {
+            var asset = _fixture.Create<Asset>();
+
+            var request = asset.ToDatabase();
+            _mockGateway.Setup(x => x.AddAsset(request)).ReturnsAsync(asset);
+
+            var response = await _classUnderTest.PostAsync(asset.ToDatabase()).ConfigureAwait(false);
+            response.Should().BeNull();
         }
     }
 }

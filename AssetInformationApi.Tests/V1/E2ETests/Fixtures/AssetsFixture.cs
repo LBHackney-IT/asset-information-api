@@ -70,7 +70,12 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
 
         public void GivenAnInvalidAssetId()
         {
-            InvalidAssetId = "12345667890";
+            var asset = _fixture.Build<Asset>()
+               .With(x => x.VersionNumber, (int?) null)
+               .Create();
+            asset.Id = Guid.Empty;
+
+            AssetRequest = asset;
         }
     }
 }

@@ -52,5 +52,14 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
                 .Then(t => _steps.ThenTheAssetDetailsAreReturned(_assetsFixture.AssetRequest))
                 .BDDfy();
         }
+
+        [Fact]
+        public void ServiceReturnsBadRequestIfIdInvalid()
+        {
+            this.Given(g => _assetsFixture.GivenAnInvalidAssetId())
+                .When(w => _steps.WhenTheAddAssetApiIsCalled(_assetsFixture.AssetRequest))
+                .Then(t => _steps.ThenBadRequestIsReturned())
+                .BDDfy();
+        }
     }
 }

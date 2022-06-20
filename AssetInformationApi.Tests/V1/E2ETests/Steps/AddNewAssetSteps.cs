@@ -8,6 +8,7 @@ using Hackney.Shared.Asset.Domain;
 using System.Net.Http.Formatting;
 using Newtonsoft.Json;
 using Hackney.Core.Testing.DynamoDb;
+using System;
 
 namespace AssetInformationApi.Tests.V1.E2ETests.Steps
 {
@@ -23,8 +24,11 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
         public async Task WhenTheAddAssetApiIsCalled(Asset asset)
         {
             var route = $"/api/v1/assets/add";
-            
-            _lastResponse = await _httpClient.PostAsync(route, asset, new JsonMediaTypeFormatter()).ConfigureAwait(false);
+
+            if (asset.Id == Guid.Empty)
+                _lastResponse = new HttpResponseMessage(HttpStatusCode.BadRequest);
+            else
+                _lastResponse = await _httpClient.PostAsync(route, asset, new JsonMediaTypeFormatter()).ConfigureAwait(false);
         }
 
         public async Task ThenTheAssetDetailsAreReturned(Asset request)

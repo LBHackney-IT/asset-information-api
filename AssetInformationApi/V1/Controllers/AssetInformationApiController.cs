@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Hackney.Shared.Asset.Boundary.Response;
 using Hackney.Shared.Asset.Domain;
+using Hackney.Shared.Asset.Factories;
 
 namespace AssetInformationApi.V1.Controllers
 {
@@ -80,7 +81,7 @@ namespace AssetInformationApi.V1.Controllers
         [LogCall(LogLevel.Information)]
         public async Task<IActionResult> AddAsset([FromBody] Asset asset)
         {
-            var result = await _newAssetUseCase.PostAsync(asset).ConfigureAwait(false);
+            var result = await _newAssetUseCase.PostAsync(asset.ToDatabase()).ConfigureAwait(false);
 
             return StatusCode(StatusCodes.Status201Created, result);
         }
