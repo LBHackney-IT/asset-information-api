@@ -113,8 +113,7 @@ namespace AssetInformationApi.Tests.V1.Controllers
                 .Setup(x => x.ExecuteAsync(It.IsAny<GetAssetByIdRequest>()))
                 .ReturnsAsync(useCaseResponse);
 
-
-            var useCase = _fixture.Create<Asset>();
+            var useCase = _fixture.Create<AddAssetRequest>();
             var Id = Guid.NewGuid();
             useCase.Id = Id;
             var query = new GetAssetByIdRequest

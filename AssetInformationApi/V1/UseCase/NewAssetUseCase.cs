@@ -3,6 +3,9 @@ using AssetInformationApi.V1.UseCase.Interfaces;
 using System.Threading.Tasks;
 using Hackney.Shared.Asset.Domain;
 using Hackney.Shared.Asset.Factories;
+using Hackney.Shared.Asset.Boundary.Response;
+using Hackney.Core.Logging;
+using Hackney.Shared.Asset.Infrastructure;
 
 namespace AssetInformationApi.V1.UseCase
 {
@@ -15,9 +18,10 @@ namespace AssetInformationApi.V1.UseCase
             _gateway = gateway;
         }
 
-        public async Task<Asset> PostAsync(Asset request)
+        [LogCall]
+        public async Task<AssetResponseObject> PostAsync(AssetDb request)
         {
-            return await _gateway.AddAsset(request.ToDatabase()).ConfigureAwait(false);
+            return (await _gateway.AddAsset(request).ConfigureAwait(false)).ToResponse();
         }
     }
 }

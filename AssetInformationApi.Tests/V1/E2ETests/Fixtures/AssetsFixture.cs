@@ -2,6 +2,7 @@ using Hackney.Core.Testing.DynamoDb;
 using AutoFixture;
 using System;
 using Hackney.Shared.Asset.Infrastructure;
+using Hackney.Shared.Asset.Domain;
 
 namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
 {
@@ -11,6 +12,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
         private readonly IDynamoDbFixture _dbFixture;
 
         public AssetDb Asset { get; private set; }
+        public Asset AssetRequest { get; private set; }
         public Guid AssetId { get; private set; }
         public string PropertyReference { get; set; }
         public string InvalidAssetId { get; private set; }
@@ -38,6 +40,16 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
             }
         }
 
+        public void PrepareAssetObject()
+        {
+            var asset = _fixture.Build<Asset>()
+                .With(x => x.VersionNumber, (int?) null)
+                .Create();
+            asset.Id = Guid.NewGuid();
+
+            AssetRequest = asset;
+        }
+
         public void GivenAnAssetAlreadyExists()
         {
             Asset = _fixture.Build<AssetDb>()
@@ -54,6 +66,16 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
         {
             AssetId = Guid.NewGuid();
             PropertyReference = _fixture.Create<string>();
+        }
+
+        public void GivenAnEmptyAssetId()
+        {
+            var asset = _fixture.Build<Asset>()
+               .With(x => x.VersionNumber, (int?) null)
+               .Create();
+            asset.Id = Guid.Empty;
+
+            AssetRequest = asset;
         }
 
         public void GivenAnInvalidAssetId()
