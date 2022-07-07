@@ -12,12 +12,15 @@ services:
       - 3000:3000
     environment:
       - DynamoDb_LocalMode=true
+      - Sns_LocalMode=true
       - DynamoDb_LocalServiceUrl=http://dynamodb-database:8000
+      - Localstack_SnsServiceUrl=http://localstack-asset-information-api:4566
       - AWS_REGION=eu-west-2
       - AWS_ACCESS_KEY_ID=local
       - AWS_SECRET_ACCESS_KEY=local
     links:
       - dynamodb-database
+      - localstack-asset-information-api
 
   asset-information-api-test:
     image: asset-information-api-test
@@ -30,14 +33,31 @@ services:
 
     environment:
       - DynamoDb_LocalMode=true
+      - Sns_LocalMode=true
       - DynamoDb_LocalServiceUrl=http://dynamodb-database:8000
+      - Localstack_SnsServiceUrl=http://localstack-asset-information-api:4566
       - AWS_REGION=eu-west-2
       - AWS_ACCESS_KEY_ID=local
       - AWS_SECRET_ACCESS_KEY=local
     links:
      - dynamodb-database
-
+     - localstack-asset-information-api
+     
   dynamodb-database:
     image: amazon/dynamodb-local
     ports:
       - 8000:8000
+
+  localstack-asset-information-api:
+    image: localstack/localstack:0.14.1
+    hostname: awslocal    
+    ports:
+      - "4566:4566"      
+    environment:
+      - SERVICES=sns,sqs
+      - DEBUG=1                  
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - HOST_TMP_FOLDER=/tmp/localstack      
+    volumes:
+      - "./.localstack:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"        

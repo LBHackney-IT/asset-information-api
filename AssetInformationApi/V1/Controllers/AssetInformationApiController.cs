@@ -1,6 +1,7 @@
 using AssetInformationApi.V1.Boundary.Request;
 using AssetInformationApi.V1.UseCase.Interfaces;
 using Hackney.Core.Logging;
+using Hackney.Core.JWT;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 using Hackney.Shared.Asset.Boundary.Response;
 using Hackney.Shared.Asset.Domain;
 using Hackney.Shared.Asset.Factories;
+using Hackney.Core.Http;
 
 namespace AssetInformationApi.V1.Controllers
 {
@@ -20,15 +22,19 @@ namespace AssetInformationApi.V1.Controllers
         private readonly IGetAssetByIdUseCase _getAssetByIdUseCase;
         private readonly IGetAssetByAssetIdUseCase _getAssetByAssetIdUseCase;
         private readonly INewAssetUseCase _newAssetUseCase;
-
-
+        private readonly ITokenFactory _tokenFactory;
+        private readonly IHttpContextWrapper _contextWrapper;
+        
         public AssetInformationApiController(
             IGetAssetByIdUseCase getAssetByIdUseCase,
-            IGetAssetByAssetIdUseCase getAssetByAssetIdUseCase, INewAssetUseCase newAssetUseCase)
+            IGetAssetByAssetIdUseCase getAssetByAssetIdUseCase, INewAssetUseCase newAssetUseCase,
+            ITokenFactory tokenFactory, IHttpContextWrapper contextWrapper)
         {
             _getAssetByIdUseCase = getAssetByIdUseCase;
             _getAssetByAssetIdUseCase = getAssetByAssetIdUseCase;
             _newAssetUseCase = newAssetUseCase;
+            _tokenFactory = tokenFactory;
+            _contextWrapper = contextWrapper;
         }
 
         /// <summary>
@@ -81,7 +87,8 @@ namespace AssetInformationApi.V1.Controllers
         [LogCall(LogLevel.Information)]
         public async Task<IActionResult> AddAsset([FromBody] AddAssetRequest asset)
         {
-            var result = await _newAssetUseCase.PostAsync(asset.ToDatabase()).ConfigureAwait(false);
+            var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(HttpContext));
+            var result = await _newAssetUseCase.PostAsync(asset.ToDatabase(), token).ConfigureAwait(false);
 
             return StatusCode(StatusCodes.Status201Created, result);
         }

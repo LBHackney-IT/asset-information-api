@@ -43,10 +43,25 @@ terraform {
   }
 }
 
+resource "aws_sns_topic" "asset" {
+  name                        = "asset.fifo"
+  fifo_topic                  = true
+  content_based_deduplication = true
+  kms_master_key_id           = "alias/aws/sns"
+}
+
+resource "aws_ssm_parameter" "asset_sns_arn" {
+  name  = "/sns-topic/production/asset/arn"
+  type  = "String"
+  value = aws_sns_topic.asset.arn
+}
+
+
 module "asset_information_api_cloudwatch_dashboard" {
     source              = "github.com/LBHackney-IT/aws-hackney-common-terraform.git//modules/cloudwatch/dashboards/api-dashboard"
     environment_name    = var.environment_name
     api_name            = "asset-information-api"
+    sns_topic_name      = aws_sns_topic.asset.name
     dynamodb_table_name = aws_dynamodb_table.assetinformationapi_dynamodb_table.name
     include_sns_widget  = false
 }
@@ -63,3 +78,4 @@ module "api-alarm" {
   error_threshold  = "1"
   sns_topic_arn    = data.aws_ssm_parameter.cloudwatch_topic_arn.value
 }
+

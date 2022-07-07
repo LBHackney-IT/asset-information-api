@@ -14,6 +14,8 @@ using Hackney.Core.Logging;
 using Hackney.Core.Middleware.CorrelationId;
 using Hackney.Core.Middleware.Exception;
 using Hackney.Core.Middleware.Logging;
+using Hackney.Core.Sns;
+using Hackney.Core.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -34,6 +36,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Hackney.Shared.Asset.Infrastructure;
+using AssetInformationApi.V1.Factories;
 
 namespace AssetInformationApi
 {
@@ -140,13 +143,24 @@ namespace AssetInformationApi
             services.AddLogCallAspect();
             services.ConfigureDynamoDB();
             services.AddTokenFactory();
-
+            services.ConfigureSns();
+            
             RegisterGateways(services);
             RegisterUseCases(services);
 
             services.AddSingleton<IConfiguration>(Configuration);
+            services.AddScoped<ISnsFactory, AssetSnsFactory>();
+
+            ConfigureHackneyCoreDI(services);
         }
 
+        private static void ConfigureHackneyCoreDI(IServiceCollection services)
+        {
+            services.AddSnsGateway()
+                .AddTokenFactory()
+                .AddHttpContextWrapper();
+        }
+        
         private static void RegisterGateways(IServiceCollection services)
         {
             services.AddScoped<IAssetGateway, DynamoDbGateway>();
