@@ -4,7 +4,7 @@ using Hackney.Shared.Asset.Domain;
 using Hackney.Shared.Asset.Infrastructure;
 using System;
 using AssetInformationApi.V1.Infrastructure;
-    
+
 namespace AssetInformationApi.V1.Factories
 {
     public class AssetSnsFactory : ISnsFactory

@@ -144,7 +144,7 @@ namespace AssetInformationApi
             services.ConfigureDynamoDB();
             services.AddTokenFactory();
             services.ConfigureSns();
-            
+
             RegisterGateways(services);
             RegisterUseCases(services);
 
@@ -160,7 +160,7 @@ namespace AssetInformationApi
                 .AddTokenFactory()
                 .AddHttpContextWrapper();
         }
-        
+
         private static void RegisterGateways(IServiceCollection services)
         {
             services.AddScoped<IAssetGateway, DynamoDbGateway>();

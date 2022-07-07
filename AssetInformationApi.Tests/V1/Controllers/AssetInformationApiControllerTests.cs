@@ -25,7 +25,7 @@ namespace AssetInformationApi.Tests.V1.Controllers
         private readonly Fixture _fixture = new Fixture();
         private readonly Mock<ITokenFactory> _mockTokenFactory;
         private readonly Mock<IHttpContextWrapper> _mockContextWrapper;
-        
+
         public AssetInformationApiControllerTests()
         {
             _mockGetAssetByIdUseCase = new Mock<IGetAssetByIdUseCase>();

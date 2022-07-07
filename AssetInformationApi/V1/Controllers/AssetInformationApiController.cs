@@ -24,7 +24,7 @@ namespace AssetInformationApi.V1.Controllers
         private readonly INewAssetUseCase _newAssetUseCase;
         private readonly ITokenFactory _tokenFactory;
         private readonly IHttpContextWrapper _contextWrapper;
-        
+
         public AssetInformationApiController(
             IGetAssetByIdUseCase getAssetByIdUseCase,
             IGetAssetByAssetIdUseCase getAssetByAssetIdUseCase, INewAssetUseCase newAssetUseCase,

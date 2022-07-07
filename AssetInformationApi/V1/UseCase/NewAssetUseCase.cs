@@ -18,7 +18,7 @@ namespace AssetInformationApi.V1.UseCase
         private readonly IAssetGateway _gateway;
         private readonly ISnsGateway _snsGateway;
         private readonly ISnsFactory _snsFactory;
-        
+
         public NewAssetUseCase(IAssetGateway gateway, ISnsGateway snsGateway, ISnsFactory snsFactory)
         {
             _gateway = gateway;
@@ -34,10 +34,10 @@ namespace AssetInformationApi.V1.UseCase
             {
                 var assetSnsMessage = _snsFactory.CreateAsset(asset, token);
                 var assetTopicArn = Environment.GetEnvironmentVariable("ASSET_SNS_ARN");
-                await _snsGateway.Publish(assetSnsMessage, assetTopicArn).ConfigureAwait(false);                
+                await _snsGateway.Publish(assetSnsMessage, assetTopicArn).ConfigureAwait(false);
             }
-            
-            
+
+
             return asset.ToResponse();
         }
     }
