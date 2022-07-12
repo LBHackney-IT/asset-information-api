@@ -3,6 +3,8 @@ using AutoFixture;
 using System;
 using Hackney.Shared.Asset.Infrastructure;
 using Hackney.Shared.Asset.Domain;
+using Amazon.SimpleNotificationService;
+using System.Collections.Generic;
 
 namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
 {
@@ -10,6 +12,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
     {
         private readonly Fixture _fixture = new Fixture();
         private readonly IDynamoDbFixture _dbFixture;
+        private readonly IAmazonSimpleNotificationService _amazonSimpleNotificationService;
 
         public AssetDb Asset { get; private set; }
         public Asset AssetRequest { get; private set; }
@@ -17,9 +20,10 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
         public string PropertyReference { get; set; }
         public string InvalidAssetId { get; private set; }
 
-        public AssetsFixture(IDynamoDbFixture dbFixture)
+        public AssetsFixture(IDynamoDbFixture dbFixture, IAmazonSimpleNotificationService amazonSimpleNotificationService)
         {
             _dbFixture = dbFixture;
+            _amazonSimpleNotificationService = amazonSimpleNotificationService;
         }
 
         public void Dispose()

@@ -30,7 +30,7 @@ namespace AssetInformationApi.V1.UseCase
         public async Task<AssetResponseObject> PostAsync(AssetDb request, Token token)
         {
             var asset = await _gateway.AddAsset(request).ConfigureAwait(false);
-            if (asset != null)
+            if (asset != null && token != null)
             {
                 var assetSnsMessage = _snsFactory.CreateAsset(asset, token);
                 var assetTopicArn = Environment.GetEnvironmentVariable("ASSET_SNS_ARN");
