@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using Hackney.Shared.Asset.Boundary.Response;
 using Xunit;
 using Hackney.Shared.Asset.Domain;
+using Hackney.Core.JWT;
+using Hackney.Core.Http;
 
 namespace AssetInformationApi.Tests.V1.Controllers
 {
@@ -21,17 +23,23 @@ namespace AssetInformationApi.Tests.V1.Controllers
         private readonly Mock<IGetAssetByAssetIdUseCase> _mockGetAssetByAssetIdUseCase;
         private readonly Mock<INewAssetUseCase> _mockAddNewAssetUseCase;
         private readonly Fixture _fixture = new Fixture();
+        private readonly Mock<ITokenFactory> _mockTokenFactory;
+        private readonly Mock<IHttpContextWrapper> _mockContextWrapper;
 
         public AssetInformationApiControllerTests()
         {
             _mockGetAssetByIdUseCase = new Mock<IGetAssetByIdUseCase>();
             _mockGetAssetByAssetIdUseCase = new Mock<IGetAssetByAssetIdUseCase>();
             _mockAddNewAssetUseCase = new Mock<INewAssetUseCase>();
+            _mockTokenFactory = new Mock<ITokenFactory>();
+            _mockContextWrapper = new Mock<IHttpContextWrapper>();
 
             _classUnderTest = new AssetInformationApiController(
                 _mockGetAssetByIdUseCase.Object,
                 _mockGetAssetByAssetIdUseCase.Object,
-                _mockAddNewAssetUseCase.Object);
+                _mockAddNewAssetUseCase.Object,
+                _mockTokenFactory.Object,
+                _mockContextWrapper.Object);
         }
 
         private static GetAssetByIdRequest ConstructRequest(Guid? id = null)

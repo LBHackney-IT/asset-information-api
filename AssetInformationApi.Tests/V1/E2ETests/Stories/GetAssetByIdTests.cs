@@ -21,7 +21,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         public GetAssetByIdTests(MockWebApplicationFactory<Startup> appFactory)
         {
             _dbFixture = appFactory.DynamoDbFixture;
-            _assetsFixture = new AssetsFixture(_dbFixture);
+            _assetsFixture = new AssetsFixture(_dbFixture, appFactory.SnsFixture.SimpleNotificationService);
             _steps = new GetAssetByIdSteps(appFactory.Client);
         }
 
