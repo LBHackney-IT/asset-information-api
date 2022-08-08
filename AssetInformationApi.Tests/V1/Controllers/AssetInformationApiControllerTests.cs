@@ -12,6 +12,13 @@ using Xunit;
 using Hackney.Shared.Asset.Domain;
 using Hackney.Core.JWT;
 using Hackney.Core.Http;
+using Hackney.Shared.Asset.Infrastructure;
+using Hackney.Shared.Asset.Factories;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using System.Text;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Mvc.Controllers;
 
 namespace AssetInformationApi.Tests.V1.Controllers
 {
@@ -25,6 +32,14 @@ namespace AssetInformationApi.Tests.V1.Controllers
         private readonly Fixture _fixture = new Fixture();
         private readonly Mock<ITokenFactory> _mockTokenFactory;
         private readonly Mock<IHttpContextWrapper> _mockContextWrapper;
+        private readonly Mock<IEditAssetUseCase> _mockEditAssetUseCase;
+
+        private readonly Mock<HttpRequest> _mockHttpRequest;
+        private readonly HeaderDictionary _requestHeaders;
+        private readonly Mock<HttpResponse> _mockHttpResponse;
+        private readonly HeaderDictionary _responseHeaders;
+
+        private const string RequestBodyText = "Some request body text";
 
         public AssetInformationApiControllerTests()
         {
@@ -33,13 +48,40 @@ namespace AssetInformationApi.Tests.V1.Controllers
             _mockAddNewAssetUseCase = new Mock<INewAssetUseCase>();
             _mockTokenFactory = new Mock<ITokenFactory>();
             _mockContextWrapper = new Mock<IHttpContextWrapper>();
+            _mockEditAssetUseCase = new Mock<IEditAssetUseCase>();
+
+            _mockHttpRequest = new Mock<HttpRequest>();
+            _mockHttpResponse = new Mock<HttpResponse>();
 
             _classUnderTest = new AssetInformationApiController(
                 _mockGetAssetByIdUseCase.Object,
                 _mockGetAssetByAssetIdUseCase.Object,
                 _mockAddNewAssetUseCase.Object,
                 _mockTokenFactory.Object,
-                _mockContextWrapper.Object);
+                _mockContextWrapper.Object,
+                _mockEditAssetUseCase.Object);
+
+            // changes to allow reading of raw request body
+#pragma warning disable CA2000 // Dispose objects before losing scope
+            _mockHttpRequest.SetupGet(x => x.Body).Returns(new MemoryStream(Encoding.Default.GetBytes(RequestBodyText)));
+#pragma warning restore CA2000 // Dispose objects before losing scope
+
+            _requestHeaders = new HeaderDictionary();
+            _mockHttpRequest.SetupGet(x => x.Headers).Returns(_requestHeaders);
+
+            _mockContextWrapper
+                .Setup(x => x.GetContextRequestHeaders(It.IsAny<HttpContext>()))
+                .Returns(_requestHeaders);
+
+            _responseHeaders = new HeaderDictionary();
+            _mockHttpResponse.SetupGet(x => x.Headers).Returns(_responseHeaders);
+
+            var mockHttpContext = new Mock<HttpContext>();
+            mockHttpContext.SetupGet(x => x.Request).Returns(_mockHttpRequest.Object);
+            mockHttpContext.SetupGet(x => x.Response).Returns(_mockHttpResponse.Object);
+
+            var controllerContext = new ControllerContext(new ActionContext(mockHttpContext.Object, new RouteData(), new ControllerActionDescriptor()));
+            _classUnderTest.ControllerContext = controllerContext;
         }
 
         private static GetAssetByIdRequest ConstructRequest(Guid? id = null)
@@ -138,6 +180,32 @@ namespace AssetInformationApi.Tests.V1.Controllers
             (response as OkObjectResult).Value.Should().BeOfType(typeof(AssetResponseObject));
 
             ((response as OkObjectResult).Value as AssetResponseObject).Should().BeEquivalentTo(useCaseResponse);
+        }
+
+        [Fact]
+        public async Task EditAssetWhenValidReturns204NoContentResponse()
+        {
+            var mockQuery = _fixture.Create<AssetDb>();
+            var mockRequestObject = _fixture.Create<EditAssetByIdRequest>();
+
+            _mockEditAssetUseCase.Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<AssetDb>(), It.IsAny<string>(), It.IsAny<Token>())).ReturnsAsync(_fixture.Create<AssetResponseObject>());
+
+            var response = await _classUnderTest.PatchAsset(mockRequestObject, mockQuery).ConfigureAwait(false);
+
+            response.Should().BeOfType(typeof(NoContentResult));
+        }
+
+        [Fact]
+        public async Task EditAssetWhenAssetDoesntExistReturns404NotFoundResponse()
+        {
+            var mockQuery = _fixture.Create<AssetDb>();
+            var mockRequestObject = _fixture.Create<EditAssetByIdRequest>();
+
+            _mockEditAssetUseCase.Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<AssetDb>(), It.IsAny<string>(), It.IsAny<Token>())).ReturnsAsync((AssetResponseObject) null);
+
+            var response = await _classUnderTest.PatchAsset(mockRequestObject, mockQuery).ConfigureAwait(false);
+
+            response.Should().BeOfType(typeof(NotFoundResult));
         }
     }
 }
