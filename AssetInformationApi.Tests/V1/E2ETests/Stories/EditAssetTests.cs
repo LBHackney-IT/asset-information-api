@@ -125,11 +125,6 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         private EditAssetRequest CreateValidRequestObject()
         {
             return _fixture.Build<EditAssetRequest>()
-                .Without(x => x.AssetAddress)
-                .Without(x => x.AssetCharacteristics)
-                .Without(x => x.AssetLocation)
-                .Without(x => x.AssetManagement)
-                .Without(x => x.Tenure)
                 .With(x => x.VersionNumber, (int?) null)
                 .Create();
         }
