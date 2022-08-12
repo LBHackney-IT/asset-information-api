@@ -11,6 +11,7 @@ using AutoFixture.Kernel;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2;
 using Amazon.SimpleNotificationService;
+using Hackney.Shared.Asset.Domain;
 
 namespace AssetInformationApi.Tests.V1.E2ETests.Stories
 {
@@ -125,6 +126,16 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         private EditAssetRequest CreateValidRequestObject()
         {
             return _fixture.Build<EditAssetRequest>()
+                .Without(x => x.Tenure)
+                .With(x => x.AssetAddress, _fixture.Build<AssetAddress>()
+                    .With(a => a.Uprn == "700123")
+                    .With(a => a.AddressLine1 == "AddressLine1")
+                    .With(a => a.AddressLine2 == "AddressLine2")
+                    .With(a => a.AddressLine3 == "AddressLine3")
+                    .With(a => a.AddressLine4 == "AddressLine4")
+                    .With(a => a.PostCode == "N99EE")
+                    .With(a => a.PostPreamble == "PostPreamble")
+                    .Create())
                 .With(x => x.VersionNumber, (int?) null)
                 .Create();
         }
