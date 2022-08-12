@@ -1,3 +1,4 @@
+using AssetInformationApi.V1.Boundary.Request;
 using AssetInformationApi.V1.Factories;
 using AssetInformationApi.V1.Gateways;
 using AssetInformationApi.V1.UseCase.Interfaces;
@@ -26,9 +27,9 @@ namespace AssetInformationApi.V1.UseCase
         }
 
         public async Task<AssetResponseObject> ExecuteAsync(
-            Guid assetId, AssetDb assetRequestObject, string requestBody, Token token)
+            Guid assetId, EditAssetRequest assetRequestObject, string requestBody, Token token, int? ifMatch)
         {
-            var result = await _assetGateway.EditAssetDetails(assetId, assetRequestObject, requestBody).ConfigureAwait(false);
+            var result = await _assetGateway.EditAssetDetails(assetId, assetRequestObject, requestBody, ifMatch).ConfigureAwait(false);
             if (result == null) return null;
 
             if (result.NewValues.Any())

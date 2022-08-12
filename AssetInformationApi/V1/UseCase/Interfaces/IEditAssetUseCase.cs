@@ -1,3 +1,4 @@
+using AssetInformationApi.V1.Boundary.Request;
 using Hackney.Core.JWT;
 using Hackney.Shared.Asset.Boundary.Response;
 using Hackney.Shared.Asset.Infrastructure;
@@ -8,6 +9,6 @@ namespace AssetInformationApi.V1.UseCase.Interfaces
 {
     public interface IEditAssetUseCase
     {
-        Task<AssetResponseObject> ExecuteAsync(Guid assetId, AssetDb assetRequestObject, string requestBody, Token token);
+        Task<AssetResponseObject> ExecuteAsync(Guid assetId, EditAssetRequest assetRequestObject, string requestBody, Token token, int? ifMatch);
     }
 }

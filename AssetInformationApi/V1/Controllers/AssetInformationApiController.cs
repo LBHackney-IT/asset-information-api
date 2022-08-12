@@ -13,6 +13,9 @@ using Hackney.Core.Http;
 using Hackney.Shared.Asset.Infrastructure;
 using System;
 using Hackney.Core.Middleware;
+using HeaderConstants = AssetInformationApi.V1.Infrastructure.HeaderConstants;
+using System.Net.Http.Headers;
+using AssetInformationApi.V1.Infrastructure.Exceptions;
 
 namespace AssetInformationApi.V1.Controllers
 {
@@ -105,16 +108,43 @@ namespace AssetInformationApi.V1.Controllers
         [HttpPatch]
         [Route("{id}")]
         [LogCall(LogLevel.Information)]
-        public async Task<IActionResult> PatchAsset([FromRoute] EditAssetByIdRequest query, [FromBody] AssetDb asset)
+        public async Task<IActionResult> PatchAsset([FromRoute] EditAssetByIdRequest query, [FromBody] EditAssetRequest asset)
         {
             var bodyText = await HttpContext.Request.GetRawBodyStringAsync().ConfigureAwait(false);
+            var ifMatch = GetIfMatchFromHeader();
             var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(HttpContext));
+            try
+            {
+                var result = await _editAssetUseCase.ExecuteAsync(query.Id, asset, bodyText, token, ifMatch).ConfigureAwait(false);
 
-            var result = await _editAssetUseCase.ExecuteAsync(query.Id, asset, bodyText, token).ConfigureAwait(false);
+                if (result == null) return NotFound();
 
-            if (result == null) return NotFound();
+                return NoContent();
+            }
+            catch (VersionNumberConflictException vncErr)
+            {
+                return Conflict(vncErr.Message);
+            }
+        }
 
-            return NoContent();
+        private int? GetIfMatchFromHeader()
+        {
+            var header = HttpContext.Request.Headers.GetHeaderValue(HeaderConstants.IfMatch);
+
+            if (header == null)
+                return null;
+
+            _ = EntityTagHeaderValue.TryParse(header, out var entityTagHeaderValue);
+
+            if (entityTagHeaderValue == null)
+                return null;
+
+            var version = entityTagHeaderValue.Tag.Replace("\"", string.Empty);
+
+            if (int.TryParse(version, out var numericValue))
+                return numericValue;
+
+            return null;
         }
     }
 }

@@ -11,6 +11,7 @@ using Hackney.Shared.Asset.Factories;
 using Hackney.Shared.Asset.Infrastructure;
 using AssetInformationApi.V1.Infrastructure;
 using System;
+using AssetInformationApi.V1.Infrastructure.Exceptions;
 
 namespace AssetInformationApi.V1.Gateways
 {
@@ -67,11 +68,14 @@ namespace AssetInformationApi.V1.Gateways
 
 
         [LogCall]
-        public async Task<UpdateEntityResult<AssetDb>> EditAssetDetails(Guid assetId, AssetDb assetRequestObject, string requestBody)
+        public async Task<UpdateEntityResult<AssetDb>> EditAssetDetails(Guid assetId, EditAssetRequest assetRequestObject, string requestBody, int? ifMatch)
         {
             _logger.LogDebug($"Calling IDynamoDBContext.SaveAsync for id {assetId}");
             var existingAsset = await _dynamoDbContext.LoadAsync<AssetDb>(assetId).ConfigureAwait(false);
             if (existingAsset == null) return null;
+
+            if (ifMatch != existingAsset.VersionNumber)
+                throw new VersionNumberConflictException(ifMatch, existingAsset.VersionNumber);
 
             var response = _updater.UpdateEntity(existingAsset, requestBody, assetRequestObject);
 

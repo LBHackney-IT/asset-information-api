@@ -5,13 +5,17 @@ using Hackney.Shared.Asset.Infrastructure;
 using Hackney.Shared.Asset.Domain;
 using Amazon.SimpleNotificationService;
 using System.Collections.Generic;
+using Amazon.DynamoDBv2.DataModel;
+using Hackney.Shared.Asset.Factories;
 
 namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
 {
     public class AssetsFixture : IDisposable
     {
         private readonly Fixture _fixture = new Fixture();
-        private readonly IDynamoDbFixture _dbFixture;
+
+        public readonly IDynamoDbFixture _dbFixture;
+
         private readonly IAmazonSimpleNotificationService _amazonSimpleNotificationService;
 
         public AssetDb Asset { get; private set; }
@@ -19,6 +23,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
         public Guid AssetId { get; private set; }
         public string PropertyReference { get; set; }
         public string InvalidAssetId { get; private set; }
+        public Asset ExistingAsset { get; private set; }
 
         public AssetsFixture(IDynamoDbFixture dbFixture, IAmazonSimpleNotificationService amazonSimpleNotificationService)
         {
@@ -56,14 +61,17 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
 
         public void GivenAnAssetAlreadyExists()
         {
-            Asset = _fixture.Build<AssetDb>()
+            var entity = _fixture.Build<AssetDb>()
                 .With(x => x.VersionNumber, (int?) null)
                 .Create();
 
-            AssetId = Asset.Id;
-            PropertyReference = Asset.AssetId;
+            _dbFixture.DynamoDbContext.SaveAsync<AssetDb>(entity).GetAwaiter().GetResult();
+            entity.VersionNumber = 0;
 
-            _dbFixture.DynamoDbContext.SaveAsync(Asset).GetAwaiter().GetResult();
+            ExistingAsset = entity.ToDomain();
+            Asset = entity;
+            AssetId = entity.Id;
+            PropertyReference = entity.AssetId;
         }
 
         public void GivenAnAssetThatDoesntExist()

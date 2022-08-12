@@ -185,10 +185,10 @@ namespace AssetInformationApi.Tests.V1.Controllers
         [Fact]
         public async Task EditAssetWhenValidReturns204NoContentResponse()
         {
-            var mockQuery = _fixture.Create<AssetDb>();
+            var mockQuery = _fixture.Create<EditAssetRequest>();
             var mockRequestObject = _fixture.Create<EditAssetByIdRequest>();
 
-            _mockEditAssetUseCase.Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<AssetDb>(), It.IsAny<string>(), It.IsAny<Token>())).ReturnsAsync(_fixture.Create<AssetResponseObject>());
+            _mockEditAssetUseCase.Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditAssetRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>())).ReturnsAsync(_fixture.Create<AssetResponseObject>());
 
             var response = await _classUnderTest.PatchAsset(mockRequestObject, mockQuery).ConfigureAwait(false);
 
@@ -198,10 +198,10 @@ namespace AssetInformationApi.Tests.V1.Controllers
         [Fact]
         public async Task EditAssetWhenAssetDoesntExistReturns404NotFoundResponse()
         {
-            var mockQuery = _fixture.Create<AssetDb>();
+            var mockQuery = _fixture.Create<EditAssetRequest>();
             var mockRequestObject = _fixture.Create<EditAssetByIdRequest>();
 
-            _mockEditAssetUseCase.Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<AssetDb>(), It.IsAny<string>(), It.IsAny<Token>())).ReturnsAsync((AssetResponseObject) null);
+            _mockEditAssetUseCase.Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditAssetRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>())).ReturnsAsync((AssetResponseObject) null);
 
             var response = await _classUnderTest.PatchAsset(mockRequestObject, mockQuery).ConfigureAwait(false);
 
