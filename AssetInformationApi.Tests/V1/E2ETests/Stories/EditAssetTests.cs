@@ -122,7 +122,6 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         private EditAssetRequest CreateValidRequestObject()
         {
             return _fixture.Build<EditAssetRequest>()
-                .Without(x => x.Tenure)
                 .With(x => x.AssetAddress, _fixture.Build<AssetAddress>()
                     .With(a => a.Uprn, "700123")
                     .With(a => a.AddressLine1, "AddressLine1")

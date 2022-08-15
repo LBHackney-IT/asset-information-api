@@ -163,7 +163,6 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
             databaseResponse.RootAsset.Should().Be(requestObject.RootAsset);
             databaseResponse.AssetLocation.Should().Be(requestObject.AssetLocation);
             databaseResponse.AssetId.Should().Be(requestObject.AssetId);
-            databaseResponse.Tenure.Should().Be(requestObject.Tenure);
         }
 
         public async Task ThenTheAssetUpdatedEventIsRaised(AssetsFixture assetFixture, ISnsFixture snsFixture)
@@ -238,10 +237,6 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
 
             var eventDataAssetLocation = JsonSerializer.Deserialize<AssetLocation>(data["assetLocation"].ToString(), CreateJsonOptions());
             eventDataAssetLocation.Should().BeEquivalentTo(expected["assetLocation"]);
-
-            var eventDataTenure = JsonSerializer.Deserialize<AssetTenureDb>(data["tenure"].ToString(), CreateJsonOptions());
-            eventDataTenure.Should().BeEquivalentTo(expected["tenure"]);
-
         }
     }
 }
