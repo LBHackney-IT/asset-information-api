@@ -97,15 +97,11 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         [Fact]
         public void ServiceReturns204AndUpdatesDatabase()
         {
-            // request with empty body should still return 204 no content.
-            // the request also shouldnt update the database since no changes were sent.
-
-            var requestObject = CreateValidRequestObject();
-
             this.Given(g => _assetFixture.GivenAnAssetAlreadyExists())
-                .When(w => _steps.WhenEditAssetApiIsCalled(_assetFixture.AssetId, requestObject))
+                .Then(t => _assetFixture.CreateEditAssetObject())
+                .When(w => _steps.WhenEditAssetApiIsCalled(_assetFixture.AssetId, _assetFixture.EditAsset))
                 .Then(t => _steps.ThenNoContentResponseReturned())
-                .And(a => _steps.TheAssetHasBeenUpdatedInTheDatabase(_assetFixture, requestObject))
+                .And(a => _steps.TheAssetHasBeenUpdatedInTheDatabase(_assetFixture, _assetFixture.EditAsset))
                 .And(t => _steps.ThenTheAssetUpdatedEventIsRaised(_assetFixture, _snsFixture))
                 .BDDfy();
         }

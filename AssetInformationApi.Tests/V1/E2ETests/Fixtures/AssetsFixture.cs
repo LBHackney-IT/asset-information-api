@@ -7,6 +7,7 @@ using Amazon.SimpleNotificationService;
 using System.Collections.Generic;
 using Amazon.DynamoDBv2.DataModel;
 using Hackney.Shared.Asset.Factories;
+using AssetInformationApi.V1.Boundary.Request;
 
 namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
 {
@@ -24,6 +25,8 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
         public string PropertyReference { get; set; }
         public string InvalidAssetId { get; private set; }
         public Asset ExistingAsset { get; private set; }
+
+        public EditAssetRequest EditAsset { get; private set; }
 
         public AssetsFixture(IDynamoDbFixture dbFixture, IAmazonSimpleNotificationService amazonSimpleNotificationService)
         {
@@ -57,6 +60,16 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
             asset.Id = Guid.NewGuid();
 
             AssetRequest = asset;
+        }
+
+        public void CreateEditAssetObject()
+        {
+            var asset = _fixture.Build<EditAssetRequest>()
+                .With(x => x.Id, AssetId)
+                .With(x => x.VersionNumber, (int?) null)
+                .Create();
+
+            EditAsset = asset;
         }
 
         public void GivenAnAssetAlreadyExists()
