@@ -150,19 +150,19 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
             responseEntity.Error.Should().Be(StatusCodes.Status400BadRequest);
         }
 
-        public async Task TheAssetHasBeenUpdatedInTheDatabase(AssetsFixture assetFixture, EditAssetRequest requestObject)
+        public async Task TheAssetHasBeenUpdatedInTheDatabase(AssetsFixture assetFixture)
         {
             var databaseResponse = await _dbContext.LoadAsync<AssetDb>(assetFixture.AssetId).ConfigureAwait(false);
 
             databaseResponse.Id.Should().Be(assetFixture.ExistingAsset.Id);
-            databaseResponse.AssetAddress.Should().Be(requestObject.AssetAddress);
-            databaseResponse.AssetCharacteristics.Should().Be(requestObject.AssetCharacteristics);
-            databaseResponse.AssetManagement.Should().Be(requestObject.AssetManagement);
-            databaseResponse.AssetType.Should().Be(requestObject.AssetType);
-            databaseResponse.ParentAssetIds.Should().Be(requestObject.ParentAssetIds);
-            databaseResponse.RootAsset.Should().Be(requestObject.RootAsset);
-            databaseResponse.AssetLocation.Should().Be(requestObject.AssetLocation);
-            databaseResponse.AssetId.Should().Be(requestObject.AssetId);
+            databaseResponse.AssetAddress.ToString().Should().Be(assetFixture.EditAsset.AssetAddress.ToString());
+            databaseResponse.AssetCharacteristics.ToString().Should().Be(assetFixture.EditAsset.AssetCharacteristics.ToString());
+            databaseResponse.AssetManagement.ToString().Should().Be(assetFixture.EditAsset.AssetManagement.ToString());
+            databaseResponse.AssetType.Should().Be(assetFixture.EditAsset.AssetType);
+            databaseResponse.ParentAssetIds.Should().Be(assetFixture.EditAsset.ParentAssetIds);
+            databaseResponse.RootAsset.Should().Be(assetFixture.EditAsset.RootAsset);
+            databaseResponse.AssetLocation.ToString().Should().Be(assetFixture.EditAsset.AssetLocation.ToString());
+            databaseResponse.AssetId.Should().Be(assetFixture.EditAsset.AssetId);
         }
 
         public async Task ThenTheAssetUpdatedEventIsRaised(AssetsFixture assetFixture, ISnsFixture snsFixture)
@@ -186,7 +186,6 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
                     { "assetCharacteristics", assetFixture.Asset.AssetCharacteristics },
                     { "assetManagement", assetFixture.Asset.AssetManagement },
                     { "assetLocation", assetFixture.Asset.AssetLocation },
-                    { "tenure", assetFixture.Asset.Tenure },
                 };
                 var expectedNewData = new Dictionary<string, object>
                 {
@@ -199,7 +198,6 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
                     { "assetCharacteristics", dbRecord.AssetCharacteristics },
                     { "assetManagement", dbRecord.AssetManagement },
                     { "assetLocation", dbRecord.AssetLocation },
-                    { "tenure", dbRecord.Tenure },
                 };
                 VerifyEventData(actual.EventData.OldData, expectedOldData);
                 VerifyEventData(actual.EventData.NewData, expectedNewData);
@@ -222,9 +220,6 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
         private void VerifyEventData(object eventDataJsonObj, Dictionary<string, object> expected)
         {
             var data = JsonSerializer.Deserialize<Dictionary<string, object>>(eventDataJsonObj.ToString(), CreateJsonOptions());
-
-            var eventDataAssetType = JsonSerializer.Deserialize<AssetType>(data["assetType"].ToString(), CreateJsonOptions());
-            eventDataAssetType.Should().BeEquivalentTo(expected["assetType"]);
 
             var eventDataAssetAddress = JsonSerializer.Deserialize<AssetAddress>(data["assetAddress"].ToString(), CreateJsonOptions());
             eventDataAssetAddress.Should().BeEquivalentTo(expected["assetAddress"]);

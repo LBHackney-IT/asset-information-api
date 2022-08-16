@@ -46,7 +46,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
             if (disposing && !_disposed)
             {
                 if (Asset != null)
-                    _dbFixture.DynamoDbContext.DeleteAsync(Asset).GetAwaiter().GetResult();
+                    _dbFixture.DynamoDbContext.DeleteAsync<AssetDb>(Asset.Id).GetAwaiter().GetResult();
 
                 _disposed = true;
             }
@@ -65,16 +65,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
         public void CreateEditAssetObject()
         {
             var asset = _fixture.Build<EditAssetRequest>()
-                .With(x => x.AssetAddress, _fixture.Build<AssetAddress>()
-                    .With(a => a.Uprn, "700123")
-                    .With(a => a.AddressLine1, "AddressLine1")
-                    .With(a => a.AddressLine2, "AddressLine2")
-                    .With(a => a.AddressLine3, "AddressLine3")
-                    .With(a => a.AddressLine4, "AddressLine4")
-                    .With(a => a.PostCode, "N99EE")
-                    .With(a => a.PostPreamble, "PostPreamble")
-                    .Create())
-                .With(x => x.VersionNumber, (int?) null)
+                .With(x => x.VersionNumber, Asset.VersionNumber)
                 .Create();
 
             EditAsset = asset;

@@ -34,22 +34,6 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
             _snsFixture = appFactory.SnsFixture;
             _assetFixture = new AssetsFixture(_dbFixture, _snsFixture.SimpleNotificationService);
             _steps = new EditAssetSteps(appFactory.Client, _dbFixture.DynamoDbContext);
-            _fixture.Customizations.Add(
-                new TypeRelay(
-                    typeof(IDynamoDbFixture),
-                    typeof(DynamoDbFixture)));
-            _fixture.Customizations.Add(
-                new TypeRelay(
-                    typeof(IDynamoDBContext),
-                    typeof(DynamoDBContext)));
-            _fixture.Customizations.Add(
-                new TypeRelay(
-                    typeof(IAmazonDynamoDB),
-                    typeof(AmazonDynamoDBClient)));
-            _fixture.Customizations.Add(
-             new TypeRelay(
-                 typeof(IAmazonSimpleNotificationService),
-                 typeof(AmazonSimpleNotificationServiceClient)));
         }
 
         public void Dispose()
@@ -101,7 +85,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
                 .Then(t => _assetFixture.CreateEditAssetObject())
                 .When(w => _steps.WhenEditAssetApiIsCalled(_assetFixture.AssetId, _assetFixture.EditAsset))
                 .Then(t => _steps.ThenNoContentResponseReturned())
-                .And(a => _steps.TheAssetHasBeenUpdatedInTheDatabase(_assetFixture, _assetFixture.EditAsset))
+                .And(a => _steps.TheAssetHasBeenUpdatedInTheDatabase(_assetFixture))
                 .And(t => _steps.ThenTheAssetUpdatedEventIsRaised(_assetFixture, _snsFixture))
                 .BDDfy();
         }
