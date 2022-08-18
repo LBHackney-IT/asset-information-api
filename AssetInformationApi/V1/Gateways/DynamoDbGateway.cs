@@ -48,5 +48,17 @@ namespace AssetInformationApi.V1.Gateways
 
             return response.First().ToDomain();
         }
+
+        [LogCall]
+        public async Task<Asset> AddAsset(AssetDb asset)
+        {
+            _logger.LogDebug($"Calling IDynamoDBContext.SaveAsync for id {asset.Id}");
+            _dynamoDbContext.SaveAsync(asset).GetAwaiter().GetResult();
+
+            _logger.LogDebug($"Calling IDynamoDBContext.LoadAsync for id {asset.Id}");
+            var result = await _dynamoDbContext.LoadAsync<AssetDb>(asset.Id).ConfigureAwait(false);
+
+            return result?.ToDomain();
+        }
     }
 }
