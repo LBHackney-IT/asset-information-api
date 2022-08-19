@@ -38,7 +38,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
         {
             var token =
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMTUwMTgxMTYwOTIwOTg2NzYxMTMiLCJlbWFpbCI6ImUyZS10ZXN0aW5nQGRldmVsb3BtZW50LmNvbSIsImlzcyI6IkhhY2tuZXkiLCJuYW1lIjoiVGVzdGVyIiwiZ3JvdXBzIjpbImUyZS10ZXN0aW5nIl0sImlhdCI6MTYyMzA1ODIzMn0.SooWAr-NUZLwW8brgiGpi2jZdWjyZBwp4GJikn0PvEw";
-            var uri = new Uri($"api/v1/assets/add", UriKind.Relative);
+            var uri = new Uri($"api/v1/assets", UriKind.Relative);
 
             using (var message = new HttpRequestMessage(HttpMethod.Post, uri))
             {
@@ -56,7 +56,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
 
         public async Task WhenTheAddAssetApiIsCalled(Asset asset)
         {
-            var route = $"/api/v1/assets/add";
+            var route = $"/api/v1/assets";
             //var token = new Token();
             if (asset.Id == Guid.Empty)
                 _lastResponse = new HttpResponseMessage(HttpStatusCode.BadRequest);
