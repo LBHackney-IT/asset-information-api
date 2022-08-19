@@ -80,6 +80,7 @@ namespace AssetInformationApi.V1.Controllers
         }
 
         [ProducesResponseType(typeof(AssetResponseObject), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
         [LogCall(LogLevel.Information)]
