@@ -35,10 +35,10 @@ namespace AssetInformationApi.V1.UseCase
 
             if (result.NewValues.Any())
             {
-                //var assetSnsMessage = _snsFactory.UpdateAsset(result, token);
-                //var assetTopicArn = Environment.GetEnvironmentVariable("ASSET_SNS_ARN");
+                var assetSnsMessage = _snsFactory.UpdateAsset(result, token);
+                var assetTopicArn = Environment.GetEnvironmentVariable("ASSET_SNS_ARN");
 
-                //await _snsGateway.Publish(assetSnsMessage, assetTopicArn).ConfigureAwait(false);
+                await _snsGateway.Publish(assetSnsMessage, assetTopicArn).ConfigureAwait(false);
             }
 
             return result.UpdatedEntity.ToDomain().ToResponse();
