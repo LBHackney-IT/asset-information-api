@@ -18,6 +18,7 @@ using System.Net.Http.Headers;
 using AssetInformationApi.V1.Infrastructure.Exceptions;
 using Hackney.Shared.Asset.Boundary.Request;
 
+
 namespace AssetInformationApi.V1.Controllers
 {
     [ApiController]
@@ -87,19 +88,17 @@ namespace AssetInformationApi.V1.Controllers
             return Ok(result);
         }
 
-        [ProducesResponseType(typeof(AssetResponseObject), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AssetResponseObject), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
-        [Route("add")]
         [LogCall(LogLevel.Information)]
         public async Task<IActionResult> AddAsset([FromBody] AddAssetRequest asset)
         {
             var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(HttpContext));
             var result = await _newAssetUseCase.PostAsync(asset.ToDatabase(), token).ConfigureAwait(false);
 
-            return StatusCode(StatusCodes.Status201Created, result);
+            return Created(new Uri($"api/v1/assets/{asset.Id}", UriKind.Relative), result);
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
