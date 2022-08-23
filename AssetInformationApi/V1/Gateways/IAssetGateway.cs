@@ -4,6 +4,7 @@ using Hackney.Shared.Asset.Domain;
 using Hackney.Shared.Asset.Infrastructure;
 using System;
 using AssetInformationApi.V1.Infrastructure;
+using Hackney.Shared.Asset.Boundary.Request;
 
 namespace AssetInformationApi.V1.Gateways
 {

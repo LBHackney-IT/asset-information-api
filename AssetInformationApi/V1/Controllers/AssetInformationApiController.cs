@@ -16,6 +16,7 @@ using Hackney.Core.Middleware;
 using HeaderConstants = AssetInformationApi.V1.Infrastructure.HeaderConstants;
 using System.Net.Http.Headers;
 using AssetInformationApi.V1.Infrastructure.Exceptions;
+using Hackney.Shared.Asset.Boundary.Request;
 
 namespace AssetInformationApi.V1.Controllers
 {

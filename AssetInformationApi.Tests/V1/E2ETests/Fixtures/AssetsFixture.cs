@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using Amazon.DynamoDBv2.DataModel;
 using Hackney.Shared.Asset.Factories;
 using AssetInformationApi.V1.Boundary.Request;
+using Hackney.Shared.Asset.Boundary.Request;
 
 namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
 {
@@ -65,7 +66,6 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
         public void CreateEditAssetObject()
         {
             var asset = _fixture.Build<EditAssetRequest>()
-                .With(x => x.VersionNumber, Asset.VersionNumber)
                 .Create();
 
             EditAsset = asset;
@@ -75,15 +75,6 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
         {
             var entity = _fixture.Build<AssetDb>()
                 .Without(x => x.Tenure)
-                .With(x => x.AssetAddress, _fixture.Build<AssetAddress>()
-                    .With(a => a.Uprn, "700123")
-                    .With(a => a.AddressLine1, "AddressLine1")
-                    .With(a => a.AddressLine2, "AddressLine2")
-                    .With(a => a.AddressLine3, "AddressLine3")
-                    .With(a => a.AddressLine4, "AddressLine4")
-                    .With(a => a.PostCode, "N99EE")
-                    .With(a => a.PostPreamble, "PostPreamble")
-                    .Create())
                 .With(x => x.VersionNumber, (int?) null)
                 .Create();
 

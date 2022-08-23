@@ -19,6 +19,7 @@ using System.IO;
 using System.Text;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Hackney.Shared.Asset.Boundary.Request;
 
 namespace AssetInformationApi.Tests.V1.Controllers
 {

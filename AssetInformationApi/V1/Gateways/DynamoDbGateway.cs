@@ -12,6 +12,7 @@ using Hackney.Shared.Asset.Infrastructure;
 using AssetInformationApi.V1.Infrastructure;
 using System;
 using AssetInformationApi.V1.Infrastructure.Exceptions;
+using Hackney.Shared.Asset.Boundary.Request;
 
 namespace AssetInformationApi.V1.Gateways
 {

@@ -4,6 +4,7 @@ using AssetInformationApi.V1.Gateways;
 using AssetInformationApi.V1.UseCase.Interfaces;
 using Hackney.Core.JWT;
 using Hackney.Core.Sns;
+using Hackney.Shared.Asset.Boundary.Request;
 using Hackney.Shared.Asset.Boundary.Response;
 using Hackney.Shared.Asset.Factories;
 using Hackney.Shared.Asset.Infrastructure;
@@ -34,10 +35,10 @@ namespace AssetInformationApi.V1.UseCase
 
             if (result.NewValues.Any())
             {
-                var assetSnsMessage = _snsFactory.UpdateAsset(result, token);
-                var assetTopicArn = Environment.GetEnvironmentVariable("ASSET_SNS_ARN");
+                //var assetSnsMessage = _snsFactory.UpdateAsset(result, token);
+                //var assetTopicArn = Environment.GetEnvironmentVariable("ASSET_SNS_ARN");
 
-                await _snsGateway.Publish(assetSnsMessage, assetTopicArn).ConfigureAwait(false);
+                //await _snsGateway.Publish(assetSnsMessage, assetTopicArn).ConfigureAwait(false);
             }
 
             return result.UpdatedEntity.ToDomain().ToResponse();

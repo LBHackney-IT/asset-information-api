@@ -155,14 +155,11 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
             var databaseResponse = await _dbContext.LoadAsync<AssetDb>(assetFixture.AssetId).ConfigureAwait(false);
 
             databaseResponse.Id.Should().Be(assetFixture.ExistingAsset.Id);
-            databaseResponse.AssetAddress.ToString().Should().Be(assetFixture.EditAsset.AssetAddress.ToString());
             databaseResponse.AssetCharacteristics.ToString().Should().Be(assetFixture.EditAsset.AssetCharacteristics.ToString());
             databaseResponse.AssetManagement.ToString().Should().Be(assetFixture.EditAsset.AssetManagement.ToString());
-            databaseResponse.AssetType.Should().Be(assetFixture.EditAsset.AssetType);
             databaseResponse.ParentAssetIds.Should().Be(assetFixture.EditAsset.ParentAssetIds);
             databaseResponse.RootAsset.Should().Be(assetFixture.EditAsset.RootAsset);
             databaseResponse.AssetLocation.ToString().Should().Be(assetFixture.EditAsset.AssetLocation.ToString());
-            databaseResponse.AssetId.Should().Be(assetFixture.EditAsset.AssetId);
         }
 
         public async Task ThenTheAssetUpdatedEventIsRaised(AssetsFixture assetFixture, ISnsFixture snsFixture)
@@ -177,24 +174,16 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
 
                 var expectedOldData = new Dictionary<string, object>
                 {
-                    { "assetId", assetFixture.Asset.AssetId },
                     { "rootAsset", assetFixture.Asset.RootAsset },
                     { "parentAssetIds", assetFixture.Asset.ParentAssetIds },
-                    { "assetType", assetFixture.Asset.AssetType },
-
-                    { "assetAddress", assetFixture.Asset.AssetAddress },
                     { "assetCharacteristics", assetFixture.Asset.AssetCharacteristics },
                     { "assetManagement", assetFixture.Asset.AssetManagement },
                     { "assetLocation", assetFixture.Asset.AssetLocation },
                 };
                 var expectedNewData = new Dictionary<string, object>
                 {
-                    { "assetId", dbRecord.AssetId },
                     { "rootAsset", dbRecord.RootAsset },
                     { "parentAssetIds", dbRecord.ParentAssetIds },
-                    { "assetType", dbRecord.AssetType },
-
-                    { "assetAddress", dbRecord.AssetAddress },
                     { "assetCharacteristics", dbRecord.AssetCharacteristics },
                     { "assetManagement", dbRecord.AssetManagement },
                     { "assetLocation", dbRecord.AssetLocation },
@@ -220,9 +209,6 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
         private void VerifyEventData(object eventDataJsonObj, Dictionary<string, object> expected)
         {
             var data = JsonSerializer.Deserialize<Dictionary<string, object>>(eventDataJsonObj.ToString(), CreateJsonOptions());
-
-            var eventDataAssetAddress = JsonSerializer.Deserialize<AssetAddress>(data["assetAddress"].ToString(), CreateJsonOptions());
-            eventDataAssetAddress.Should().BeEquivalentTo(expected["assetAddress"]);
 
             var eventDataAssetCharacteristics = JsonSerializer.Deserialize<AssetCharacteristics>(data["assetCharacteristics"].ToString(), CreateJsonOptions());
             eventDataAssetCharacteristics.Should().BeEquivalentTo(expected["assetCharacteristics"]);
