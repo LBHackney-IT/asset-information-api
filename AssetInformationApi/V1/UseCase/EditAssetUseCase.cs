@@ -37,7 +37,6 @@ namespace AssetInformationApi.V1.UseCase
             {
                 var assetSnsMessage = _snsFactory.UpdateAsset(result, token);
                 var assetTopicArn = Environment.GetEnvironmentVariable("ASSET_SNS_ARN");
-
                 await _snsGateway.Publish(assetSnsMessage, assetTopicArn).ConfigureAwait(false);
             }
 

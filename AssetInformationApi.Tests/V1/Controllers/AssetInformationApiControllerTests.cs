@@ -63,9 +63,9 @@ namespace AssetInformationApi.Tests.V1.Controllers
                 _mockEditAssetUseCase.Object);
 
             // changes to allow reading of raw request body
-#pragma warning disable CA2000 // Dispose objects before losing scope
-            _mockHttpRequest.SetupGet(x => x.Body).Returns(new MemoryStream(Encoding.Default.GetBytes(RequestBodyText)));
-#pragma warning restore CA2000 // Dispose objects before losing scope
+            var requestStream = new MemoryStream(Encoding.Default.GetBytes(RequestBodyText));
+            _mockHttpRequest.SetupGet(x => x.Body).Returns(requestStream);
+
 
             _requestHeaders = new HeaderDictionary();
             _mockHttpRequest.SetupGet(x => x.Headers).Returns(_requestHeaders);
@@ -83,6 +83,8 @@ namespace AssetInformationApi.Tests.V1.Controllers
 
             var controllerContext = new ControllerContext(new ActionContext(mockHttpContext.Object, new RouteData(), new ControllerActionDescriptor()));
             _classUnderTest.ControllerContext = controllerContext;
+
+            requestStream.Dispose();
         }
 
         private static GetAssetByIdRequest ConstructRequest(Guid? id = null)
