@@ -13,14 +13,21 @@
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "api/v1/healthcheck/ping",
-      "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "LocalDevelopment",
+        "DynamoDb_LocalServiceUrl": "http://localhost:8000",
         "DynamoDb_LocalMode": "true",
         "Sns_LocalMode": "true",
-        "DynamoDb_LocalServiceUrl": "http://localhost:8000",
         "Localstack_SnsServiceUrl": "http://localhost:4566"
-      }
+      },
+      "applicationUrl": "http://localhost:5000"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/api/v1/healthcheck/ping",
+      "publishAllPorts": true,
+      "useSSL": true
     }
   }
 }
