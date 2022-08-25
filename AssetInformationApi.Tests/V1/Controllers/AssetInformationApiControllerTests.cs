@@ -41,6 +41,7 @@ namespace AssetInformationApi.Tests.V1.Controllers
         private readonly HeaderDictionary _responseHeaders;
 
         private const string RequestBodyText = "Some request body text";
+        private readonly MemoryStream _requestStream;
 
         public AssetInformationApiControllerTests()
         {
@@ -63,8 +64,8 @@ namespace AssetInformationApi.Tests.V1.Controllers
                 _mockEditAssetUseCase.Object);
 
             // changes to allow reading of raw request body
-            var requestStream = new MemoryStream(Encoding.Default.GetBytes(RequestBodyText));
-            _mockHttpRequest.SetupGet(x => x.Body).Returns(requestStream);
+            _requestStream = new MemoryStream(Encoding.Default.GetBytes(RequestBodyText));
+            _mockHttpRequest.SetupGet(x => x.Body).Returns(_requestStream);
 
 
             _requestHeaders = new HeaderDictionary();
@@ -84,7 +85,7 @@ namespace AssetInformationApi.Tests.V1.Controllers
             var controllerContext = new ControllerContext(new ActionContext(mockHttpContext.Object, new RouteData(), new ControllerActionDescriptor()));
             _classUnderTest.ControllerContext = controllerContext;
 
-            requestStream.Dispose();
+
         }
 
         private static GetAssetByIdRequest ConstructRequest(Guid? id = null)
