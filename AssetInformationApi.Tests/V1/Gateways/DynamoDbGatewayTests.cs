@@ -11,6 +11,7 @@ using AssetInformationApi.V1.Boundary.Request;
 using AssetInformationApi.V1.Gateways;
 using Hackney.Shared.Asset.Factories;
 using Hackney.Shared.Asset.Infrastructure;
+using AssetInformationApi.V1.Infrastructure;
 
 namespace AssetInformationApi.Tests.V1.Gateways
 {
@@ -21,12 +22,13 @@ namespace AssetInformationApi.Tests.V1.Gateways
         private readonly IDynamoDbFixture _dbFixture;
         private readonly Mock<ILogger<DynamoDbGateway>> _logger;
         private readonly DynamoDbGateway _classUnderTest;
-
+        private readonly Mock<IEntityUpdater> _updater;
         public DynamoDbGatewayTests(MockWebApplicationFactory<Startup> appFactory)
         {
             _dbFixture = appFactory.DynamoDbFixture;
             _logger = new Mock<ILogger<DynamoDbGateway>>();
-            _classUnderTest = new DynamoDbGateway(_dbFixture.DynamoDbContext, _logger.Object);
+            _updater = new Mock<IEntityUpdater>();
+            _classUnderTest = new DynamoDbGateway(_dbFixture.DynamoDbContext, _logger.Object, _updater.Object);
         }
 
         public void Dispose()
