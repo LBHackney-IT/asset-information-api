@@ -97,7 +97,7 @@ namespace AssetInformationApi.Tests.V1.Controllers
         public async Task GetTenureWithNoIdReturnsNotFound()
         {
             var request = ConstructRequest();
-            _mockGetAssetByIdUseCase.Setup(x => x.ExecuteAsync(request)).ReturnsAsync((AssetResponseObject) null);
+            _mockGetAssetByIdUseCase.Setup(x => x.ExecuteAsync(request)).ReturnsAsync((Asset) null);
 
             var response = await _classUnderTest.GetAssetById(request).ConfigureAwait(false);
             response.Should().BeOfType(typeof(NotFoundObjectResult));
@@ -107,7 +107,7 @@ namespace AssetInformationApi.Tests.V1.Controllers
         [Fact]
         public async Task GetTenureWithValidIdReturnsOKResponse()
         {
-            var tenureResponse = _fixture.Create<AssetResponseObject>();
+            var tenureResponse = _fixture.Create<Asset>();
             var request = ConstructRequest(tenureResponse.Id);
             _mockGetAssetByIdUseCase.Setup(x => x.ExecuteAsync(request)).ReturnsAsync(tenureResponse);
 
@@ -162,7 +162,7 @@ namespace AssetInformationApi.Tests.V1.Controllers
         public async Task SaveAssetReturnsEntity()
         {
             // Arrange
-            var useCaseResponse = _fixture.Create<AssetResponseObject>();
+            var useCaseResponse = _fixture.Create<Asset>();
             _mockGetAssetByIdUseCase
                 .Setup(x => x.ExecuteAsync(It.IsAny<GetAssetByIdRequest>()))
                 .ReturnsAsync(useCaseResponse);
@@ -181,9 +181,9 @@ namespace AssetInformationApi.Tests.V1.Controllers
 
             // Assert
             response.Should().BeOfType(typeof(OkObjectResult));
-            (response as OkObjectResult).Value.Should().BeOfType(typeof(AssetResponseObject));
+            (response as OkObjectResult).Value.Should().BeOfType(typeof(Asset));
 
-            ((response as OkObjectResult).Value as AssetResponseObject).Should().BeEquivalentTo(useCaseResponse);
+            ((response as OkObjectResult).Value as Asset).Should().BeEquivalentTo(useCaseResponse);
         }
 
         [Fact]

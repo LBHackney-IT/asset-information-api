@@ -64,6 +64,13 @@ namespace AssetInformationApi.V1.Controllers
         {
             var result = await _getAssetByIdUseCase.ExecuteAsync(query).ConfigureAwait(false);
             if (result == null) return NotFound(query.Id);
+
+            var eTag = string.Empty;
+            if (result.VersionNumber.HasValue)
+                eTag = result.VersionNumber.ToString();
+
+            HttpContext.Response.Headers.Add(HeaderConstants.ETag, EntityTagHeaderValue.Parse($"\"{eTag}\"").Tag);
+
             return Ok(result);
         }
 
