@@ -5,6 +5,7 @@ using Hackney.Core.Logging;
 using System.Threading.Tasks;
 using Hackney.Shared.Asset.Boundary.Response;
 using Hackney.Shared.Asset.Factories;
+using Hackney.Shared.Asset.Domain;
 
 namespace AssetInformationApi.V1.UseCase
 {
@@ -18,9 +19,9 @@ namespace AssetInformationApi.V1.UseCase
         }
 
         [LogCall]
-        public async Task<AssetResponseObject> ExecuteAsync(GetAssetByIdRequest query)
+        public async Task<Asset> ExecuteAsync(GetAssetByIdRequest query)
         {
-            return (await _gateway.GetAssetByIdAsync(query).ConfigureAwait(false)).ToResponse();
+            return (await _gateway.GetAssetByIdAsync(query).ConfigureAwait(false));
         }
     }
 }
