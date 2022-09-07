@@ -59,7 +59,7 @@ namespace AssetInformationApi.Tests.V1.UseCase
             var request = ConstructRequest();
             var exception = new ApplicationException("Test Exception");
             _mockGateway.Setup(x => x.GetAssetByIdAsync(request)).ThrowsAsync(exception);
-            Func<Task<AssetResponseObject>> throwException = async () => await _classUnderTest.ExecuteAsync(request).ConfigureAwait(false);
+            Func<Task<Asset>> throwException = async () => await _classUnderTest.ExecuteAsync(request).ConfigureAwait(false);
             throwException.Should().Throw<ApplicationException>().WithMessage("Test Exception");
         }
     }

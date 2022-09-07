@@ -28,5 +28,26 @@ namespace AssetInformationApi.V1.Factories
                 User = new User { Name = token.Name, Email = token.Email }
             };
         }
+
+        public EntityEventSns UpdateAsset(UpdateEntityResult<AssetDb> updateResult, Token token)
+        {
+            return new EntityEventSns
+            {
+                CorrelationId = Guid.NewGuid(),
+                DateTime = DateTime.UtcNow,
+                EntityId = updateResult.UpdatedEntity.Id,
+                Id = Guid.NewGuid(),
+                EventType = UpdateAssetConstants.EVENTTYPE,
+                Version = UpdateAssetConstants.V1_VERSION,
+                SourceDomain = UpdateAssetConstants.SOURCE_DOMAIN,
+                SourceSystem = UpdateAssetConstants.SOURCE_SYSTEM,
+                EventData = new EventData
+                {
+                    NewData = updateResult.NewValues,
+                    OldData = updateResult.OldValues
+                },
+                User = new User { Name = token.Name, Email = token.Email }
+            };
+        }
     }
 }

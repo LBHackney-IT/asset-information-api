@@ -20,6 +20,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         private readonly AddNewAssetSteps _steps;
         private readonly AssetsFixture _assetsFixture;
 
+#pragma warning disable 0649
         public AddNewAssetTests(MockWebApplicationFactory<Startup> appFactory)
         {
             _dbFixture = appFactory.DynamoDbFixture;

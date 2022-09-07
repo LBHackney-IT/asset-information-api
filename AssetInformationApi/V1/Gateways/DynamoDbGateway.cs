@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 using Hackney.Shared.Asset.Domain;
 using Hackney.Shared.Asset.Factories;
 using Hackney.Shared.Asset.Infrastructure;
+using AssetInformationApi.V1.Infrastructure;
+using System;
+using AssetInformationApi.V1.Infrastructure.Exceptions;
+using Hackney.Shared.Asset.Boundary.Request;
 
 namespace AssetInformationApi.V1.Gateways
 {
@@ -16,11 +20,13 @@ namespace AssetInformationApi.V1.Gateways
     {
         private readonly IDynamoDBContext _dynamoDbContext;
         private readonly ILogger<DynamoDbGateway> _logger;
+        private readonly IEntityUpdater _updater;
 
-        public DynamoDbGateway(IDynamoDBContext dynamoDbContext, ILogger<DynamoDbGateway> logger)
+        public DynamoDbGateway(IDynamoDBContext dynamoDbContext, ILogger<DynamoDbGateway> logger, IEntityUpdater updater)
         {
             _dynamoDbContext = dynamoDbContext;
             _logger = logger;
+            _updater = updater;
         }
 
         [LogCall]
@@ -59,6 +65,28 @@ namespace AssetInformationApi.V1.Gateways
             var result = await _dynamoDbContext.LoadAsync<AssetDb>(asset.Id).ConfigureAwait(false);
 
             return result?.ToDomain();
+        }
+
+
+        [LogCall]
+        public async Task<UpdateEntityResult<AssetDb>> EditAssetDetails(Guid assetId, EditAssetRequest assetRequestObject, string requestBody, int? ifMatch)
+        {
+            _logger.LogDebug($"Calling IDynamoDBContext.SaveAsync for id {assetId}");
+            var existingAsset = await _dynamoDbContext.LoadAsync<AssetDb>(assetId).ConfigureAwait(false);
+            if (existingAsset == null) return null;
+
+            if (ifMatch != existingAsset.VersionNumber)
+                throw new VersionNumberConflictException(ifMatch, existingAsset.VersionNumber);
+
+            var response = _updater.UpdateEntity(existingAsset, requestBody, assetRequestObject);
+
+            if (response.NewValues.Any())
+            {
+                _logger.LogDebug($"Calling IDynamoDBContext.SaveAsync to update id {assetId}");
+                await _dynamoDbContext.SaveAsync<AssetDb>(response.UpdatedEntity).ConfigureAwait(false);
+            }
+
+            return response;
         }
     }
 }
