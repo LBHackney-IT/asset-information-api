@@ -102,10 +102,17 @@ namespace AssetInformationApi.V1.Controllers
         [LogCall(LogLevel.Information)]
         public async Task<IActionResult> AddAsset([FromBody] AddAssetRequest asset)
         {
-            var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(HttpContext));
-            var result = await _newAssetUseCase.PostAsync(asset.ToDatabase(), token).ConfigureAwait(false);
+            try
+            {
+                var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(HttpContext));
+                var result = await _newAssetUseCase.PostAsync(asset.ToDatabase(), token).ConfigureAwait(false);
 
-            return Created(new Uri($"api/v1/assets/{asset.Id}", UriKind.Relative), result);
+                return Created(new Uri($"api/v1/assets/{asset.Id}", UriKind.Relative), result);
+            }
+            catch (UprnConflictException uprnErr)
+            {
+                return Conflict(uprnErr.Message);
+            }
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
