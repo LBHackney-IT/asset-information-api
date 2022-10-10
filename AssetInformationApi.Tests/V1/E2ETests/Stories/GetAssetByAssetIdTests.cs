@@ -1,3 +1,4 @@
+using Amazon.SimpleNotificationService;
 using AssetInformationApi.Tests.V1.E2ETests.Fixtures;
 using AssetInformationApi.Tests.V1.E2ETests.Steps;
 using Hackney.Core.Testing.DynamoDb;
@@ -21,7 +22,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         public GetAssetByAssetIdTests(MockWebApplicationFactory<Startup> appFactory)
         {
             _dbFixture = appFactory.DynamoDbFixture;
-            _assetsFixture = new AssetsFixture(_dbFixture);
+            _assetsFixture = new AssetsFixture(_dbFixture, appFactory.SnsFixture.SimpleNotificationService);
             _steps = new GetAssetByAssetIdSteps(appFactory.Client);
         }
 

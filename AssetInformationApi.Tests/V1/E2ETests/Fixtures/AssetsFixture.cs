@@ -3,23 +3,36 @@ using AutoFixture;
 using System;
 using Hackney.Shared.Asset.Infrastructure;
 using Hackney.Shared.Asset.Domain;
+using Amazon.SimpleNotificationService;
+using System.Collections.Generic;
+using Amazon.DynamoDBv2.DataModel;
+using Hackney.Shared.Asset.Factories;
+using AssetInformationApi.V1.Boundary.Request;
+using Hackney.Shared.Asset.Boundary.Request;
 
 namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
 {
     public class AssetsFixture : IDisposable
     {
         private readonly Fixture _fixture = new Fixture();
-        private readonly IDynamoDbFixture _dbFixture;
+
+        public readonly IDynamoDbFixture _dbFixture;
+
+        private readonly IAmazonSimpleNotificationService _amazonSimpleNotificationService;
 
         public AssetDb Asset { get; private set; }
         public Asset AssetRequest { get; private set; }
         public Guid AssetId { get; private set; }
         public string PropertyReference { get; set; }
         public string InvalidAssetId { get; private set; }
+        public Asset ExistingAsset { get; private set; }
 
-        public AssetsFixture(IDynamoDbFixture dbFixture)
+        public EditAssetRequest EditAsset { get; private set; }
+
+        public AssetsFixture(IDynamoDbFixture dbFixture, IAmazonSimpleNotificationService amazonSimpleNotificationService)
         {
             _dbFixture = dbFixture;
+            _amazonSimpleNotificationService = amazonSimpleNotificationService;
         }
 
         public void Dispose()
@@ -34,7 +47,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
             if (disposing && !_disposed)
             {
                 if (Asset != null)
-                    _dbFixture.DynamoDbContext.DeleteAsync(Asset).GetAwaiter().GetResult();
+                    _dbFixture.DynamoDbContext.DeleteAsync<AssetDb>(Asset.Id).GetAwaiter().GetResult();
 
                 _disposed = true;
             }
@@ -50,16 +63,28 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
             AssetRequest = asset;
         }
 
+        public void CreateEditAssetObject()
+        {
+            var asset = _fixture.Build<EditAssetRequest>()
+                .Create();
+
+            EditAsset = asset;
+        }
+
         public void GivenAnAssetAlreadyExists()
         {
-            Asset = _fixture.Build<AssetDb>()
+            var entity = _fixture.Build<AssetDb>()
+                .Without(x => x.Tenure)
                 .With(x => x.VersionNumber, (int?) null)
                 .Create();
 
-            AssetId = Asset.Id;
-            PropertyReference = Asset.AssetId;
+            _dbFixture.DynamoDbContext.SaveAsync<AssetDb>(entity).GetAwaiter().GetResult();
+            entity.VersionNumber = 0;
 
-            _dbFixture.DynamoDbContext.SaveAsync(Asset).GetAwaiter().GetResult();
+            ExistingAsset = entity.ToDomain();
+            Asset = entity;
+            AssetId = entity.Id;
+            PropertyReference = entity.AssetId;
         }
 
         public void GivenAnAssetThatDoesntExist()

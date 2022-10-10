@@ -14,6 +14,8 @@ using Hackney.Core.Logging;
 using Hackney.Core.Middleware.CorrelationId;
 using Hackney.Core.Middleware.Exception;
 using Hackney.Core.Middleware.Logging;
+using Hackney.Core.Sns;
+using Hackney.Core.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -34,6 +36,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Hackney.Shared.Asset.Infrastructure;
+using AssetInformationApi.V1.Factories;
+using AssetInformationApi.V1.Infrastructure;
+using Hackney.Core.Middleware;
 
 namespace AssetInformationApi
 {
@@ -140,11 +145,23 @@ namespace AssetInformationApi
             services.AddLogCallAspect();
             services.ConfigureDynamoDB();
             services.AddTokenFactory();
+            services.ConfigureSns();
 
             RegisterGateways(services);
             RegisterUseCases(services);
 
             services.AddSingleton<IConfiguration>(Configuration);
+            services.AddScoped<ISnsFactory, AssetSnsFactory>();
+            services.AddScoped<IEntityUpdater, EntityUpdater>();
+
+            ConfigureHackneyCoreDI(services);
+        }
+
+        private static void ConfigureHackneyCoreDI(IServiceCollection services)
+        {
+            services.AddSnsGateway()
+                .AddTokenFactory()
+                .AddHttpContextWrapper();
         }
 
         private static void RegisterGateways(IServiceCollection services)
@@ -157,6 +174,7 @@ namespace AssetInformationApi
             services.AddScoped<IGetAssetByIdUseCase, GetAssetByIdUseCase>();
             services.AddScoped<IGetAssetByAssetIdUseCase, GetAssetByAssetIdUseCase>();
             services.AddScoped<INewAssetUseCase, NewAssetUseCase>();
+            services.AddScoped<IEditAssetUseCase, EditAssetUseCase>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -182,6 +200,7 @@ namespace AssetInformationApi
             app.UseCustomExceptionHandler(logger);
             app.UseXRay("asset-information-api");
 
+            app.EnableRequestBodyRewind();
 
             //Get All ApiVersions,
             var api = app.ApplicationServices.GetService<IApiVersionDescriptionProvider>();
