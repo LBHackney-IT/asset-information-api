@@ -13,6 +13,7 @@ using AssetInformationApi.V1.Infrastructure;
 using System;
 using AssetInformationApi.V1.Infrastructure.Exceptions;
 using Hackney.Shared.Asset.Boundary.Request;
+using System.Linq.Expressions;
 
 namespace AssetInformationApi.V1.Gateways
 {
@@ -59,6 +60,15 @@ namespace AssetInformationApi.V1.Gateways
         public async Task<Asset> AddAsset(AssetDb asset)
         {
             _logger.LogDebug($"Calling IDynamoDBContext.SaveAsync for id {asset.Id}");
+            if (!string.IsNullOrEmpty(asset.AssetId))
+            {
+                GetAssetByAssetIdRequest getAssetByAssetIdRequest = new GetAssetByAssetIdRequest();
+                getAssetByAssetIdRequest.AssetId = asset.AssetId;
+                var assetById = GetAssetByAssetId(getAssetByAssetIdRequest);
+
+                if (assetById != null)
+                    throw new DuplicateAssetIdException(asset.AssetId);
+            }
             _dynamoDbContext.SaveAsync(asset).GetAwaiter().GetResult();
 
             _logger.LogDebug($"Calling IDynamoDBContext.LoadAsync for id {asset.Id}");
@@ -77,7 +87,15 @@ namespace AssetInformationApi.V1.Gateways
 
             if (ifMatch != existingAsset.VersionNumber)
                 throw new VersionNumberConflictException(ifMatch, existingAsset.VersionNumber);
+            if (!string.IsNullOrEmpty(existingAsset.AssetId))
+            {
+                GetAssetByAssetIdRequest getAssetByAssetIdRequest = new GetAssetByAssetIdRequest();
+                getAssetByAssetIdRequest.AssetId = existingAsset.AssetId;
+                var assetById = GetAssetByAssetId(getAssetByAssetIdRequest);
 
+                if (assetById != null && assetById.Result.Id != assetId)
+                    throw new DuplicateAssetIdException(existingAsset.AssetId);
+            }
             var response = _updater.UpdateEntity(existingAsset, requestBody, assetRequestObject);
 
             if (response.NewValues.Any())
