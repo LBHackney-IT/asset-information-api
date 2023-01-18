@@ -64,7 +64,7 @@ namespace AssetInformationApi.V1.Gateways
             {
                 GetAssetByAssetIdRequest getAssetByAssetIdRequest = new GetAssetByAssetIdRequest();
                 getAssetByAssetIdRequest.AssetId = asset.AssetId;
-                var assetById = GetAssetByAssetId(getAssetByAssetIdRequest);
+                var assetById = await GetAssetByAssetId(getAssetByAssetIdRequest);
 
                 if (assetById != null)
                     throw new DuplicateAssetIdException(asset.AssetId);
