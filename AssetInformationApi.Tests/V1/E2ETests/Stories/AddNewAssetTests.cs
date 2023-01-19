@@ -74,5 +74,16 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
                 .Then(t => _steps.ThenAssetDetailsAreReturnedAndTheAssetCreatedEventIsRaised(_assetsFixture.AssetRequest, _snsFixture))
                 .BDDfy();
         }
+
+        [Fact]
+        public void ServiceReturns500IfAssetIdDuplicated()
+        {
+            this.Given(g => _assetsFixture.PrepareAssetObjectWithAssetId())
+                .When(w => _steps.WhenTheAddAssetApiIsCalledWithAToken(_assetsFixture.AssetRequest))
+                .Given(g => _assetsFixture.PrepareAssetObjectWithAssetId())
+                .When(w => _steps.WhenTheAddAssetApiIsCalledWithAToken(_assetsFixture.AssetRequest))
+                .Then(t => _steps.Then500IsReturned())
+                .BDDfy();
+        }
     }
 }

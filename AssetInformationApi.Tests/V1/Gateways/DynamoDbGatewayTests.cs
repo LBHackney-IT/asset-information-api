@@ -132,6 +132,7 @@ namespace AssetInformationApi.Tests.V1.Gateways
             // Arrange
             var entity = _fixture.Build<AssetDb>()
                 .With(x => x.VersionNumber, (int?) null)
+                .With(x => x.AssetId, (string) null)
                 .Create();
 
             var query = new GetAssetByIdRequest()
