@@ -67,7 +67,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
         {
             var asset = _fixture.Build<Asset>()
                 .With(x => x.VersionNumber, (int?) null)
-                .With(x => x.AssetId, "12345")
+                .With(x => x.AssetId, "12345678910")
                 .Create();
             asset.Id = Guid.NewGuid();
 

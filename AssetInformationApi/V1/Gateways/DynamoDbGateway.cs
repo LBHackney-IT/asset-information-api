@@ -87,15 +87,7 @@ namespace AssetInformationApi.V1.Gateways
 
             if (ifMatch != existingAsset.VersionNumber)
                 throw new VersionNumberConflictException(ifMatch, existingAsset.VersionNumber);
-            if (!string.IsNullOrEmpty(existingAsset.AssetId))
-            {
-                GetAssetByAssetIdRequest getAssetByAssetIdRequest = new GetAssetByAssetIdRequest();
-                getAssetByAssetIdRequest.AssetId = existingAsset.AssetId;
-                var assetById = GetAssetByAssetId(getAssetByAssetIdRequest);
 
-                if (assetById != null && assetById.Result.Id != assetId)
-                    throw new DuplicateAssetIdException(existingAsset.AssetId);
-            }
             var response = _updater.UpdateEntity(existingAsset, requestBody, assetRequestObject);
 
             if (response.NewValues.Any())
