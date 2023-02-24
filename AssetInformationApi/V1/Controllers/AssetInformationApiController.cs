@@ -134,6 +134,32 @@ namespace AssetInformationApi.V1.Controllers
             }
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPatch]
+        [Route("{id}/address")]
+        [LogCall(LogLevel.Information)]
+        public async Task<IActionResult> PatchAssetAddress([FromRoute] EditAssetByIdRequest query, [FromBody] EditAssetRequest asset)
+        {
+            var bodyText = await HttpContext.Request.GetRawBodyStringAsync().ConfigureAwait(false);
+            var ifMatch = GetIfMatchFromHeader();
+            var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(HttpContext));
+            try
+            {
+                var result = await _editAssetUseCase.ExecuteAsync(query.Id, asset, bodyText, token, ifMatch).ConfigureAwait(false);
+
+                if (result == null) return NotFound();
+
+                return Ok();
+            }
+            catch (VersionNumberConflictException vncErr)
+            {
+                return Conflict(vncErr.Message);
+            }
+        }
+
         private int? GetIfMatchFromHeader()
         {
             var header = HttpContext.Request.Headers.GetHeaderValue(HeaderConstants.IfMatch);
