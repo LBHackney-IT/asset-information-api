@@ -215,7 +215,7 @@ namespace AssetInformationApi.Tests.V1.Controllers
         }
 
         [Fact]
-        public async Task EditAssetAddressWhenValidReturns201Response()
+        public async Task EditAssetAddressWhenValidReturns204Response()
         {
             var mockQuery = _fixture.Create<EditAssetAddressRequest>();
             var mockRequestObject = _fixture.Create<EditAssetByIdRequest>();
