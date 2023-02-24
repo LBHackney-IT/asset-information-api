@@ -20,6 +20,7 @@ using System.Text;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Hackney.Shared.Asset.Boundary.Request;
+using AssetInformationApi.V1.Infrastructure.Exceptions;
 
 namespace AssetInformationApi.Tests.V1.Controllers
 {
@@ -210,6 +211,50 @@ namespace AssetInformationApi.Tests.V1.Controllers
             var response = await _classUnderTest.PatchAsset(mockRequestObject, mockQuery).ConfigureAwait(false);
 
             response.Should().BeOfType(typeof(NotFoundResult));
+        }
+
+        [Fact]
+        public async Task EditAssetAddressWhenValidReturns200OkResponse()
+        {
+            var mockQuery = _fixture.Create<EditAssetAddressRequest>();
+            var mockRequestObject = _fixture.Create<EditAssetByIdRequest>();
+            EditAssetRequest calledRequest = null;
+
+            _mockEditAssetUseCase.Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditAssetRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>()))
+                .ReturnsAsync(_fixture.Create<AssetResponseObject>())
+                .Callback<Guid, EditAssetRequest, string, Token, int?>((g, r, req, t, m) => calledRequest = r);
+
+            var response = await _classUnderTest.PatchAssetAddress(mockRequestObject, mockQuery).ConfigureAwait(false);
+
+            response.Should().BeOfType(typeof(OkResult));
+            calledRequest.Should().BeEquivalentTo(mockQuery);
+        }
+
+        [Fact]
+        public async Task EditAssetAddressWhenAssetDoesntExistReturns404NotFoundResponse()
+        {
+            var mockQuery = _fixture.Create<EditAssetAddressRequest>();
+            var mockRequestObject = _fixture.Create<EditAssetByIdRequest>();
+
+            _mockEditAssetUseCase.Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditAssetRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>())).ReturnsAsync((AssetResponseObject) null);
+
+            var response = await _classUnderTest.PatchAssetAddress(mockRequestObject, mockQuery).ConfigureAwait(false);
+
+            response.Should().BeOfType(typeof(NotFoundResult));
+        }
+
+        [Fact]
+        public async Task EditAssetAddressReturns409WhenExceptionIsThrown()
+        {
+            var mockQuery = _fixture.Create<EditAssetAddressRequest>();
+            var mockRequestObject = _fixture.Create<EditAssetByIdRequest>();
+
+            _mockEditAssetUseCase.Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditAssetRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>()))
+                .Throws(new VersionNumberConflictException(1, 2));
+
+            var response = await _classUnderTest.PatchAssetAddress(mockRequestObject, mockQuery).ConfigureAwait(false);
+
+            response.Should().BeOfType(typeof(ConflictObjectResult));
         }
     }
 }
