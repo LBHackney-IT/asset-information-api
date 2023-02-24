@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Hackney.Shared.Asset.Boundary.Request;
 using AssetInformationApi.V1.Infrastructure.Exceptions;
+using TestStack.BDDfy;
 
 namespace AssetInformationApi.Tests.V1.Controllers
 {
@@ -214,7 +215,7 @@ namespace AssetInformationApi.Tests.V1.Controllers
         }
 
         [Fact]
-        public async Task EditAssetAddressWhenValidReturns200OkResponse()
+        public async Task EditAssetAddressWhenValidReturns201Response()
         {
             var mockQuery = _fixture.Create<EditAssetAddressRequest>();
             var mockRequestObject = _fixture.Create<EditAssetByIdRequest>();
@@ -226,7 +227,7 @@ namespace AssetInformationApi.Tests.V1.Controllers
 
             var response = await _classUnderTest.PatchAssetAddress(mockRequestObject, mockQuery).ConfigureAwait(false);
 
-            response.Should().BeOfType(typeof(OkResult));
+            response.Should().BeOfType(typeof(NoContentResult));
             calledRequest.Should().BeEquivalentTo(mockQuery);
         }
 

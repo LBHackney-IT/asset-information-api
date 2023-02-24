@@ -141,7 +141,7 @@ namespace AssetInformationApi.V1.Controllers
         [HttpPatch]
         [Route("{id}/address")]
         [LogCall(LogLevel.Information)]
-        public async Task<IActionResult> PatchAssetAddress([FromRoute] EditAssetByIdRequest query, [FromBody] EditAssetRequest asset)
+        public async Task<IActionResult> PatchAssetAddress([FromRoute] EditAssetByIdRequest query, [FromBody] EditAssetAddressRequest asset)
         {
             var bodyText = await HttpContext.Request.GetRawBodyStringAsync().ConfigureAwait(false);
             var ifMatch = GetIfMatchFromHeader();
@@ -152,7 +152,7 @@ namespace AssetInformationApi.V1.Controllers
 
                 if (result == null) return NotFound();
 
-                return Ok();
+                return NoContent();
             }
             catch (VersionNumberConflictException vncErr)
             {
