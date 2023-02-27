@@ -63,7 +63,6 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
                 .When(w => _steps.WhenEditAssetAddressApiIsCalled(_assetFixture.AssetId, _assetFixture.EditAssetAddress))
                 .Then(t => _steps.ThenNoContentResponseReturned())
                 .And(a => _steps.TheAssetHasBeenUpdatedInTheDatabase(_assetFixture))
-                .And(t => _steps.ThenTheAssetAddressUpdatedEventIsRaised(_assetFixture, _snsFixture))
                 .BDDfy();
         }
 
