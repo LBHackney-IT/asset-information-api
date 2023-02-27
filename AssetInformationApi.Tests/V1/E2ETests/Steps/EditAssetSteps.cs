@@ -217,7 +217,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
             var dbRecord = await _dbContext.LoadAsync<AssetDb>(assetFixture.Asset.Id).ConfigureAwait(false);
 
             Action<EntityEventSns> verifyFunc = (actual) => { };
-            
+
             var snsVerifer = snsFixture.GetSnsEventVerifier<EntityEventSns>();
             var snsResult = await snsVerifer.VerifySnsEventRaised(verifyFunc).ConfigureAwait(false);
             if (snsVerifer.LastException != null)
