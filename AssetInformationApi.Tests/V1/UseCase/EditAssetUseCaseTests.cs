@@ -22,11 +22,10 @@ using Hackney.Shared.Asset.Boundary.Response;
 namespace AssetInformationApi.Tests.V1.UseCase
 {
     [Collection("LogCall collection")]
-    public class EditAssetUseCaseTests
+    public class EditAssetUseCaseTests : EditAssetTestBase
     {
         private readonly Mock<IAssetGateway> _mockGateway;
         private readonly EditAssetUseCase _classUnderTest;
-        private readonly Fixture _fixture = new Fixture();
         private readonly Mock<ISnsGateway> _assetSnsGateway;
         private readonly Mock<ISnsFactory> _assetSnsFactory;
 
@@ -132,27 +131,5 @@ namespace AssetInformationApi.Tests.V1.UseCase
 
             _assetSnsGateway.Verify(x => x.Publish(snsEvent, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
-
-        private UpdateEntityResult<AssetDb> MockUpdateEntityResultWhereChangesAreMade()
-        {
-            return new UpdateEntityResult<AssetDb>
-            {
-                UpdatedEntity = _fixture.Create<AssetDb>(),
-                NewValues = new Dictionary<string, object>
-                {
-                    { "ParentAssetIds", _fixture.Create<string>() }
-                }
-            };
-        }
-
-        private UpdateEntityResult<AssetDb> MockUpdateEntityResultWhereNoChangesAreMade()
-        {
-            return new UpdateEntityResult<AssetDb>
-            {
-                UpdatedEntity = _fixture.Create<AssetDb>()
-                // empty
-            };
-        }
-
     }
 }
