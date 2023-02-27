@@ -78,7 +78,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         {
             this.Given(g => _assetFixture.GivenAnAssetAlreadyExists())
                 .Then(t => _assetFixture.CreateEditAssetAddressObject())
-                .When(w => _steps.WhenEditAssetAddressApiIsCalled(_assetFixture.AssetId, _assetFixture.EditAsset))
+                .When(w => _steps.WhenEditAssetAddressApiIsCalled(_assetFixture.AssetId, _assetFixture.EditAssetAddress))
                 .Then(t => _steps.ThenNoContentResponseReturned())
                 .And(a => _steps.TheAssetHasBeenUpdatedInTheDatabase(_assetFixture))
                 .And(t => _steps.ThenTheAssetUpdatedEventIsRaised(_assetFixture, _snsFixture))
