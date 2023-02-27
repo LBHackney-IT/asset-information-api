@@ -6,21 +6,27 @@ using AssetInformationApi.Tests.V1.E2ETests.Steps;
 using TestStack.BDDfy;
 using Xunit;
 using Hackney.Core.Testing.DynamoDb;
+using AssetInformationApi.V1.Boundary.Request;
+using AutoFixture.Kernel;
+using Amazon.DynamoDBv2.DataModel;
+using Amazon.DynamoDBv2;
+using Amazon.SimpleNotificationService;
+using Hackney.Shared.Asset.Domain;
 using Hackney.Shared.Asset.Boundary.Request;
 
 namespace AssetInformationApi.Tests.V1.E2ETests.Stories
 {
     [Story(
         AsA = "Service",
-        IWant = "an endpoint to edit an existing asset address",
-        SoThat = "address data can be corrected and updated")]
+        IWant = "an endpoint to edit an existing asset and return a 204 response",
+        SoThat = "it is possible to edit the details of an asset.")]
     [Collection("AppTest collection")]
     public class EditAssetAddressTests : IDisposable
     {
         private readonly IDynamoDbFixture _dbFixture;
         private readonly ISnsFixture _snsFixture;
         private readonly AssetsFixture _assetFixture;
-        private readonly EditAssetAddressSteps _steps;
+        private readonly EditAssetSteps _steps;
         private readonly Fixture _fixture = new Fixture();
 
         public EditAssetAddressTests(MockWebApplicationFactory<Startup> appFactory)
@@ -28,7 +34,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
             _dbFixture = appFactory.DynamoDbFixture;
             _snsFixture = appFactory.SnsFixture;
             _assetFixture = new AssetsFixture(_dbFixture, _snsFixture.SimpleNotificationService);
-            _steps = new EditAssetAddressSteps(appFactory.Client, _dbFixture.DynamoDbContext);
+            _steps = new EditAssetSteps(appFactory.Client, _dbFixture.DynamoDbContext);
         }
 
         public void Dispose()
@@ -47,6 +53,18 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
 
                 _disposed = true;
             }
+        }
+
+        [Fact]
+        public void AddressEditServiceReturns204AndUpdatesDatabase()
+        {
+            this.Given(g => _assetFixture.GivenAnAssetAlreadyExists())
+                .Then(t => _assetFixture.CreateEditAssetAddressObject())
+                .When(w => _steps.WhenEditAssetAddressApiIsCalled(_assetFixture.AssetId, _assetFixture.EditAssetAddress))
+                .Then(t => _steps.ThenNoContentResponseReturned())
+                .And(a => _steps.TheAssetHasBeenUpdatedInTheDatabase(_assetFixture))
+                .And(t => _steps.ThenTheAssetAddressUpdatedEventIsRaised(_assetFixture, _snsFixture))
+                .BDDfy();
         }
 
         [Fact]
@@ -73,35 +91,11 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
 
         }
 
-        [Fact]
-        public void ServiceReturns204AndUpdatesDatabase()
-        {
-            this.Given(g => _assetFixture.GivenAnAssetAlreadyExists())
-                .Then(t => _assetFixture.CreateEditAssetAddressObject())
-                .When(w => _steps.WhenEditAssetAddressApiIsCalled(_assetFixture.AssetId, _assetFixture.EditAssetAddress))
-                .Then(t => _steps.ThenNoContentResponseReturned())
-                .And(a => _steps.TheAssetHasBeenUpdatedInTheDatabase(_assetFixture))
-                .And(t => _steps.ThenTheAssetUpdatedEventIsRaised(_assetFixture, _snsFixture))
-                .BDDfy();
-        }
-
-        [Theory]
-        [InlineData(null)]
-        [InlineData(5)]
-        public void ServiceReturnsConflictWhenIncorrectVersionNumber(int? versionNumber)
-        {
-            var requestObject = CreateValidRequestObject();
-
-            this.Given(g => _assetFixture.GivenAnAssetAlreadyExists())
-                .When(w => _steps.WhenEditAssetAddressApiIsCalled(_assetFixture.AssetId, requestObject, versionNumber))
-                .Then(t => _steps.ThenConflictIsReturned(versionNumber))
-                .BDDfy();
-        }
-
         private EditAssetAddressRequest CreateValidRequestObject()
         {
             return _fixture.Build<EditAssetAddressRequest>()
                 .Create();
         }
+
     }
 }

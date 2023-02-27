@@ -90,6 +90,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
                 .Create();
 
             EditAssetAddress = asset;
+            EditAsset = asset;
         }
 
         public void GivenAnAssetAlreadyExists()
