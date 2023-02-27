@@ -36,6 +36,7 @@ namespace AssetInformationApi.Tests.V1.Controllers
         private readonly Mock<ITokenFactory> _mockTokenFactory;
         private readonly Mock<IHttpContextWrapper> _mockContextWrapper;
         private readonly Mock<IEditAssetUseCase> _mockEditAssetUseCase;
+        private readonly Mock<IEditAssetAddressUseCase> _mockEditAssetAddressUseCase;
 
         private readonly Mock<HttpRequest> _mockHttpRequest;
         private readonly HeaderDictionary _requestHeaders;
@@ -53,6 +54,7 @@ namespace AssetInformationApi.Tests.V1.Controllers
             _mockTokenFactory = new Mock<ITokenFactory>();
             _mockContextWrapper = new Mock<IHttpContextWrapper>();
             _mockEditAssetUseCase = new Mock<IEditAssetUseCase>();
+            _mockEditAssetAddressUseCase = new Mock<IEditAssetAddressUseCase>();
 
             _mockHttpRequest = new Mock<HttpRequest>();
             _mockHttpResponse = new Mock<HttpResponse>();
@@ -63,7 +65,8 @@ namespace AssetInformationApi.Tests.V1.Controllers
                 _mockAddNewAssetUseCase.Object,
                 _mockTokenFactory.Object,
                 _mockContextWrapper.Object,
-                _mockEditAssetUseCase.Object);
+                _mockEditAssetUseCase.Object,
+                _mockEditAssetAddressUseCase.Object);
 
             // changes to allow reading of raw request body
             _requestStream = new MemoryStream(Encoding.Default.GetBytes(RequestBodyText));
@@ -219,16 +222,35 @@ namespace AssetInformationApi.Tests.V1.Controllers
         {
             var mockQuery = _fixture.Create<EditAssetAddressRequest>();
             var mockRequestObject = _fixture.Create<EditAssetByIdRequest>();
-            EditAssetRequest calledRequest = null;
+            EditAssetAddressRequest calledRequest = null;
 
-            _mockEditAssetUseCase.Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditAssetRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>()))
+            _mockEditAssetAddressUseCase.Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditAssetAddressRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>()))
                 .ReturnsAsync(_fixture.Create<AssetResponseObject>())
-                .Callback<Guid, EditAssetRequest, string, Token, int?>((g, r, req, t, m) => calledRequest = r);
+                .Callback<Guid, EditAssetAddressRequest, string, Token, int?>((g, r, req, t, m) => calledRequest = r);
 
             var response = await _classUnderTest.PatchAssetAddress(mockRequestObject, mockQuery).ConfigureAwait(false);
 
             response.Should().BeOfType(typeof(NoContentResult));
             calledRequest.Should().BeEquivalentTo(mockQuery);
+            _mockEditAssetAddressUseCase.Verify(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditAssetAddressRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>()), Times.Once);
+            _mockEditAssetUseCase.Verify(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditAssetRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task EditAssetAddressWhenValidCallsTheCorrectUseCaseCorrectly()
+        {
+            var mockQuery = _fixture.Create<EditAssetAddressRequest>();
+            var mockRequestObject = _fixture.Create<EditAssetByIdRequest>();
+            EditAssetAddressRequest calledRequest = null;
+
+            _mockEditAssetAddressUseCase.Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditAssetAddressRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>()))
+                .ReturnsAsync(_fixture.Create<AssetResponseObject>())
+                .Callback<Guid, EditAssetAddressRequest, string, Token, int?>((g, r, req, t, m) => calledRequest = r);
+
+            var response = await _classUnderTest.PatchAssetAddress(mockRequestObject, mockQuery).ConfigureAwait(false);
+
+            _mockEditAssetAddressUseCase.Verify(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditAssetAddressRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>()), Times.Once);
+            _mockEditAssetUseCase.Verify(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditAssetRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>()), Times.Never);
         }
 
         [Fact]
@@ -237,7 +259,7 @@ namespace AssetInformationApi.Tests.V1.Controllers
             var mockQuery = _fixture.Create<EditAssetAddressRequest>();
             var mockRequestObject = _fixture.Create<EditAssetByIdRequest>();
 
-            _mockEditAssetUseCase.Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditAssetRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>())).ReturnsAsync((AssetResponseObject) null);
+            _mockEditAssetAddressUseCase.Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditAssetAddressRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>())).ReturnsAsync((AssetResponseObject) null);
 
             var response = await _classUnderTest.PatchAssetAddress(mockRequestObject, mockQuery).ConfigureAwait(false);
 
@@ -250,7 +272,7 @@ namespace AssetInformationApi.Tests.V1.Controllers
             var mockQuery = _fixture.Create<EditAssetAddressRequest>();
             var mockRequestObject = _fixture.Create<EditAssetByIdRequest>();
 
-            _mockEditAssetUseCase.Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditAssetRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>()))
+            _mockEditAssetAddressUseCase.Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditAssetAddressRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>()))
                 .Throws(new VersionNumberConflictException(1, 2));
 
             var response = await _classUnderTest.PatchAssetAddress(mockRequestObject, mockQuery).ConfigureAwait(false);
