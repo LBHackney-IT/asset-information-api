@@ -44,6 +44,8 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
                 if (null != _assetsFixture)
                     _assetsFixture.Dispose();
 
+                _snsFixture?.PurgeAllQueueMessages();
+
                 _disposed = true;
             }
         }
