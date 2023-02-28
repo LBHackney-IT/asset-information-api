@@ -18,8 +18,8 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
 {
     [Story(
         AsA = "Service",
-        IWant = "an endpoint to edit an existing asset and return a 204 response",
-        SoThat = "it is possible to edit the details of an asset.")]
+        IWant = "an endpoint to edit an existing address",
+        SoThat = "it is possible to edit the address of an asset.")]
     [Collection("AppTest collection")]
     public class EditAssetAddressTests : IDisposable
     {
