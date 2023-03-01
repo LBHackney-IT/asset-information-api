@@ -31,13 +31,14 @@ namespace AssetInformationApi.V1.Controllers
         private readonly IGetAssetByAssetIdUseCase _getAssetByAssetIdUseCase;
         private readonly INewAssetUseCase _newAssetUseCase;
         private readonly IEditAssetUseCase _editAssetUseCase;
+        private readonly IEditAssetAddressUseCase _editAssetAddressUseCase;
         private readonly ITokenFactory _tokenFactory;
         private readonly IHttpContextWrapper _contextWrapper;
 
         public AssetInformationApiController(
             IGetAssetByIdUseCase getAssetByIdUseCase,
             IGetAssetByAssetIdUseCase getAssetByAssetIdUseCase, INewAssetUseCase newAssetUseCase,
-            ITokenFactory tokenFactory, IHttpContextWrapper contextWrapper, IEditAssetUseCase editAssetUseCase)
+            ITokenFactory tokenFactory, IHttpContextWrapper contextWrapper, IEditAssetUseCase editAssetUseCase, IEditAssetAddressUseCase editAssetAddressUseCase)
         {
             _getAssetByIdUseCase = getAssetByIdUseCase;
             _getAssetByAssetIdUseCase = getAssetByAssetIdUseCase;
@@ -45,6 +46,7 @@ namespace AssetInformationApi.V1.Controllers
             _tokenFactory = tokenFactory;
             _contextWrapper = contextWrapper;
             _editAssetUseCase = editAssetUseCase;
+            _editAssetAddressUseCase = editAssetAddressUseCase;
         }
 
         /// <summary>
@@ -123,6 +125,32 @@ namespace AssetInformationApi.V1.Controllers
             try
             {
                 var result = await _editAssetUseCase.ExecuteAsync(query.Id, asset, bodyText, token, ifMatch).ConfigureAwait(false);
+
+                if (result == null) return NotFound();
+
+                return NoContent();
+            }
+            catch (VersionNumberConflictException vncErr)
+            {
+                return Conflict(vncErr.Message);
+            }
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPatch]
+        [Route("{id}/address")]
+        [LogCall(LogLevel.Information)]
+        public async Task<IActionResult> PatchAssetAddress([FromRoute] EditAssetByIdRequest query, [FromBody] EditAssetAddressRequest asset)
+        {
+            var bodyText = await HttpContext.Request.GetRawBodyStringAsync().ConfigureAwait(false);
+            var ifMatch = GetIfMatchFromHeader();
+            var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(HttpContext));
+            try
+            {
+                var result = await _editAssetAddressUseCase.ExecuteAsync(query.Id, asset, bodyText, token, ifMatch).ConfigureAwait(false);
 
                 if (result == null) return NotFound();
 

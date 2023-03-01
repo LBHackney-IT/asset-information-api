@@ -79,7 +79,7 @@ namespace AssetInformationApi.V1.Gateways
 
 
         [LogCall]
-        public async Task<UpdateEntityResult<AssetDb>> EditAssetDetails(Guid assetId, EditAssetRequest assetRequestObject, string requestBody, int? ifMatch)
+        public async Task<UpdateEntityResult<AssetDb>> EditAssetDetails<T>(Guid assetId, T assetRequestObject, string requestBody, int? ifMatch) where T : class
         {
             _logger.LogDebug($"Calling IDynamoDBContext.SaveAsync for id {assetId}");
             var existingAsset = await _dynamoDbContext.LoadAsync<AssetDb>(assetId).ConfigureAwait(false);

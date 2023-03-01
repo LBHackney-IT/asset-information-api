@@ -99,7 +99,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
             var requestObject = CreateValidRequestObject();
 
             this.Given(g => _assetFixture.GivenAnAssetAlreadyExists())
-                .When(w => _steps.WhenEditAssetApiIsCalled(_assetFixture.AssetId, requestObject, versionNumber))
+                .When(w => _steps.WhenEditAssetApiIsCalled(_assetFixture.AssetId, requestObject, versionNumber, false))
                 .Then(t => _steps.ThenConflictIsReturned(versionNumber))
                 .BDDfy();
         }
