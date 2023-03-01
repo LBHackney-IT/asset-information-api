@@ -79,6 +79,28 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         }
 
         [Fact]
+        public void ServiceReturns400BadRequestForFailedValidation()
+        {
+            var requestWithoutAddressLine1 = new EditAssetAddressRequest
+            {
+                ParentAssetIds = Guid.NewGuid().ToString(),
+                AssetAddress = new AssetAddress
+                {
+                    Uprn = "88888098765432",
+                    AddressLine1 = "",
+                    AddressLine2 = "Example line 2",
+                    AddressLine3 = "Example line 3",
+                    PostCode = "Example postcode"
+                }
+            };
+
+            this.Given(g => _assetFixture.GivenAnAssetAlreadyExists())
+                .When(w => _steps.WhenEditAssetAddressApiIsCalled(_assetFixture.AssetId, requestWithoutAddressLine1))
+                .Then(t => _steps.ThenBadRequestIsReturned())
+                .BDDfy();
+        }
+
+        [Fact]
         public void ServiceReturnsNotFoundResponse()
         {
             var randomId = Guid.NewGuid();
