@@ -166,8 +166,16 @@ namespace AssetInformationApi.V1.Controllers
         {
             var header = HttpContext.Request.Headers.GetHeaderValue(HeaderConstants.IfMatch);
 
+            int numericValue;
+
             if (header == null)
                 return null;
+
+            if (header.GetType() == typeof(string))
+            {
+                if (int.TryParse(header, out numericValue))
+                    return numericValue;
+            }
 
             _ = EntityTagHeaderValue.TryParse(header, out var entityTagHeaderValue);
 
@@ -176,7 +184,7 @@ namespace AssetInformationApi.V1.Controllers
 
             var version = entityTagHeaderValue.Tag.Replace("\"", string.Empty);
 
-            if (int.TryParse(version, out var numericValue))
+            if (int.TryParse(version, out numericValue))
                 return numericValue;
 
             return null;
