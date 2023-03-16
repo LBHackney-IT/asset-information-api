@@ -85,8 +85,13 @@ namespace AssetInformationApi.V1.Gateways
             var existingAsset = await _dynamoDbContext.LoadAsync<AssetDb>(assetId).ConfigureAwait(false);
             if (existingAsset == null) return null;
 
-            if (ifMatch != existingAsset.VersionNumber)
+            if (ifMatch != existingAsset.VersionNumber && existingAsset.VersionNumber != null)
                 throw new VersionNumberConflictException(ifMatch, existingAsset.VersionNumber);
+
+            if (existingAsset.VersionNumber == null)
+            {
+                existingAsset.VersionNumber = 0;
+            }
 
             var response = _updater.UpdateEntity(existingAsset, requestBody, assetRequestObject);
 
