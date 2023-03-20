@@ -120,6 +120,12 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
             responseContent.Should().Contain($"The version number supplied ({sentVersionNumberString}) does not match the current value on the entity (0).");
         }
 
+        public async Task ThenUnauthorizedIsReturned()
+        {
+            _lastResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+            await _lastResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+        }
+
         private static void ShouldHaveErrorFor(JEnumerable<JToken> errors, string propertyName, string errorCode = null)
         {
             var error = errors.FirstOrDefault(x => (x.Path.Split('.').Last().Trim('\'', ']')) == propertyName) as JProperty;

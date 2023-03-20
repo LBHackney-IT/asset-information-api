@@ -35,6 +35,8 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
             _snsFixture = appFactory.SnsFixture;
             _assetFixture = new AssetsFixture(_dbFixture, _snsFixture.SimpleNotificationService);
             _steps = new EditAssetSteps(appFactory.Client, _dbFixture.DynamoDbContext);
+
+            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "e2e-testing");
         }
 
         public void Dispose()
@@ -58,7 +60,6 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         [Fact]
         public void AddressEditServiceReturns204AndUpdatesDatabase()
         {
-            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "e2e-testing");
             this.Given(g => _assetFixture.GivenAnAssetAlreadyExists())
                 .Then(t => _assetFixture.CreateEditAssetAddressObject())
                 .When(w => _steps.WhenEditAssetAddressApiIsCalled(_assetFixture.AssetId, _assetFixture.EditAssetAddress))
@@ -71,8 +72,6 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         [Fact]
         public void ServiceReturns400BadRequest()
         {
-            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "e2e-testing");
-
             var invalidRequestObject = "bad-data";
 
             this.Given(g => _assetFixture.GivenAnAssetAlreadyExists())
@@ -84,8 +83,6 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         [Fact]
         public void ServiceReturns400BadRequestForFailedValidation()
         {
-            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "e2e-testing");
-
             var requestWithoutAddressLine1 = new EditAssetAddressRequest
             {
                 ParentAssetIds = Guid.NewGuid().ToString(),
@@ -108,8 +105,6 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         [Fact]
         public void ServiceReturnsNotFoundResponse()
         {
-            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "e2e-testing");
-
             var randomId = Guid.NewGuid();
             var requestObject = CreateValidRequestObject();
 
@@ -118,6 +113,21 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
                 .Then(t => _steps.ThenNotFoundIsReturned())
                 .BDDfy();
 
+        }
+
+
+        [Fact]
+        public void ServiceReturnsUnauthorizedWhenUserIsNotInAllowedGroups()
+        {
+            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "unauthorized-group");
+
+            var randomId = Guid.NewGuid();
+            var requestObject = CreateValidRequestObject();
+
+            this.Given(g => _assetFixture.GivenAnAssetAlreadyExists())
+                .When(w => _steps.WhenEditAssetAddressApiIsCalled(randomId, requestObject))
+                .Then(t => _steps.ThenUnauthorizedIsReturned())
+                .BDDfy();
         }
 
         private EditAssetAddressRequest CreateValidRequestObject()
