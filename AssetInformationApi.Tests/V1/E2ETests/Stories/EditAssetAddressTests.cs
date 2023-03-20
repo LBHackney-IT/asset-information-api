@@ -58,7 +58,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         [Fact]
         public void AddressEditServiceReturns204AndUpdatesDatabase()
         {
-            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "mmh-asset-admin,e2e-testing-development,e2e-testing-staging");
+            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "e2e-testing");
             this.Given(g => _assetFixture.GivenAnAssetAlreadyExists())
                 .Then(t => _assetFixture.CreateEditAssetAddressObject())
                 .When(w => _steps.WhenEditAssetAddressApiIsCalled(_assetFixture.AssetId, _assetFixture.EditAssetAddress))
@@ -71,7 +71,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         [Fact]
         public void ServiceReturns400BadRequest()
         {
-            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "mmh-asset-admin,e2e-testing-development,e2e-testing-staging");
+            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "e2e-testing");
 
             var invalidRequestObject = "bad-data";
 
@@ -84,7 +84,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         [Fact]
         public void ServiceReturns400BadRequestForFailedValidation()
         {
-            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "mmh-asset-admin,e2e-testing-development,e2e-testing-staging");
+            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "e2e-testing");
 
             var requestWithoutAddressLine1 = new EditAssetAddressRequest
             {
@@ -108,7 +108,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         [Fact]
         public void ServiceReturnsNotFoundResponse()
         {
-            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "mmh-asset-admin,e2e-testing-development,e2e-testing-staging");
+            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "e2e-testing");
 
             var randomId = Guid.NewGuid();
             var requestObject = CreateValidRequestObject();
