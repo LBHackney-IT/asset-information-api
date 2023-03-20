@@ -58,6 +58,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         [Fact]
         public void AddressEditServiceReturns204AndUpdatesDatabase()
         {
+            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "mmh-asset-admin,e2e-testing-development,e2e-testing-staging");
             this.Given(g => _assetFixture.GivenAnAssetAlreadyExists())
                 .Then(t => _assetFixture.CreateEditAssetAddressObject())
                 .When(w => _steps.WhenEditAssetAddressApiIsCalled(_assetFixture.AssetId, _assetFixture.EditAssetAddress))
@@ -70,6 +71,8 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         [Fact]
         public void ServiceReturns400BadRequest()
         {
+            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "mmh-asset-admin,e2e-testing-development,e2e-testing-staging");
+
             var invalidRequestObject = "bad-data";
 
             this.Given(g => _assetFixture.GivenAnAssetAlreadyExists())
@@ -81,6 +84,8 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         [Fact]
         public void ServiceReturns400BadRequestForFailedValidation()
         {
+            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "mmh-asset-admin,e2e-testing-development,e2e-testing-staging");
+
             var requestWithoutAddressLine1 = new EditAssetAddressRequest
             {
                 ParentAssetIds = Guid.NewGuid().ToString(),
@@ -103,6 +108,8 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         [Fact]
         public void ServiceReturnsNotFoundResponse()
         {
+            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "mmh-asset-admin,e2e-testing-development,e2e-testing-staging");
+
             var randomId = Guid.NewGuid();
             var requestObject = CreateValidRequestObject();
 
