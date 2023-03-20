@@ -35,6 +35,8 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
             _snsFixture = appFactory.SnsFixture;
             _assetFixture = new AssetsFixture(_dbFixture, _snsFixture.SimpleNotificationService);
             _steps = new EditAssetSteps(appFactory.Client, _dbFixture.DynamoDbContext);
+
+            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "e2e-testing");
         }
 
         public void Dispose()
@@ -111,6 +113,21 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
                 .Then(t => _steps.ThenNotFoundIsReturned())
                 .BDDfy();
 
+        }
+
+
+        [Fact]
+        public void ServiceReturnsUnauthorizedWhenUserIsNotInAllowedGroups()
+        {
+            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "unauthorized-group");
+
+            var randomId = Guid.NewGuid();
+            var requestObject = CreateValidRequestObject();
+
+            this.Given(g => _assetFixture.GivenAnAssetAlreadyExists())
+                .When(w => _steps.WhenEditAssetAddressApiIsCalled(randomId, requestObject))
+                .Then(t => _steps.ThenUnauthorizedIsReturned())
+                .BDDfy();
         }
 
         private EditAssetAddressRequest CreateValidRequestObject()

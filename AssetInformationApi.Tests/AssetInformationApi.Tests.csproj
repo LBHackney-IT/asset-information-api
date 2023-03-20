@@ -17,7 +17,9 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
+    <PackageReference Include="Hackney.Core.Authorization" Version="1.78.0" />
     <PackageReference Include="Hackney.Core.Http" Version="1.70.0" />
+    <PackageReference Include="Hackney.Core.JWT" Version="1.72.0" />
     <PackageReference Include="Hackney.Core.Sns" Version="1.52.0" />
     <PackageReference Include="Hackney.Core.Testing.DynamoDb" Version="1.57.0" />
     <PackageReference Include="Hackney.Core.Testing.Shared" Version="1.66.0" />
