@@ -17,7 +17,7 @@ using HeaderConstants = AssetInformationApi.V1.Infrastructure.HeaderConstants;
 using System.Net.Http.Headers;
 using AssetInformationApi.V1.Infrastructure.Exceptions;
 using Hackney.Shared.Asset.Boundary.Request;
-
+using Hackney.Core.Authorization;
 
 namespace AssetInformationApi.V1.Controllers
 {
@@ -143,6 +143,7 @@ namespace AssetInformationApi.V1.Controllers
         [HttpPatch]
         [Route("{id}/address")]
         [LogCall(LogLevel.Information)]
+        [AuthorizeEndpointByGroups("ASSET_ADMIN_GROUPS")]
         public async Task<IActionResult> PatchAssetAddress([FromRoute] EditAssetByIdRequest query, [FromBody] EditAssetAddressRequest asset)
         {
             var bodyText = await HttpContext.Request.GetRawBodyStringAsync().ConfigureAwait(false);
