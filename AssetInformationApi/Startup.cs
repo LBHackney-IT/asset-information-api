@@ -16,6 +16,8 @@ using Hackney.Core.Middleware.Exception;
 using Hackney.Core.Middleware.Logging;
 using Hackney.Core.Sns;
 using Hackney.Core.Http;
+using Hackney.Core.Validation.AspNet;
+using Hackney.Shared.Asset.Boundary.Request.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -67,6 +69,8 @@ namespace AssetInformationApi
                 {
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
+
+            services.AddFluentValidation(Assembly.GetAssembly(typeof(EditAssetAddressRequestValidator)));
 
             services.AddApiVersioning(o =>
             {
@@ -174,6 +178,7 @@ namespace AssetInformationApi
             services.AddScoped<IGetAssetByAssetIdUseCase, GetAssetByAssetIdUseCase>();
             services.AddScoped<INewAssetUseCase, NewAssetUseCase>();
             services.AddScoped<IEditAssetUseCase, EditAssetUseCase>();
+            services.AddScoped<IEditAssetAddressUseCase, EditAssetAddressUseCase>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

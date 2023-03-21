@@ -43,16 +43,22 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
         public async Task WhenEditAssetApiIsCalled(Guid id, object requestObject)
         {
             int? defaultIfMatch = 0;
-            await WhenEditAssetApiIsCalled(id, requestObject, defaultIfMatch).ConfigureAwait(false);
+            await WhenEditAssetApiIsCalled(id, requestObject, defaultIfMatch, false).ConfigureAwait(false);
         }
 
-        public async Task WhenEditAssetApiIsCalled(Guid id, object requestObject, int? ifMatch)
+        public async Task WhenEditAssetAddressApiIsCalled(Guid id, object requestObject)
+        {
+            int? defaultIfMatch = 0;
+            await WhenEditAssetApiIsCalled(id, requestObject, defaultIfMatch, true).ConfigureAwait(false);
+        }
+
+        public async Task WhenEditAssetApiIsCalled(Guid id, object requestObject, int? ifMatch, bool addressEndpoint)
         {
             var token =
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMTUwMTgxMTYwOTIwOTg2NzYxMTMiLCJlbWFpbCI6ImUyZS10ZXN0aW5nQGRldmVsb3BtZW50LmNvbSIsImlzcyI6IkhhY2tuZXkiLCJuYW1lIjoiVGVzdGVyIiwiZ3JvdXBzIjpbImUyZS10ZXN0aW5nIl0sImlhdCI6MTYyMzA1ODIzMn0.SooWAr-NUZLwW8brgiGpi2jZdWjyZBwp4GJikn0PvEw";
 
             // setup request
-            var uri = new Uri($"api/v1/assets/{id}", UriKind.Relative);
+            var uri = new Uri($"api/v1/assets/{id}{(addressEndpoint ? "/address" : "")}", UriKind.Relative);
             using (var message = new HttpRequestMessage(HttpMethod.Patch, uri))
             {
 
@@ -112,6 +118,12 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
 
             var sentVersionNumberString = (versionNumber is null) ? "{null}" : versionNumber.ToString();
             responseContent.Should().Contain($"The version number supplied ({sentVersionNumberString}) does not match the current value on the entity (0).");
+        }
+
+        public async Task ThenUnauthorizedIsReturned()
+        {
+            _lastResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+            await _lastResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
 
         private static void ShouldHaveErrorFor(JEnumerable<JToken> errors, string propertyName, string errorCode = null)
@@ -203,6 +215,19 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
             var snsVerifer = snsFixture.GetSnsEventVerifier<EntityEventSns>();
             var snsResult = await snsVerifer.VerifySnsEventRaised(verifyFunc).ConfigureAwait(false);
             if (!snsResult && snsVerifer.LastException != null)
+                throw snsVerifer.LastException;
+        }
+
+        public async Task ThenTheAssetAddressUpdatedEventIsRaised(AssetsFixture assetFixture, ISnsFixture snsFixture)
+        {
+            var dbRecord = await _dbContext.LoadAsync<AssetDb>(assetFixture.Asset.Id).ConfigureAwait(false);
+
+            Action<EntityEventSns> verifyFunc = (actual) => { };
+
+            var snsVerifer = snsFixture.GetSnsEventVerifier<EntityEventSns>();
+            var snsResult = await snsVerifer.VerifySnsEventRaised(verifyFunc).ConfigureAwait(false);
+            if (snsVerifer.LastException != null)
+                //throw new Exception("Assert test: " + snsFixture.AmazonSQS.Config.ServiceURL + " and " + snsFixture.SimpleNotificationService.Config.RegionEndpointServiceName + " and " + assetFixture.Asset.Id);
                 throw snsVerifer.LastException;
         }
 

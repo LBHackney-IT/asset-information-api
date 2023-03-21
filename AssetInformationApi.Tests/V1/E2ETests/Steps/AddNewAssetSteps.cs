@@ -141,5 +141,12 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
         {
             _lastResponse = await CallAPI(asset).ConfigureAwait(false);
         }
+
+        public void Then500IsReturned()
+        {
+            var msg = _lastResponse.Content.ReadAsStringAsync().Result.Contains(") already exists.");
+            msg.Should().BeTrue();
+            _lastResponse.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+        }
     }
 }

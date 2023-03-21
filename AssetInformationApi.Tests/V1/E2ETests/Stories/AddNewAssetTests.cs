@@ -44,6 +44,8 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
                 if (null != _assetsFixture)
                     _assetsFixture.Dispose();
 
+                _snsFixture?.PurgeAllQueueMessages();
+
                 _disposed = true;
             }
         }
@@ -72,6 +74,17 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
             this.Given(g => _assetsFixture.PrepareAssetObject())
                 .When(w => _steps.WhenTheAddAssetApiIsCalledWithAToken(_assetsFixture.AssetRequest))
                 .Then(t => _steps.ThenAssetDetailsAreReturnedAndTheAssetCreatedEventIsRaised(_assetsFixture.AssetRequest, _snsFixture))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void ServiceReturns500IfAssetIdDuplicated()
+        {
+            this.Given(g => _assetsFixture.PrepareAssetObjectWithAssetId())
+                .When(w => _steps.WhenTheAddAssetApiIsCalledWithAToken(_assetsFixture.AssetRequest))
+                .Given(g => _assetsFixture.PrepareAssetObjectWithAssetId())
+                .When(w => _steps.WhenTheAddAssetApiIsCalledWithAToken(_assetsFixture.AssetRequest))
+                .Then(t => _steps.Then500IsReturned())
                 .BDDfy();
         }
     }

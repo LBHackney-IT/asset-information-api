@@ -22,30 +22,30 @@ using Hackney.Shared.Asset.Boundary.Response;
 namespace AssetInformationApi.Tests.V1.UseCase
 {
     [Collection("LogCall collection")]
-    public class EditAssetUseCaseTests : EditAssetTestBase
+    public class EditAssetAddressUseCaseTests : EditAssetTestBase
     {
         private readonly Mock<IAssetGateway> _mockGateway;
-        private readonly EditAssetUseCase _classUnderTest;
+        private readonly EditAssetAddressUseCase _classUnderTest;
         private readonly Mock<ISnsGateway> _assetSnsGateway;
         private readonly Mock<ISnsFactory> _assetSnsFactory;
 
-        public EditAssetUseCaseTests()
+        public EditAssetAddressUseCaseTests()
         {
             _mockGateway = new Mock<IAssetGateway>();
             _assetSnsGateway = new Mock<ISnsGateway>();
             _assetSnsFactory = new Mock<ISnsFactory>();
-            _classUnderTest = new EditAssetUseCase(_mockGateway.Object, _assetSnsGateway.Object, _assetSnsFactory.Object);
+            _classUnderTest = new EditAssetAddressUseCase(_mockGateway.Object, _assetSnsGateway.Object, _assetSnsFactory.Object);
         }
 
         [Fact]
-        public async Task EditAssetDetailsUseCaseWhenAssetDoesntExistReturnsNull()
+        public async Task EditAssetAddressDetailsUseCaseWhenAssetDoesntExistReturnsNull()
         {
             var mockQuery = new Guid();
-            var mockRequestObject = _fixture.Create<EditAssetRequest>();
+            var mockRequestObject = _fixture.Create<EditAssetAddressRequest>();
             var mockRawBody = "";
             var mockToken = _fixture.Create<Token>();
 
-            _mockGateway.Setup(x => x.EditAssetDetails(It.IsAny<Guid>(), It.IsAny<EditAssetRequest>(), It.IsAny<string>(), It.IsAny<int?>())).ReturnsAsync((UpdateEntityResult<AssetDb>) null);
+            _mockGateway.Setup(x => x.EditAssetDetails(It.IsAny<Guid>(), It.IsAny<EditAssetAddressRequest>(), It.IsAny<string>(), It.IsAny<int?>())).ReturnsAsync((UpdateEntityResult<AssetDb>) null);
 
             var response = await _classUnderTest.ExecuteAsync(mockQuery, mockRequestObject, mockRawBody, mockToken, null).ConfigureAwait(false);
 
@@ -53,10 +53,10 @@ namespace AssetInformationApi.Tests.V1.UseCase
         }
 
         [Fact]
-        public async Task EditAssetDetailsUseCaseWhenAssetExistsReturnsAssetResponseObject()
+        public async Task EditAssetAddressDetailsUseCaseWhenAssetExistsReturnsAssetResponseObject()
         {
             var mockQuery = new Guid();
-            var mockRequestObject = _fixture.Create<EditAssetRequest>();
+            var mockRequestObject = _fixture.Create<EditAssetAddressRequest>();
             var mockRawBody = "";
             var mockToken = _fixture.Create<Token>();
 
@@ -65,55 +65,51 @@ namespace AssetInformationApi.Tests.V1.UseCase
                 UpdatedEntity = _fixture.Create<AssetDb>()
             };
 
-            _mockGateway.Setup(x => x.EditAssetDetails(It.IsAny<Guid>(), It.IsAny<EditAssetRequest>(), It.IsAny<string>(), It.IsAny<int?>())).ReturnsAsync(gatewayResponse);
+            _mockGateway.Setup(x => x.EditAssetDetails(It.IsAny<Guid>(), It.IsAny<EditAssetAddressRequest>(), It.IsAny<string>(), It.IsAny<int?>())).ReturnsAsync(gatewayResponse);
 
             var response = await _classUnderTest.ExecuteAsync(mockQuery, mockRequestObject, mockRawBody, mockToken, null).ConfigureAwait(false);
 
             response.Should().NotBeNull();
             response.Should().BeOfType(typeof(AssetResponseObject));
 
-            response.AssetCharacteristics.Should().Be(gatewayResponse.UpdatedEntity.AssetCharacteristics);
-            response.AssetManagement.Should().Be(gatewayResponse.UpdatedEntity.AssetManagement);
+            response.AssetAddress.Should().Be(gatewayResponse.UpdatedEntity.AssetAddress);
             response.Id.Should().Be(gatewayResponse.UpdatedEntity.Id);
         }
 
         [Fact]
-        public async Task EditAssetDetailsUseCaseWhenNoChangesSNSGatewayIsntCalled()
+        public async Task EditAssetAddressDetailsUseCaseWhenNoChangesSNSGatewayIsntCalled()
         {
             var mockQuery = new Guid();
-            var mockRequestObject = _fixture.Create<EditAssetRequest>();
+            var mockRequestObject = _fixture.Create<EditAssetAddressRequest>();
             var mockRawBody = "";
             var mockToken = _fixture.Create<Token>();
 
-            // setup mock gateway to return UpdateEntityResult with no changes
             var gatewayResult = MockUpdateEntityResultWhereNoChangesAreMade();
 
             _mockGateway
-                .Setup(x => x.EditAssetDetails(It.IsAny<Guid>(), It.IsAny<EditAssetRequest>(), It.IsAny<string>(), It.IsAny<int?>()))
+                .Setup(x => x.EditAssetDetails(It.IsAny<Guid>(), It.IsAny<EditAssetAddressRequest>(), It.IsAny<string>(), It.IsAny<int?>()))
                 .ReturnsAsync(gatewayResult);
 
             var response = await _classUnderTest.ExecuteAsync(mockQuery, mockRequestObject, mockRawBody, mockToken, null).ConfigureAwait(false);
 
-            // assert result is AssetResponseObject
             response.Should().BeOfType(typeof(AssetResponseObject));
 
-            // assert that sns factory wasnt called
             _assetSnsGateway.Verify(x => x.Publish(It.IsAny<EntityEventSns>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
-        public async Task EditAssetDetailsUseCaseWhenChangesSNSGatewayIsCalled()
+        public async Task EditAssetAddressDetailsUseCaseWhenChangesSNSGatewayIsCalled()
         {
             // Arrange
             var mockQuery = new Guid();
-            var mockRequestObject = _fixture.Create<EditAssetRequest>();
+            var mockRequestObject = _fixture.Create<EditAssetAddressRequest>();
             var mockRawBody = "";
             var mockToken = _fixture.Create<Token>();
 
             var gatewayResult = MockUpdateEntityResultWhereChangesAreMade();
 
             _mockGateway
-                .Setup(x => x.EditAssetDetails(It.IsAny<Guid>(), It.IsAny<EditAssetRequest>(), It.IsAny<string>(), It.IsAny<int?>()))
+                .Setup(x => x.EditAssetDetails(It.IsAny<Guid>(), It.IsAny<EditAssetAddressRequest>(), It.IsAny<string>(), It.IsAny<int?>()))
                 .ReturnsAsync(gatewayResult);
 
             var snsEvent = _fixture.Create<EntityEventSns>();
@@ -127,8 +123,6 @@ namespace AssetInformationApi.Tests.V1.UseCase
 
             // Assert
             response.Should().BeOfType(typeof(AssetResponseObject));
-
-
             _assetSnsGateway.Verify(x => x.Publish(snsEvent, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
     }
