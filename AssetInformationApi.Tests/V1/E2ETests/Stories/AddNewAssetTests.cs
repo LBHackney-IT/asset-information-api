@@ -1,7 +1,10 @@
 using AssetInformationApi.Tests.V1.E2ETests.Fixtures;
 using AssetInformationApi.Tests.V1.E2ETests.Steps;
+using AssetInformationApi.V1.Boundary.Request;
+using AutoFixture;
 using Hackney.Core.Testing.DynamoDb;
 using Hackney.Core.Testing.Sns;
+using Hackney.Shared.Asset.Boundary.Request;
 using System;
 using TestStack.BDDfy;
 using Xunit;
@@ -20,6 +23,8 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         private readonly AddNewAssetSteps _steps;
         private readonly AssetsFixture _assetsFixture;
 
+        //private readonly Fixture _fixture = new Fixture();
+
 #pragma warning disable 0649
         public AddNewAssetTests(MockWebApplicationFactory<Startup> appFactory)
         {
@@ -27,6 +32,8 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
             _snsFixture = appFactory.SnsFixture;
             _assetsFixture = new AssetsFixture(_dbFixture, _snsFixture.SimpleNotificationService);
             _steps = new AddNewAssetSteps(appFactory.Client, _dbFixture);
+
+            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "e2e-testing");
         }
 
         public void Dispose()
@@ -74,6 +81,17 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
             this.Given(g => _assetsFixture.PrepareAssetObject())
                 .When(w => _steps.WhenTheAddAssetApiIsCalledWithAToken(_assetsFixture.AssetRequest))
                 .Then(t => _steps.ThenAssetDetailsAreReturnedAndTheAssetCreatedEventIsRaised(_assetsFixture.AssetRequest, _snsFixture))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void ServiceReturnsUnauthorizedWhenUserIsNotInAllowedGroups()
+        {
+            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "unauthorized-group");
+
+            this.Given(g => _assetsFixture.PrepareAssetObject())
+                .When(w => _steps.WhenTheAddAssetApiIsCalled(_assetsFixture.AssetRequest))
+                .Then(t => _steps.ThenUnauthorizedIsReturned())
                 .BDDfy();
         }
 
