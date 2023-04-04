@@ -23,8 +23,6 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         private readonly AddNewAssetSteps _steps;
         private readonly AssetsFixture _assetsFixture;
 
-        //private readonly Fixture _fixture = new Fixture();
-
 #pragma warning disable 0649
         public AddNewAssetTests(MockWebApplicationFactory<Startup> appFactory)
         {
