@@ -61,7 +61,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         public void ServiceReturnsTheRequestedAsset()
         {
             this.Given(g => _assetsFixture.PrepareAssetObject())
-                .When(w => _steps.WhenTheAddAssetApiIsCalled(_assetsFixture.AssetRequest))
+                .When(w => _steps.WhenTheAddAssetApiIsCalledWithAToken(_assetsFixture.AssetRequest))
                 .Then(t => _steps.ThenTheAssetDetailsAreReturned(_assetsFixture.AssetRequest))
                 .BDDfy();
         }
