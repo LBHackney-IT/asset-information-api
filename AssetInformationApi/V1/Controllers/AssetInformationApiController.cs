@@ -102,6 +102,7 @@ namespace AssetInformationApi.V1.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
         [LogCall(LogLevel.Information)]
+        [AuthorizeEndpointByGroups("ASSET_ADMIN_GROUPS")]
         public async Task<IActionResult> AddAsset([FromBody] AddAssetRequest asset)
         {
             var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(HttpContext));
