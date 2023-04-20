@@ -10,6 +10,8 @@ using Hackney.Core.Sns;
 using AssetInformationApi.V1.Factories;
 using System;
 using Hackney.Core.JWT;
+using AssetInformationApi.V1.Boundary.Request;
+using AssetInformationApi.V1.Helpers;
 
 namespace AssetInformationApi.V1.UseCase
 {
@@ -27,9 +29,14 @@ namespace AssetInformationApi.V1.UseCase
         }
 
         [LogCall]
-        public async Task<AssetResponseObject> PostAsync(AssetDb request, Token token)
+        public async Task<AssetResponseObject> PostAsync(AddAssetRequest request, Token token)
         {
-            var asset = await _gateway.AddAsset(request).ConfigureAwait(false);
+            if (PostCodeHelpers.SearchTextIsValidPostCode(request.AssetAddress.PostCode))
+            {
+                request.AssetAddress.PostCode = PostCodeHelpers.NormalizePostcode(request.AssetAddress.PostCode);
+            }
+
+            var asset = await _gateway.AddAsset(request.ToDatabase()).ConfigureAwait(false);
             if (asset != null && token != null)
             {
                 var assetSnsMessage = _snsFactory.CreateAsset(asset, token);
