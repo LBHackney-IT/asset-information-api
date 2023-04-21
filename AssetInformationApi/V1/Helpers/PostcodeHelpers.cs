@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace AssetInformationApi.V1.Helpers
 {
-    public static class PostCodeHelpers
+    public static class PostcodeHelpers
     {
         public static string NormalizePostcode(string postcode)
         {

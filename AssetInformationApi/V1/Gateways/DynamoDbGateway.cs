@@ -61,9 +61,9 @@ namespace AssetInformationApi.V1.Gateways
         [LogCall]
         public async Task<Asset> AddAsset(AssetDb asset)
         {
-            if (PostCodeHelpers.IsValidPostCode(asset.AssetAddress.PostCode))
+            if (PostcodeHelpers.IsValidPostCode(asset.AssetAddress.PostCode))
             {
-                asset.AssetAddress.PostCode = PostCodeHelpers.NormalizePostcode(asset.AssetAddress.PostCode);
+                asset.AssetAddress.PostCode = PostcodeHelpers.NormalizePostcode(asset.AssetAddress.PostCode);
             }
 
             _logger.LogDebug($"Calling IDynamoDBContext.SaveAsync for id {asset.Id}");
@@ -96,9 +96,9 @@ namespace AssetInformationApi.V1.Gateways
 
             if (assetRequestObject is EditAssetAddressRequest editAddressRequest)
             {
-                if (PostCodeHelpers.IsValidPostCode(editAddressRequest.AssetAddress.PostCode))
+                if (PostcodeHelpers.IsValidPostCode(editAddressRequest.AssetAddress.PostCode))
                 {
-                    editAddressRequest.AssetAddress.PostCode = PostCodeHelpers.NormalizePostcode(editAddressRequest.AssetAddress.PostCode);
+                    editAddressRequest.AssetAddress.PostCode = PostcodeHelpers.NormalizePostcode(editAddressRequest.AssetAddress.PostCode);
                 }
             }
 
