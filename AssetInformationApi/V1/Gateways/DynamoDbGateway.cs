@@ -14,6 +14,8 @@ using System;
 using AssetInformationApi.V1.Infrastructure.Exceptions;
 using Hackney.Shared.Asset.Boundary.Request;
 using System.Linq.Expressions;
+using AssetInformationApi.V1.Helpers;
+using System.Collections;
 
 namespace AssetInformationApi.V1.Gateways
 {
@@ -59,6 +61,11 @@ namespace AssetInformationApi.V1.Gateways
         [LogCall]
         public async Task<Asset> AddAsset(AssetDb asset)
         {
+            if (PostCodeHelpers.IsValidPostCode(asset.AssetAddress.PostCode))
+            {
+                asset.AssetAddress.PostCode = PostCodeHelpers.NormalizePostcode(asset.AssetAddress.PostCode);
+            }
+
             _logger.LogDebug($"Calling IDynamoDBContext.SaveAsync for id {asset.Id}");
             if (!string.IsNullOrEmpty(asset.AssetId))
             {
