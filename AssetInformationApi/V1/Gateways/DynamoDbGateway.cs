@@ -94,12 +94,9 @@ namespace AssetInformationApi.V1.Gateways
             if (ifMatch != existingAsset.VersionNumber)
                 throw new VersionNumberConflictException(ifMatch, existingAsset.VersionNumber);
 
-            if (assetRequestObject is EditAssetAddressRequest editAddressRequest)
+            if (assetRequestObject is EditAssetAddressRequest editAddressRequest && PostcodeHelpers.IsValidPostCode(editAddressRequest.AssetAddress.PostCode))
             {
-                if (PostcodeHelpers.IsValidPostCode(editAddressRequest.AssetAddress.PostCode))
-                {
                     editAddressRequest.AssetAddress.PostCode = PostcodeHelpers.NormalizePostcode(editAddressRequest.AssetAddress.PostCode);
-                }
             }
 
             var response = _updater.UpdateEntity(existingAsset, requestBody, assetRequestObject);
