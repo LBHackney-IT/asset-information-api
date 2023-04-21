@@ -97,6 +97,14 @@ namespace AssetInformationApi.V1.Gateways
 
             var response = _updater.UpdateEntity(existingAsset, requestBody, assetRequestObject);
 
+            if (typeof(T) == typeof(EditAssetAddressRequest))
+            {
+                if (PostCodeHelpers.IsValidPostCode(assetRequestObject.AssetAddress.PostCode))
+                {
+                    assetRequestObject.AssetAddress.PostCode = PostCodeHelpers.NormalizePostcode(assetRequestObject.AssetAddress.PostCode);
+                }
+            }
+
             if (response.NewValues.Any())
             {
                 _logger.LogDebug($"Calling IDynamoDBContext.SaveAsync to update id {assetId}");
