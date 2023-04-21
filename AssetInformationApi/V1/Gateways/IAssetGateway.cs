@@ -13,8 +13,7 @@ namespace AssetInformationApi.V1.Gateways
         Task<Asset> GetAssetByIdAsync(GetAssetByIdRequest query);
         Task<Asset> GetAssetByAssetId(GetAssetByAssetIdRequest query);
         Task<Asset> AddAsset(AssetDb asset);
-        Task<UpdateEntityResult<AssetDb>> EditAssetDetails(Guid assetId, EditAssetRequest assetRequestObject, string requestBody, int? ifMatch);
-        Task<UpdateEntityResult<AssetDb>> EditAssetAddressDetails(Guid assetId, EditAssetAddressRequest assetRequestObject, string requestBody, int? ifMatch);
+        Task<UpdateEntityResult<AssetDb>> EditAssetDetails<T>(Guid assetId, T assetRequestObject, string requestBody, int? ifMatch) where T : class;
 
     }
 }
