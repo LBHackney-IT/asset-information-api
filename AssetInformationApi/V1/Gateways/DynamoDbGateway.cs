@@ -86,7 +86,7 @@ namespace AssetInformationApi.V1.Gateways
 
 
         [LogCall]
-        public async Task<UpdateEntityResult<AssetDb>> EditAssetDetails<T>(Guid assetId, T assetRequestObject, string requestBody, int? ifMatch) where T : class
+        public async Task<UpdateEntityResult<AssetDb>> EditAssetDetails(Guid assetId, EditAssetAddressRequest assetRequestObject, string requestBody, int? ifMatch)
         {
             _logger.LogDebug($"Calling IDynamoDBContext.SaveAsync for id {assetId}");
             var existingAsset = await _dynamoDbContext.LoadAsync<AssetDb>(assetId).ConfigureAwait(false);
@@ -97,12 +97,9 @@ namespace AssetInformationApi.V1.Gateways
 
             var response = _updater.UpdateEntity(existingAsset, requestBody, assetRequestObject);
 
-            if (typeof(T) == typeof(EditAssetAddressRequest))
+            if (PostCodeHelpers.IsValidPostCode(assetRequestObject.AssetAddress.PostCode))
             {
-                if (PostCodeHelpers.IsValidPostCode(assetRequestObject.AssetAddress.PostCode))
-                {
-                    assetRequestObject.AssetAddress.PostCode = PostCodeHelpers.NormalizePostcode(assetRequestObject.AssetAddress.PostCode);
-                }
+                assetRequestObject.AssetAddress.PostCode = PostCodeHelpers.NormalizePostcode(assetRequestObject.AssetAddress.PostCode);
             }
 
             if (response.NewValues.Any())
