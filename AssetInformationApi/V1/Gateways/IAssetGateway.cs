@@ -14,6 +14,5 @@ namespace AssetInformationApi.V1.Gateways
         Task<Asset> GetAssetByAssetId(GetAssetByAssetIdRequest query);
         Task<Asset> AddAsset(AssetDb asset);
         Task<UpdateEntityResult<AssetDb>> EditAssetDetails<T>(Guid assetId, T assetRequestObject, string requestBody, int? ifMatch) where T : class;
-
     }
 }
