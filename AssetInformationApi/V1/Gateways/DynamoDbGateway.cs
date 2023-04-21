@@ -96,7 +96,7 @@ namespace AssetInformationApi.V1.Gateways
 
             if (assetRequestObject is EditAssetAddressRequest editAddressRequest && PostcodeHelpers.IsValidPostCode(editAddressRequest.AssetAddress.PostCode))
             {
-                    editAddressRequest.AssetAddress.PostCode = PostcodeHelpers.NormalizePostcode(editAddressRequest.AssetAddress.PostCode);
+                editAddressRequest.AssetAddress.PostCode = PostcodeHelpers.NormalizePostcode(editAddressRequest.AssetAddress.PostCode);
             }
 
             var response = _updater.UpdateEntity(existingAsset, requestBody, assetRequestObject);
