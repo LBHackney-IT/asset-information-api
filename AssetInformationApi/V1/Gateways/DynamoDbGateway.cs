@@ -96,37 +96,6 @@ namespace AssetInformationApi.V1.Gateways
 
             var response = _updater.UpdateEntity(existingAsset, requestBody, assetRequestObject);
 
-            if (PostCodeHelpers.IsValidPostCode(assetRequestObject.AssetAddress.PostCode))
-            {
-                assetRequestObject.AssetAddress.PostCode = PostCodeHelpers.NormalizePostcode(assetRequestObject.AssetAddress.PostCode);
-            }
-
-            if (response.NewValues.Any())
-            {
-                _logger.LogDebug($"Calling IDynamoDBContext.SaveAsync to update id {assetId}");
-                await _dynamoDbContext.SaveAsync<AssetDb>(response.UpdatedEntity).ConfigureAwait(false);
-            }
-
-            return response;
-        }
-
-        [LogCall]
-        public async Task<UpdateEntityResult<AssetDb>> EditAssetAddressDetails(Guid assetId, EditAssetAddressRequest assetRequestObject, string requestBody, int? ifMatch)
-        {
-            _logger.LogDebug($"Calling IDynamoDBContext.SaveAsync for id {assetId}");
-            var existingAsset = await _dynamoDbContext.LoadAsync<AssetDb>(assetId).ConfigureAwait(false);
-            if (existingAsset == null) return null;
-
-            if (ifMatch != existingAsset.VersionNumber)
-                throw new VersionNumberConflictException(ifMatch, existingAsset.VersionNumber);
-
-            if (PostCodeHelpers.IsValidPostCode(assetRequestObject.AssetAddress.PostCode))
-            {
-                assetRequestObject.AssetAddress.PostCode = PostCodeHelpers.NormalizePostcode(assetRequestObject.AssetAddress.PostCode);
-            }
-
-            var response = _updater.UpdateEntity(existingAsset, requestBody, assetRequestObject);
-
             if (response.NewValues.Any())
             {
                 _logger.LogDebug($"Calling IDynamoDBContext.SaveAsync to update id {assetId}");
