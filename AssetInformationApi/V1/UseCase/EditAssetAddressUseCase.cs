@@ -30,7 +30,7 @@ namespace AssetInformationApi.V1.UseCase
         public async Task<AssetResponseObject> ExecuteAsync(
             Guid assetId, EditAssetAddressRequest assetRequestObject, string requestBody, Token token, int? ifMatch)
         {
-            var result = await _assetGateway.EditAssetDetails(assetId, assetRequestObject, requestBody, ifMatch).ConfigureAwait(false);
+            var result = await _assetGateway.EditAssetAddressDetails(assetId, assetRequestObject, requestBody, ifMatch).ConfigureAwait(false);
             if (result == null) return null;
 
             if (result.NewValues.Any())
