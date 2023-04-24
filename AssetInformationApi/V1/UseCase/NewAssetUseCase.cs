@@ -10,6 +10,7 @@ using AssetInformationApi.V1.Factories;
 using System;
 using Hackney.Core.JWT;
 using Microsoft.Extensions.Logging;
+using AssetInformationApi.V1.Boundary.Request;
 
 namespace AssetInformationApi.V1.UseCase
 {
@@ -29,7 +30,7 @@ namespace AssetInformationApi.V1.UseCase
         }
 
         [LogCall]
-        public async Task<AssetResponseObject> PostAsync(AssetDb request, Token token)
+        public async Task<AssetResponseObject> PostAsync(AddAssetRequest request, Token token)
         {
             _logger.LogDebug($"NewAssetUseCase - Calling _gateway.AddAsset for asset ID {request.Id}");
 

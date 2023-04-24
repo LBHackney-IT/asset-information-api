@@ -55,7 +55,7 @@ namespace AssetInformationApi.V1.Gateways
         }
 
         [LogCall]
-        public async Task<Asset> AddAsset(AssetDb asset)
+        public async Task<Asset> AddAsset(AddAssetRequest asset)
         {
             _logger.LogDebug($"DynamoDbGateway AddAsset - Checking and normalizing postcode prior to adding asset with ID {asset.Id})");
 
@@ -74,7 +74,10 @@ namespace AssetInformationApi.V1.Gateways
                 if (assetById != null)
                     throw new DuplicateAssetIdException(asset.AssetId);
             }
-            _dynamoDbContext.SaveAsync(asset).GetAwaiter().GetResult();
+
+            var newAsset = NewAssetRequestToDatabase(asset);
+
+            _dynamoDbContext.SaveAsync(newAsset).GetAwaiter().GetResult();
 
             _logger.LogDebug($"DynamoDbGateway AddAsset - Calling IDynamoDBContext.LoadAsync for asset ID {asset.Id}");
 
@@ -107,6 +110,23 @@ namespace AssetInformationApi.V1.Gateways
             }
 
             return response;
+        }
+
+        // TEMPORARILY HERE
+        public static AssetDb NewAssetRequestToDatabase (AddAssetRequest newAssetRequest)
+        {
+            return new AssetDb
+            {
+                Id = newAssetRequest.Id,
+                AssetId = newAssetRequest.AssetId,
+                AssetType = newAssetRequest.AssetType,
+                IsActive = newAssetRequest.IsActive,
+                ParentAssetIds = newAssetRequest.ParentAssetIds,
+                AssetLocation = newAssetRequest.AssetLocation,
+                AssetAddress = newAssetRequest.AssetAddress,
+                AssetManagement = newAssetRequest.AssetManagement,
+                AssetCharacteristics = newAssetRequest.AssetCharacteristics
+            };
         }
     }
 }

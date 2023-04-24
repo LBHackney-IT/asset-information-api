@@ -130,10 +130,12 @@ namespace AssetInformationApi.Tests.V1.Gateways
         public async Task AddAssetToDatabaseAndReturnEntity()
         {
             // Arrange
-            var entity = _fixture.Build<AssetDb>()
+            var request = _fixture.Build<AddAssetRequest>()
                 .With(x => x.VersionNumber, (int?) null)
                 .With(x => x.AssetId, (string) null)
                 .Create();
+
+            var entity = DynamoDbGateway.NewAssetRequestToDatabase(request);
 
             var query = new GetAssetByIdRequest()
             {
@@ -141,7 +143,7 @@ namespace AssetInformationApi.Tests.V1.Gateways
             };
 
             // Act
-            var response = await _classUnderTest.AddAsset(entity).ConfigureAwait(false);
+            var response = await _classUnderTest.AddAsset(request).ConfigureAwait(false);
 
             // Assert
             response.Should().NotBeNull();

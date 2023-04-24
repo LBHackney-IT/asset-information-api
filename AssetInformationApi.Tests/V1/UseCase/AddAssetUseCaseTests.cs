@@ -12,6 +12,7 @@ using Hackney.Core.JWT;
 using Hackney.Core.Sns;
 using AssetInformationApi.V1.Factories;
 using Microsoft.Extensions.Logging.Abstractions;
+using AssetInformationApi.V1.Boundary.Request;
 
 namespace AssetInformationApi.Tests.V1.UseCase
 {
@@ -35,27 +36,28 @@ namespace AssetInformationApi.Tests.V1.UseCase
         [Fact]
         public async Task AddAssetUsecaseShouldReturnOkResponse()
         {
-            var asset = _fixture.Create<Asset>();
-            asset.Id = Guid.NewGuid();
+            var newAssetRequest = _fixture.Create<AddAssetRequest>();
+            newAssetRequest.Id = Guid.NewGuid();
             var token = new Token();
-            var request = asset.ToDatabase();
-            _mockGateway.Setup(x => x.AddAsset(request)).ReturnsAsync(asset);
+            var assetDb = DynamoDbGateway.NewAssetRequestToDatabase(newAssetRequest);
+            var assetToDomain = assetDb.ToDomain();
 
-            var response = await _classUnderTest.PostAsync(request, token).ConfigureAwait(false);
+            _mockGateway.Setup(x => x.AddAsset(newAssetRequest).ReturnsAsync(assetDb);
+
+            var response = await _classUnderTest.PostAsync(newAssetRequest, token).ConfigureAwait(false);
             response.Should().BeEquivalentTo(asset.ToResponse());
         }
 
         [Fact]
         public async Task AddAssetUsecaseShouldReturnNull()
         {
-            var asset = _fixture.Create<Asset>();
+            var newAssetRequest = _fixture.Create<AddAssetRequest>();
             var token = new Token();
             token.Email = "test@test.com";
             token.Name = "Test";
-            var request = asset.ToDatabase();
-            _mockGateway.Setup(x => x.AddAsset(request)).ReturnsAsync(asset);
+            _mockGateway.Setup(x => x.AddAsset(newAssetRequest)).ReturnsAsync(newAssetRequest);
 
-            var response = await _classUnderTest.PostAsync(asset.ToDatabase(), token).ConfigureAwait(false);
+            var response = await _classUnderTest.PostAsync(newAssetRequest, token).ConfigureAwait(false);
             response.Should().BeNull();
         }
     }
