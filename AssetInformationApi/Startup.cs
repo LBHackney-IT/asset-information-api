@@ -68,7 +68,7 @@ namespace AssetInformationApi
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
+                    options.JsonSerializerOptions.IgnoreNullValues = true;
                 });
 
             services.AddFluentValidation(Assembly.GetAssembly(typeof(EditAssetAddressRequestValidator)));
