@@ -116,10 +116,7 @@ namespace AssetInformationApi.V1.Controllers
 
             _logger.LogDebug($"Add Asset endpoint - Request processed, returning response (ref. asset ID {asset.Id})");
 
-            return Created(new Uri($"api/v1/assets/{asset.Id}", UriKind.Relative), new JsonResult(result, new JsonSerializerOptions
-            {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-            }));
+            return Created(new Uri($"api/v1/assets/{asset.Id}", UriKind.Relative), result);
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
