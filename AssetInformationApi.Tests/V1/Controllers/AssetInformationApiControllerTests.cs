@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Hackney.Shared.Asset.Boundary.Request;
 using AssetInformationApi.V1.Infrastructure.Exceptions;
 using TestStack.BDDfy;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace AssetInformationApi.Tests.V1.Controllers
 {
@@ -66,7 +67,9 @@ namespace AssetInformationApi.Tests.V1.Controllers
                 _mockTokenFactory.Object,
                 _mockContextWrapper.Object,
                 _mockEditAssetUseCase.Object,
-                _mockEditAssetAddressUseCase.Object);
+                _mockEditAssetAddressUseCase.Object,
+                new NullLogger<AssetInformationApiController>()
+                );
 
             // changes to allow reading of raw request body
             _requestStream = new MemoryStream(Encoding.Default.GetBytes(RequestBodyText));
