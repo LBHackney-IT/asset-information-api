@@ -9,9 +9,9 @@ using Hackney.Shared.Asset.Domain;
 using Hackney.Shared.Asset.Factories;
 using Xunit;
 using Hackney.Core.JWT;
-using Hackney.Core.Http;
 using Hackney.Core.Sns;
 using AssetInformationApi.V1.Factories;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace AssetInformationApi.Tests.V1.UseCase
 {
@@ -29,7 +29,7 @@ namespace AssetInformationApi.Tests.V1.UseCase
             _mockGateway = new Mock<IAssetGateway>();
             _assetSnsGateway = new Mock<ISnsGateway>();
             _assetSnsFactory = new AssetSnsFactory();
-            _classUnderTest = new NewAssetUseCase(_mockGateway.Object, _assetSnsGateway.Object, _assetSnsFactory);
+            _classUnderTest = new NewAssetUseCase(_mockGateway.Object, _assetSnsGateway.Object, _assetSnsFactory, new NullLogger<NewAssetUseCase>());
         }
 
         [Fact]

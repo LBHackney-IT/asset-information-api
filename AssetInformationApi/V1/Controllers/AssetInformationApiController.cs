@@ -7,10 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Hackney.Shared.Asset.Boundary.Response;
-using Hackney.Shared.Asset.Domain;
 using Hackney.Shared.Asset.Factories;
 using Hackney.Core.Http;
-using Hackney.Shared.Asset.Infrastructure;
 using System;
 using Hackney.Core.Middleware;
 using HeaderConstants = AssetInformationApi.V1.Infrastructure.HeaderConstants;
@@ -18,6 +16,8 @@ using System.Net.Http.Headers;
 using AssetInformationApi.V1.Infrastructure.Exceptions;
 using Hackney.Shared.Asset.Boundary.Request;
 using Hackney.Core.Authorization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace AssetInformationApi.V1.Controllers
 {
@@ -34,11 +34,13 @@ namespace AssetInformationApi.V1.Controllers
         private readonly IEditAssetAddressUseCase _editAssetAddressUseCase;
         private readonly ITokenFactory _tokenFactory;
         private readonly IHttpContextWrapper _contextWrapper;
+        private readonly ILogger<AssetInformationApiController> _logger;
 
         public AssetInformationApiController(
             IGetAssetByIdUseCase getAssetByIdUseCase,
             IGetAssetByAssetIdUseCase getAssetByAssetIdUseCase, INewAssetUseCase newAssetUseCase,
-            ITokenFactory tokenFactory, IHttpContextWrapper contextWrapper, IEditAssetUseCase editAssetUseCase, IEditAssetAddressUseCase editAssetAddressUseCase)
+            ITokenFactory tokenFactory, IHttpContextWrapper contextWrapper, IEditAssetUseCase editAssetUseCase, IEditAssetAddressUseCase editAssetAddressUseCase,
+            ILogger<AssetInformationApiController> logger)
         {
             _getAssetByIdUseCase = getAssetByIdUseCase;
             _getAssetByAssetIdUseCase = getAssetByAssetIdUseCase;
@@ -47,6 +49,7 @@ namespace AssetInformationApi.V1.Controllers
             _contextWrapper = contextWrapper;
             _editAssetUseCase = editAssetUseCase;
             _editAssetAddressUseCase = editAssetAddressUseCase;
+            _logger = logger;
         }
 
         /// <summary>
@@ -106,9 +109,17 @@ namespace AssetInformationApi.V1.Controllers
         public async Task<IActionResult> AddAsset([FromBody] AddAssetRequest asset)
         {
             var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(HttpContext));
+
+            _logger.LogDebug($"Add Asset endpoint - Calling _newAssetUseCase.PostAsync for asset ID {asset.Id}");
+
             var result = await _newAssetUseCase.PostAsync(asset.ToDatabase(), token).ConfigureAwait(false);
 
-            return Created(new Uri($"api/v1/assets/{asset.Id}", UriKind.Relative), result);
+            _logger.LogDebug($"Add Asset endpoint - Request processed, returning response (ref. asset ID {asset.Id})");
+
+            return Created(new Uri($"api/v1/assets/{asset.Id}", UriKind.Relative), new JsonResult(result, new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            }));
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
