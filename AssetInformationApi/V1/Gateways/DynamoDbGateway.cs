@@ -1,9 +1,7 @@
 using Amazon.DynamoDBv2.DataModel;
 using AssetInformationApi.V1.Boundary.Request;
-using AssetInformationApi.V1.Domain;
 using Hackney.Core.Logging;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Hackney.Shared.Asset.Domain;
@@ -13,7 +11,7 @@ using AssetInformationApi.V1.Infrastructure;
 using System;
 using AssetInformationApi.V1.Infrastructure.Exceptions;
 using Hackney.Shared.Asset.Boundary.Request;
-using System.Linq.Expressions;
+using AssetInformationApi.V1.Helpers;
 
 namespace AssetInformationApi.V1.Gateways
 {
@@ -59,7 +57,14 @@ namespace AssetInformationApi.V1.Gateways
         [LogCall]
         public async Task<Asset> AddAsset(AssetDb asset)
         {
-            _logger.LogDebug($"Calling IDynamoDBContext.SaveAsync for id {asset.Id}");
+            _logger.LogDebug($"DynamoDbGateway AddAsset - Checking and normalizing postcode prior to adding asset with ID {asset.Id})");
+
+            if (PostcodeHelpers.IsValidPostCode(asset.AssetAddress.PostCode))
+            {
+                asset.AssetAddress.PostCode = PostcodeHelpers.NormalizePostcode(asset.AssetAddress.PostCode);
+            }
+
+            _logger.LogDebug($"DynamoDbGateway AddAsset - Calling IDynamoDBContext.SaveAsync for asset ID {asset.Id}");
             if (!string.IsNullOrEmpty(asset.AssetId))
             {
                 GetAssetByAssetIdRequest getAssetByAssetIdRequest = new GetAssetByAssetIdRequest();
@@ -71,12 +76,12 @@ namespace AssetInformationApi.V1.Gateways
             }
             _dynamoDbContext.SaveAsync(asset).GetAwaiter().GetResult();
 
-            _logger.LogDebug($"Calling IDynamoDBContext.LoadAsync for id {asset.Id}");
+            _logger.LogDebug($"DynamoDbGateway AddAsset - Calling IDynamoDBContext.LoadAsync for asset ID {asset.Id}");
+
             var result = await _dynamoDbContext.LoadAsync<AssetDb>(asset.Id).ConfigureAwait(false);
 
             return result?.ToDomain();
         }
-
 
         [LogCall]
         public async Task<UpdateEntityResult<AssetDb>> EditAssetDetails<T>(Guid assetId, T assetRequestObject, string requestBody, int? ifMatch) where T : class
@@ -87,6 +92,11 @@ namespace AssetInformationApi.V1.Gateways
 
             if (ifMatch != existingAsset.VersionNumber)
                 throw new VersionNumberConflictException(ifMatch, existingAsset.VersionNumber);
+
+            if (assetRequestObject is EditAssetAddressRequest editAddressRequest && PostcodeHelpers.IsValidPostCode(editAddressRequest.AssetAddress.PostCode))
+            {
+                editAddressRequest.AssetAddress.PostCode = PostcodeHelpers.NormalizePostcode(editAddressRequest.AssetAddress.PostCode);
+            }
 
             var response = _updater.UpdateEntity(existingAsset, requestBody, assetRequestObject);
 
