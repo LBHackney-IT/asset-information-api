@@ -115,13 +115,14 @@ namespace AssetInformationApi.Tests.V1.Controllers
         [Fact]
         public async Task GetTenureWithValidIdReturnsOKResponse()
         {
-            var tenureResponse = _fixture.Create<Asset>();
-            var request = ConstructRequest(tenureResponse.Id);
-            _mockGetAssetByIdUseCase.Setup(x => x.ExecuteAsync(request)).ReturnsAsync(tenureResponse);
+            var tenureDomain = _fixture.Create<Asset>();
+            var tenureResponse = tenureDomain.ToResponse();
+            var request = ConstructRequest(tenureDomain.Id);
+            _mockGetAssetByIdUseCase.Setup(x => x.ExecuteAsync(request)).ReturnsAsync(tenureDomain);
 
             var response = await _classUnderTest.GetAssetById(request).ConfigureAwait(false);
             response.Should().BeOfType(typeof(OkObjectResult));
-            (response as OkObjectResult).Value.Should().Be(tenureResponse);
+            (response as OkObjectResult).Value.Should().BeEquivalentTo(tenureResponse);
         }
 
         [Fact]
@@ -171,6 +172,8 @@ namespace AssetInformationApi.Tests.V1.Controllers
         {
             // Arrange
             var useCaseResponse = _fixture.Create<Asset>();
+            var expectedControllerResponse = useCaseResponse.ToResponse();
+
             _mockGetAssetByIdUseCase
                 .Setup(x => x.ExecuteAsync(It.IsAny<GetAssetByIdRequest>()))
                 .ReturnsAsync(useCaseResponse);
@@ -189,9 +192,8 @@ namespace AssetInformationApi.Tests.V1.Controllers
 
             // Assert
             response.Should().BeOfType(typeof(OkObjectResult));
-            (response as OkObjectResult).Value.Should().BeOfType(typeof(Asset));
 
-            ((response as OkObjectResult).Value as Asset).Should().BeEquivalentTo(useCaseResponse);
+            ((response as OkObjectResult).Value).Should().BeEquivalentTo(expectedControllerResponse);
         }
 
         [Fact]
