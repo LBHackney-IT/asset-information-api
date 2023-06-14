@@ -12,6 +12,7 @@ using System;
 using AssetInformationApi.V1.Infrastructure.Exceptions;
 using Hackney.Shared.Asset.Boundary.Request;
 using AssetInformationApi.V1.Helpers;
+using AssetInformationApi.V1.Factories;
 
 namespace AssetInformationApi.V1.Gateways
 {
@@ -84,7 +85,7 @@ namespace AssetInformationApi.V1.Gateways
         }
 
         [LogCall]
-        public async Task<UpdateEntityResult<AssetDb>> EditAssetDetails<T>(Guid assetId, T assetRequestObject, string requestBody, int? ifMatch) where T : class
+        public async Task<UpdateEntityResult<AssetDb>> EditAssetDetails(Guid assetId, EditAssetRequest assetRequestObject, string requestBody, int? ifMatch)
         {
             _logger.LogDebug($"Calling IDynamoDBContext.SaveAsync for id {assetId}");
             var existingAsset = await _dynamoDbContext.LoadAsync<AssetDb>(assetId).ConfigureAwait(false);
@@ -93,20 +94,25 @@ namespace AssetInformationApi.V1.Gateways
             if (ifMatch != existingAsset.VersionNumber)
                 throw new VersionNumberConflictException(ifMatch, existingAsset.VersionNumber);
 
+            UpdateEntityResult<AssetDb> updaterResponse;
+
             if (assetRequestObject is EditAssetAddressRequest editAddressRequest && PostcodeHelpers.IsValidPostCode(editAddressRequest.AssetAddress.PostCode))
             {
                 editAddressRequest.AssetAddress.PostCode = PostcodeHelpers.NormalizePostcode(editAddressRequest.AssetAddress.PostCode);
+                updaterResponse = _updater.UpdateEntity<AssetDb, EditAssetAddressDatabase>(existingAsset, requestBody, editAddressRequest.ToDatabase());
+            }
+            else
+            {
+                updaterResponse = _updater.UpdateEntity<AssetDb, EditAssetDatabase>(existingAsset, requestBody, assetRequestObject.ToDatabase());
             }
 
-            var response = _updater.UpdateEntity(existingAsset, requestBody, assetRequestObject);
-
-            if (response.NewValues.Any())
+            if (updaterResponse.NewValues.Any())
             {
                 _logger.LogDebug($"Calling IDynamoDBContext.SaveAsync to update id {assetId}");
-                await _dynamoDbContext.SaveAsync<AssetDb>(response.UpdatedEntity).ConfigureAwait(false);
+                await _dynamoDbContext.SaveAsync<AssetDb>(updaterResponse.UpdatedEntity).ConfigureAwait(false);
             }
 
-            return response;
+            return updaterResponse;
         }
     }
 }

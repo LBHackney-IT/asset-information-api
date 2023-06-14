@@ -65,6 +65,8 @@ namespace AssetInformationApi.Tests.V1.UseCase
                 UpdatedEntity = _fixture.Create<AssetDb>()
             };
 
+            var expectedAssetCharacteristics = gatewayResponse.UpdatedEntity.AssetCharacteristics.ToDomain().ToResponse();
+
             _mockGateway.Setup(x => x.EditAssetDetails(It.IsAny<Guid>(), It.IsAny<EditAssetRequest>(), It.IsAny<string>(), It.IsAny<int?>())).ReturnsAsync(gatewayResponse);
 
             var response = await _classUnderTest.ExecuteAsync(mockQuery, mockRequestObject, mockRawBody, mockToken, null).ConfigureAwait(false);
@@ -72,7 +74,7 @@ namespace AssetInformationApi.Tests.V1.UseCase
             response.Should().NotBeNull();
             response.Should().BeOfType(typeof(AssetResponseObject));
 
-            response.AssetCharacteristics.Should().Be(gatewayResponse.UpdatedEntity.AssetCharacteristics);
+            response.AssetCharacteristics.Should().BeEquivalentTo(expectedAssetCharacteristics);
             response.AssetManagement.Should().Be(gatewayResponse.UpdatedEntity.AssetManagement);
             response.Id.Should().Be(gatewayResponse.UpdatedEntity.Id);
         }
