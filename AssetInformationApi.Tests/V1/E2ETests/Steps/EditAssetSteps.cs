@@ -167,7 +167,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
             var databaseResponse = await _dbContext.LoadAsync<AssetDb>(assetFixture.AssetId).ConfigureAwait(false);
 
             databaseResponse.Id.Should().Be(assetFixture.ExistingAsset.Id);
-            databaseResponse.AssetCharacteristics.ToString().Should().Be(assetFixture.EditAsset.AssetCharacteristics.ToString());
+            databaseResponse.AssetCharacteristics.ToString().Should().Be(assetFixture.EditAsset.AssetCharacteristics.ToDatabase().ToString());
             databaseResponse.AssetManagement.ToString().Should().Be(assetFixture.EditAsset.AssetManagement.ToString());
             databaseResponse.ParentAssetIds.Should().Be(assetFixture.EditAsset.ParentAssetIds);
             databaseResponse.RootAsset.Should().Be(assetFixture.EditAsset.RootAsset);
