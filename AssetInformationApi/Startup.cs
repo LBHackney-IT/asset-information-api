@@ -41,6 +41,7 @@ using Hackney.Shared.Asset.Infrastructure;
 using AssetInformationApi.V1.Factories;
 using AssetInformationApi.V1.Infrastructure;
 using Hackney.Core.Middleware;
+using AssetInformationApi.V1.Gateways.Interfaces;
 
 namespace AssetInformationApi
 {

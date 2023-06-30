@@ -1,4 +1,3 @@
-using AssetInformationApi.V1.Gateways;
 using AssetInformationApi.V1.UseCase;
 using AutoFixture;
 using FluentAssertions;
@@ -12,6 +11,7 @@ using Hackney.Core.JWT;
 using Hackney.Core.Sns;
 using AssetInformationApi.V1.Factories;
 using Microsoft.Extensions.Logging.Abstractions;
+using AssetInformationApi.V1.Gateways.Interfaces;
 
 namespace AssetInformationApi.Tests.V1.UseCase
 {
