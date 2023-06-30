@@ -16,13 +16,13 @@ using AssetInformationApi.V1.Factories;
 
 namespace AssetInformationApi.V1.Gateways
 {
-    public class DynamoDbGateway : IAssetGateway
+    public class AssetGateway : IAssetGateway
     {
         private readonly IDynamoDBContext _dynamoDbContext;
-        private readonly ILogger<DynamoDbGateway> _logger;
+        private readonly ILogger<AssetGateway> _logger;
         private readonly IEntityUpdater _updater;
 
-        public DynamoDbGateway(IDynamoDBContext dynamoDbContext, ILogger<DynamoDbGateway> logger, IEntityUpdater updater)
+        public AssetGateway(IDynamoDBContext dynamoDbContext, ILogger<AssetGateway> logger, IEntityUpdater updater)
         {
             _dynamoDbContext = dynamoDbContext;
             _logger = logger;

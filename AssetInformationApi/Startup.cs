@@ -170,7 +170,7 @@ namespace AssetInformationApi
 
         private static void RegisterGateways(IServiceCollection services)
         {
-            services.AddScoped<IAssetGateway, DynamoDbGateway>();
+            services.AddScoped<IAssetGateway, AssetGateway>();
         }
 
         private static void RegisterUseCases(IServiceCollection services)
