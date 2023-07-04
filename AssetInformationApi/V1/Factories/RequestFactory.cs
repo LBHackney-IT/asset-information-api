@@ -14,6 +14,7 @@ namespace AssetInformationApi.V1.Factories
             {
                 RootAsset = domainEntity.RootAsset,
                 ParentAssetIds = domainEntity.ParentAssetIds,
+                BoilerHouseId = domainEntity.BoilerHouseId,
                 IsActive = domainEntity.IsActive,
                 AssetLocation = domainEntity.AssetLocation,
                 AssetManagement = domainEntity.AssetManagement,
@@ -30,6 +31,7 @@ namespace AssetInformationApi.V1.Factories
                 AssetAddress = domainEntity.AssetAddress,
                 RootAsset = domainEntity.RootAsset,
                 ParentAssetIds = domainEntity.ParentAssetIds,
+                BoilerHouseId = domainEntity.BoilerHouseId,
                 IsActive = domainEntity.IsActive,
                 AssetLocation = domainEntity.AssetLocation,
                 AssetManagement = domainEntity.AssetManagement,
