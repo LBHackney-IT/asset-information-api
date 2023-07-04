@@ -41,6 +41,7 @@ using Hackney.Shared.Asset.Infrastructure;
 using AssetInformationApi.V1.Factories;
 using AssetInformationApi.V1.Infrastructure;
 using Hackney.Core.Middleware;
+using AssetInformationApi.V1.Gateways.Interfaces;
 
 namespace AssetInformationApi
 {
@@ -170,7 +171,7 @@ namespace AssetInformationApi
 
         private static void RegisterGateways(IServiceCollection services)
         {
-            services.AddScoped<IAssetGateway, DynamoDbGateway>();
+            services.AddScoped<IAssetGateway, AssetGateway>();
         }
 
         private static void RegisterUseCases(IServiceCollection services)

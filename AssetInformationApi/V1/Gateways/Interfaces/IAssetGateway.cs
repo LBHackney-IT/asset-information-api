@@ -6,7 +6,7 @@ using System;
 using AssetInformationApi.V1.Infrastructure;
 using Hackney.Shared.Asset.Boundary.Request;
 
-namespace AssetInformationApi.V1.Gateways
+namespace AssetInformationApi.V1.Gateways.Interfaces
 {
     public interface IAssetGateway
     {
