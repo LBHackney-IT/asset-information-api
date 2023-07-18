@@ -1,4 +1,3 @@
-using AssetInformationApi.V1.Gateways;
 using AssetInformationApi.V1.UseCase;
 using AutoFixture;
 using FluentAssertions;
@@ -18,6 +17,7 @@ using AssetInformationApi.V1.Infrastructure;
 using AssetInformationApi.V1.Boundary.Request;
 using System.Collections.Generic;
 using Hackney.Shared.Asset.Boundary.Response;
+using AssetInformationApi.V1.Gateways.Interfaces;
 
 namespace AssetInformationApi.Tests.V1.UseCase
 {

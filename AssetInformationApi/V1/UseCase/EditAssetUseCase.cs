@@ -1,6 +1,6 @@
 using AssetInformationApi.V1.Boundary.Request;
 using AssetInformationApi.V1.Factories;
-using AssetInformationApi.V1.Gateways;
+using AssetInformationApi.V1.Gateways.Interfaces;
 using AssetInformationApi.V1.UseCase.Interfaces;
 using Hackney.Core.JWT;
 using Hackney.Core.Sns;

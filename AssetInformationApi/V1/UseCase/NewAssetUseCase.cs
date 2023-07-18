@@ -1,4 +1,3 @@
-using AssetInformationApi.V1.Gateways;
 using AssetInformationApi.V1.UseCase.Interfaces;
 using System.Threading.Tasks;
 using Hackney.Shared.Asset.Factories;
@@ -10,6 +9,7 @@ using AssetInformationApi.V1.Factories;
 using System;
 using Hackney.Core.JWT;
 using Microsoft.Extensions.Logging;
+using AssetInformationApi.V1.Gateways.Interfaces;
 
 namespace AssetInformationApi.V1.UseCase
 {
