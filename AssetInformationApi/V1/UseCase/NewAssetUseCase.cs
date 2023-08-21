@@ -38,7 +38,7 @@ namespace AssetInformationApi.V1.UseCase
             if (asset != null && token != null)
             {
                 string jsonAsset = JsonConvert.SerializeObject(asset);
-                _logger.LogDebug("Publishing SNS message after creation of new asset with prop ref: {AssetId}. Asset body: {JsonAsset}", asset.AssetId, jsonAsset);
+                _logger.LogInformation("Publishing SNS message after creation of new asset with prop ref: {AssetId}. Asset body: {JsonAsset}", asset.AssetId, jsonAsset);
 
                 var assetSnsMessage = _snsFactory.CreateAsset(asset, token);
                 var assetTopicArn = Environment.GetEnvironmentVariable("ASSET_SNS_ARN");
