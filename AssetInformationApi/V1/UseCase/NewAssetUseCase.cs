@@ -10,6 +10,7 @@ using System;
 using Hackney.Core.JWT;
 using Microsoft.Extensions.Logging;
 using AssetInformationApi.V1.Gateways.Interfaces;
+using Newtonsoft.Json;
 
 namespace AssetInformationApi.V1.UseCase
 {
@@ -36,6 +37,9 @@ namespace AssetInformationApi.V1.UseCase
             var asset = await _gateway.AddAsset(request).ConfigureAwait(false);
             if (asset != null && token != null)
             {
+                string jsonAsset = JsonConvert.SerializeObject(asset);
+                _logger.LogDebug("Publishing SNS message after creation of new asset with prop ref: {AssetId}. Asset body: {JsonAsset}", asset.AssetId, jsonAsset);
+
                 var assetSnsMessage = _snsFactory.CreateAsset(asset, token);
                 var assetTopicArn = Environment.GetEnvironmentVariable("ASSET_SNS_ARN");
                 await _snsGateway.Publish(assetSnsMessage, assetTopicArn).ConfigureAwait(false);
