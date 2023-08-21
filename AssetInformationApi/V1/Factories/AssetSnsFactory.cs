@@ -23,7 +23,7 @@ namespace AssetInformationApi.V1.Factories
                 SourceSystem = CreateAssetEventConstants.SOURCE_SYSTEM,
                 EventData = new EventData
                 {
-                    NewData = asset
+                    NewData = asset.AssetId
                 },
                 User = new User { Name = token.Name, Email = token.Email }
             };
