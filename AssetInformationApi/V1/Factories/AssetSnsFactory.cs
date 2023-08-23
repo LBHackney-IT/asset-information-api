@@ -4,12 +4,13 @@ using Hackney.Shared.Asset.Domain;
 using Hackney.Shared.Asset.Infrastructure;
 using System;
 using AssetInformationApi.V1.Infrastructure;
+using AssetInformationApi.V1.Boundary.Request;
 
 namespace AssetInformationApi.V1.Factories
 {
     public class AssetSnsFactory : ISnsFactory
     {
-        public EntityEventSns CreateAsset(Asset asset, Token token)
+        public EntityEventSns CreateAsset(AddAssetRequest asset, Token token)
         {
             return new EntityEventSns
             {

@@ -4,11 +4,11 @@ using FluentAssertions;
 using Hackney.Core.JWT;
 using Hackney.Core.Sns;
 using Hackney.Shared.Asset.Infrastructure;
-using Hackney.Shared.Asset.Domain;
 using System;
 using System.Collections.Generic;
 using Xunit;
 using AssetInformationApi.V1.Factories;
+using AssetInformationApi.V1.Boundary.Request;
 
 namespace AssetInformationApi.Tests.V1.Factories
 {
@@ -28,7 +28,7 @@ namespace AssetInformationApi.Tests.V1.Factories
         [Fact]
         public void CreateAssetTestCreatesSnsEvent()
         {
-            var asset = _fixture.Create<Asset>();
+            var asset = _fixture.Create<AddAssetRequest>();
             var token = _fixture.Create<Token>();
 
             var expectedEventData = new EventData() { NewData = asset };
