@@ -1,6 +1,8 @@
+using AssetInformationApi.V1.Boundary.Request;
 using AssetInformationApi.V1.Infrastructure;
 using Hackney.Shared.Asset.Boundary.Request;
 using Hackney.Shared.Asset.Factories;
+using Hackney.Shared.Asset.Infrastructure;
 
 namespace AssetInformationApi.V1.Factories
 {
@@ -36,6 +38,29 @@ namespace AssetInformationApi.V1.Factories
                 AssetLocation = domainEntity.AssetLocation,
                 AssetManagement = domainEntity.AssetManagement,
                 AssetCharacteristics = domainEntity.AssetCharacteristics.ToDatabase()
+            };
+        }
+        public static AssetDb ToDatabase(this AddAssetRequest domainEntity)
+        {
+            if (domainEntity == null) return null;
+
+            return new AssetDb
+            {
+                Id = domainEntity.Id,
+                AssetId = domainEntity.AssetId,
+                AssetType = domainEntity.AssetType,
+                RentGroup = domainEntity.RentGroup,
+                RootAsset = domainEntity.RootAsset,
+                IsActive = domainEntity.IsActive,
+                ParentAssetIds = domainEntity.ParentAssetIds,
+                BoilerHouseId = domainEntity.BoilerHouseId,
+                AssetLocation = domainEntity.AssetLocation,
+                AssetAddress = domainEntity.AssetAddress,
+                AssetManagement = domainEntity.AssetManagement,
+                AssetCharacteristics = domainEntity.AssetCharacteristics.ToDatabase(),
+                Tenure = domainEntity.Tenure.ToDatabase(),
+                VersionNumber = domainEntity.VersionNumber,
+                Patches = domainEntity.Patches?.ToDatabase()
             };
         }
     }

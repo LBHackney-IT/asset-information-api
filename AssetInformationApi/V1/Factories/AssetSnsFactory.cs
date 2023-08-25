@@ -49,5 +49,25 @@ namespace AssetInformationApi.V1.Factories
                 User = new User { Name = token.Name, Email = token.Email }
             };
         }
+
+        public EntityEventSns AddRepairsContractsToNewAsset(AddRepairsContractsToNewAssetObject addRepairsContractsToNewAssetObject, Token token)
+        {
+            return new EntityEventSns
+            {
+                CorrelationId = Guid.NewGuid(),
+                DateTime = DateTime.UtcNow,
+                EntityId = addRepairsContractsToNewAssetObject.EntityId,
+                Id = Guid.NewGuid(),
+                EventType = CreateAssetEventConstants.EVENTTYPE,
+                Version = CreateAssetEventConstants.V1_VERSION,
+                SourceDomain = CreateAssetEventConstants.SOURCE_DOMAIN,
+                SourceSystem = CreateAssetEventConstants.SOURCE_SYSTEM,
+                EventData = new EventData
+                {
+                    NewData = addRepairsContractsToNewAssetObject
+                },
+                User = new User { Name = token.Name, Email = token.Email }
+            };
+        }
     }
 }
