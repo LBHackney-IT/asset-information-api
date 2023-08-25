@@ -74,5 +74,29 @@ namespace AssetInformationApi.Tests.V1.Factories
             result.User.Should().BeEquivalentTo(expectedUser);
             result.Version.Should().Be(UpdateAssetConstants.V1_VERSION);
         }
+
+        [Fact]
+        public void AddRepairsContractsToAssetEvent()
+        {
+            var addRepairsContractsToNewAssetObject = _fixture.Create<AddRepairsContractsToNewAssetObject>();
+            var token = _fixture.Create<Token>();
+
+            var expectedEventData = new EventData() { NewData = addRepairsContractsToNewAssetObject };
+            var expectedUser = new User() { Email = token.Email, Name = token.Name };
+
+            var factory = new AssetSnsFactory();
+            var result = factory.AddRepairsContractsToNewAsset(addRepairsContractsToNewAssetObject, token);
+
+            result.CorrelationId.Should().NotBeEmpty();
+            result.DateTime.Should().BeCloseTo(DateTime.UtcNow, 100);
+            result.EntityId.Should().Be(addRepairsContractsToNewAssetObject.EntityId);
+            result.EventData.Should().BeEquivalentTo(expectedEventData);
+            result.EventType.Should().Be(AddRepairsContractsToAssetEventConstants.EVENTTYPE);
+            result.Id.Should().NotBeEmpty();
+            result.SourceDomain.Should().Be(AddRepairsContractsToAssetEventConstants.SOURCE_DOMAIN);
+            result.SourceSystem.Should().Be(AddRepairsContractsToAssetEventConstants.SOURCE_SYSTEM);
+            result.User.Should().BeEquivalentTo(expectedUser);
+            result.Version.Should().Be(AddRepairsContractsToAssetEventConstants.V1_VERSION);
+        }
     }
 }

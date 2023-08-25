@@ -58,10 +58,10 @@ namespace AssetInformationApi.V1.Factories
                 DateTime = DateTime.UtcNow,
                 EntityId = addRepairsContractsToNewAssetObject.EntityId,
                 Id = Guid.NewGuid(),
-                EventType = CreateAssetEventConstants.EVENTTYPE,
-                Version = CreateAssetEventConstants.V1_VERSION,
-                SourceDomain = CreateAssetEventConstants.SOURCE_DOMAIN,
-                SourceSystem = CreateAssetEventConstants.SOURCE_SYSTEM,
+                EventType = AddRepairsContractsToAssetEventConstants.EVENTTYPE,
+                Version = AddRepairsContractsToAssetEventConstants.V1_VERSION,
+                SourceDomain = AddRepairsContractsToAssetEventConstants.SOURCE_DOMAIN,
+                SourceSystem = AddRepairsContractsToAssetEventConstants.SOURCE_SYSTEM,
                 EventData = new EventData
                 {
                     NewData = addRepairsContractsToNewAssetObject

@@ -1,6 +1,6 @@
 namespace AssetInformationApi.V1.Infrastructure
 {
-    public static class AddRepairsContractsToAssetEvent
+    public static class AddRepairsContractsToAssetEventConstants
     {
         // JWT TOKEN
         public const string V1_VERSION = "v1";
