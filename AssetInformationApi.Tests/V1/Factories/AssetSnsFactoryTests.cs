@@ -91,7 +91,7 @@ namespace AssetInformationApi.Tests.V1.Factories
             result.DateTime.Should().BeCloseTo(DateTime.UtcNow, 100);
             result.EntityId.Should().Be(addRepairsContractsToNewAssetObject.EntityId);
             result.EventData.Should().BeEquivalentTo(expectedEventData);
-            result.EventType.Should().Be(AddRepairsContractsToAssetEventConstants.EVENTTYPE);
+            result.EventType.Should().Be(AddRepairsContractsToAssetEventConstants.EVENT_TYPE);
             result.Id.Should().NotBeEmpty();
             result.SourceDomain.Should().Be(AddRepairsContractsToAssetEventConstants.SOURCE_DOMAIN);
             result.SourceSystem.Should().Be(AddRepairsContractsToAssetEventConstants.SOURCE_SYSTEM);

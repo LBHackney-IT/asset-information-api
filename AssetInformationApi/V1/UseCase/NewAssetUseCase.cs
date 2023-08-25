@@ -55,7 +55,6 @@ namespace AssetInformationApi.V1.UseCase
                 await _snsGateway.Publish(assetSnsMessage, assetTopicArn).ConfigureAwait(false);
 
                 _logger.LogInformation("Publishing AddRepairsContractsToAssetEvent SNS message for asset with prop ref: {AssetId}.", asset.AssetId);
-
                 await _snsGateway.Publish(assetContractsSnsMessage, assetTopicArn).ConfigureAwait(false);
             }
 
