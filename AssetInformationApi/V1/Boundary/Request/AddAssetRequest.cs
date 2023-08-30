@@ -4,6 +4,6 @@ namespace AssetInformationApi.V1.Boundary.Request
 {
     public class AddAssetRequest : Asset
     {
-        public bool AddDefaultSorContracts = false;
+        public bool AddDefaultSorContracts { get; set; } = false;
     }
 }
