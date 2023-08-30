@@ -7,6 +7,5 @@ namespace AssetInformationApi.V1.Infrastructure
     {
         public Guid EntityId { get; set; }
         public string PropRef { get; set; }
-        public bool AddRepairsContracts { get; set; }
     }
 }
