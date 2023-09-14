@@ -114,7 +114,7 @@ namespace AssetInformationApi.V1.Controllers
 
             _logger.LogDebug($"Add Asset endpoint - Calling _newAssetUseCase.PostAsync for asset ID {asset.Id}");
 
-            var result = await _newAssetUseCase.PostAsync(asset.ToDatabase(), token).ConfigureAwait(false);
+            var result = await _newAssetUseCase.PostAsync(asset, token).ConfigureAwait(false);
 
             _logger.LogDebug($"Add Asset endpoint - Request processed, returning response (ref. asset ID {asset.Id})");
 

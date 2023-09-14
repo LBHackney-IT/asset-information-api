@@ -12,6 +12,10 @@ using Hackney.Core.Sns;
 using AssetInformationApi.V1.Factories;
 using Microsoft.Extensions.Logging.Abstractions;
 using AssetInformationApi.V1.Gateways.Interfaces;
+using AssetInformationApi.V1.Boundary.Request;
+using Hackney.Shared.Asset.Infrastructure;
+using Hackney.Shared.Asset.Boundary.Response;
+using AssetInformationApi.V1.Infrastructure;
 
 namespace AssetInformationApi.Tests.V1.UseCase
 {
@@ -22,41 +26,118 @@ namespace AssetInformationApi.Tests.V1.UseCase
         private readonly NewAssetUseCase _classUnderTest;
         private readonly Fixture _fixture = new Fixture();
         private readonly Mock<ISnsGateway> _assetSnsGateway;
-        private readonly AssetSnsFactory _assetSnsFactory;
+        private readonly Mock<ISnsFactory> _assetSnsFactory;
 
         public NewAssetUseCaseTests()
         {
             _mockGateway = new Mock<IAssetGateway>();
             _assetSnsGateway = new Mock<ISnsGateway>();
-            _assetSnsFactory = new AssetSnsFactory();
-            _classUnderTest = new NewAssetUseCase(_mockGateway.Object, _assetSnsGateway.Object, _assetSnsFactory, new NullLogger<NewAssetUseCase>());
+            _assetSnsFactory = new Mock<ISnsFactory>();
+            _classUnderTest = new NewAssetUseCase(_mockGateway.Object, _assetSnsGateway.Object, _assetSnsFactory.Object, new NullLogger<NewAssetUseCase>());
         }
 
         [Fact]
         public async Task AddAssetUsecaseShouldReturnOkResponse()
         {
-            var asset = _fixture.Create<Asset>();
-            asset.Id = Guid.NewGuid();
-            var token = new Token();
-            var request = asset.ToDatabase();
-            _mockGateway.Setup(x => x.AddAsset(request)).ReturnsAsync(asset);
+            // ARRANGE
+            // Valid inbound request
+            AddAssetRequest newAssetRequest = _fixture.Create<AddAssetRequest>();
 
-            var response = await _classUnderTest.PostAsync(request, token).ConfigureAwait(false);
+            // Convert AddAssetRequest into AssetDb object (used by gateway method)
+            AssetDb assetDb = newAssetRequest.ToDatabase();
+
+            // Convert AssetDb into Asset object (used for response comparison)
+            Asset asset = assetDb.ToDomain();
+
+            var token = new Token();
+
+            _mockGateway.Setup(x => x.AddAsset(It.IsAny<AssetDb>())).ReturnsAsync(asset);
+
+            // ACT
+            var response = await _classUnderTest.PostAsync(newAssetRequest, token).ConfigureAwait(false);
+
+            // ASSERT
             response.Should().BeEquivalentTo(asset.ToResponse());
         }
 
+
         [Fact]
-        public async Task AddAssetUsecaseShouldReturnNull()
+        public async Task AddAssetUsecaseShouldReturnNullWhenAssetIsInvalid()
         {
-            var asset = _fixture.Create<Asset>();
+            // ARRANGE
+            // Invalid inbound request (no Id)
+            AddAssetRequest newAssetRequest = _fixture.Build<AddAssetRequest>().Without(requestFixture => requestFixture.Id).Create();
+
+            // Convert AddAssetRequest into AssetDb object (used by gateway method)
+            AssetDb assetDb = newAssetRequest.ToDatabase();
+
+            // Convert AssetDb into Asset object (used for response comparison)
+            Asset asset = assetDb.ToDomain();
+
             var token = new Token();
             token.Email = "test@test.com";
             token.Name = "Test";
-            var request = asset.ToDatabase();
-            _mockGateway.Setup(x => x.AddAsset(request)).ReturnsAsync(asset);
 
-            var response = await _classUnderTest.PostAsync(asset.ToDatabase(), token).ConfigureAwait(false);
+            // No asset Id will result in null gateway response 
+            _mockGateway.Setup(x => x.AddAsset(newAssetRequest.ToDatabase())).ReturnsAsync(asset);
+
+            // ACT
+            var response = await _classUnderTest.PostAsync(newAssetRequest, token).ConfigureAwait(false);
+
+            // ASSERT
             response.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task AddAssetUsecaseShouldPublishSnsMessageWhenAddDefaultSorContractsIsTrue()
+        {
+            // ARRANGE
+            AddAssetRequest newAssetRequest = _fixture.Create<AddAssetRequest>();
+            AssetDb assetDb = newAssetRequest.ToDatabase();
+            Asset asset = assetDb.ToDomain();
+            var token = new Token();
+
+            // This will trigger the publishing of the AddRepairsContract event
+            newAssetRequest.AddDefaultSorContracts = true;
+
+            _mockGateway.Setup(x => x.AddAsset(It.IsAny<AssetDb>())).ReturnsAsync(asset);
+
+            var assetContractsSnsMessage = new EntityEventSns();
+
+            _assetSnsFactory.Setup(x => x.AddRepairsContractsToNewAsset(It.IsAny<AddRepairsContractsToNewAssetObject>(), It.IsAny<Token>()))
+                            .Returns(assetContractsSnsMessage);
+
+            // ACT
+            await _classUnderTest.PostAsync(newAssetRequest, token).ConfigureAwait(false);
+
+            // ASSERT
+            _assetSnsFactory.Verify(x => x.AddRepairsContractsToNewAsset(It.IsAny<AddRepairsContractsToNewAssetObject>(), It.IsAny<Token>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task AddAssetUsecaseShouldNotPublishSnsMessageWhenAddDefaultSorContractsIsFalse()
+        {
+            // ARRANGE
+            AddAssetRequest newAssetRequest = _fixture.Create<AddAssetRequest>();
+            AssetDb assetDb = newAssetRequest.ToDatabase();
+            Asset asset = assetDb.ToDomain();
+            var token = new Token();
+
+            // This will NOT trigger the publishing of the AddRepairsContract event
+            newAssetRequest.AddDefaultSorContracts = false;
+
+            _mockGateway.Setup(x => x.AddAsset(It.IsAny<AssetDb>())).ReturnsAsync(asset);
+
+            var assetContractsSnsMessage = new EntityEventSns();
+
+            _assetSnsFactory.Setup(x => x.AddRepairsContractsToNewAsset(It.IsAny<AddRepairsContractsToNewAssetObject>(), It.IsAny<Token>()))
+                            .Returns(assetContractsSnsMessage);
+
+            // ACT
+            await _classUnderTest.PostAsync(newAssetRequest, token).ConfigureAwait(false);
+
+            // ASSERT
+            _assetSnsFactory.Verify(x => x.AddRepairsContractsToNewAsset(It.IsAny<AddRepairsContractsToNewAssetObject>(), It.IsAny<Token>()), Times.Never);
         }
     }
 }

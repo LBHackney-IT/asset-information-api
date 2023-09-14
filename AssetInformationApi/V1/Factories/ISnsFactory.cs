@@ -10,5 +10,6 @@ namespace AssetInformationApi.V1.Factories
     {
         EntityEventSns CreateAsset(Asset asset, Token token);
         EntityEventSns UpdateAsset(UpdateEntityResult<AssetDb> updateResult, Token token);
+        EntityEventSns AddRepairsContractsToNewAsset(AddRepairsContractsToNewAssetObject addRepairsContractsToNewAssetObject, Token token);
     }
 }
