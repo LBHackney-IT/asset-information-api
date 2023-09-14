@@ -10,6 +10,9 @@ using System;
 using Hackney.Core.JWT;
 using Microsoft.Extensions.Logging;
 using AssetInformationApi.V1.Gateways.Interfaces;
+using AssetInformationApi.V1.Infrastructure;
+using AssetInformationApi.V1.Boundary.Request;
+using System.Text.Json;
 
 namespace AssetInformationApi.V1.UseCase
 {
@@ -29,19 +32,34 @@ namespace AssetInformationApi.V1.UseCase
         }
 
         [LogCall]
-        public async Task<AssetResponseObject> PostAsync(AssetDb request, Token token)
+        public async Task<AssetResponseObject> PostAsync(AddAssetRequest request, Token token)
         {
             _logger.LogDebug($"NewAssetUseCase - Calling _gateway.AddAsset for asset ID {request.Id}");
 
-            var asset = await _gateway.AddAsset(request).ConfigureAwait(false);
+            var asset = await _gateway.AddAsset(request.ToDatabase()).ConfigureAwait(false);
             if (asset != null && token != null)
             {
-                var assetSnsMessage = _snsFactory.CreateAsset(asset, token);
                 var assetTopicArn = Environment.GetEnvironmentVariable("ASSET_SNS_ARN");
-                await _snsGateway.Publish(assetSnsMessage, assetTopicArn).ConfigureAwait(false);
-            }
 
-            _logger.LogDebug($"NewAssetUseCase - New asset added. Converting newly added AssetDb object back to domain object (ref. asset ID {request.Id})");
+                var assetSnsMessage = _snsFactory.CreateAsset(asset, token);
+
+                _logger.LogInformation("Publishing AssetCreatedEvent SNS message for new asset with prop ref: {AssetId}.", asset.AssetId);
+                await _snsGateway.Publish(assetSnsMessage, assetTopicArn).ConfigureAwait(false);
+
+                if (request.AddDefaultSorContracts)
+                {
+                    var addRepairsContractsToNewAssetObject = new AddRepairsContractsToNewAssetObject()
+                    {
+                        EntityId = request.Id,
+                        PropRef = request.AssetId,
+                    };
+
+                    var assetContractsSnsMessage = _snsFactory.AddRepairsContractsToNewAsset(addRepairsContractsToNewAssetObject, token);
+
+                    _logger.LogInformation("Publishing AddRepairsContractsToAssetEvent SNS message for asset with prop ref: {AssetId}.", asset.AssetId);
+                    await _snsGateway.Publish(assetContractsSnsMessage, assetTopicArn).ConfigureAwait(false);
+                }
+            }
 
             return asset.ToResponse();
         }
