@@ -48,6 +48,8 @@ namespace AssetInformationApi.V1.Factories
             {
                 Id = domainEntity.Id,
                 AssetId = domainEntity.AssetId,
+                AreaId = domainEntity.AreaId,
+                PatchId = domainEntity.PatchId,
                 AssetType = domainEntity.AssetType,
                 RentGroup = domainEntity.RentGroup,
                 RootAsset = domainEntity.RootAsset,
@@ -59,8 +61,7 @@ namespace AssetInformationApi.V1.Factories
                 AssetManagement = domainEntity.AssetManagement,
                 AssetCharacteristics = domainEntity.AssetCharacteristics.ToDatabase(),
                 Tenure = domainEntity.Tenure.ToDatabase(),
-                VersionNumber = domainEntity.VersionNumber,
-                Patches = domainEntity.Patches?.ToDatabase()
+                VersionNumber = domainEntity.VersionNumber
             };
         }
     }
