@@ -16,6 +16,7 @@ namespace AssetInformationApi.V1.Factories
             {
                 RootAsset = domainEntity.RootAsset,
                 ParentAssetIds = domainEntity.ParentAssetIds,
+                RentGroup = domainEntity.RentGroup,
                 BoilerHouseId = domainEntity.BoilerHouseId,
                 IsActive = domainEntity.IsActive,
                 AssetLocation = domainEntity.AssetLocation,
