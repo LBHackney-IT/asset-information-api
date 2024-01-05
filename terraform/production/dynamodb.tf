@@ -27,16 +27,12 @@ resource "aws_dynamodb_table" "assetinformationapi_dynamodb_table" {
     name            = "AssetParentsAndChilds"
     hash_key        = "rootAsset"
     range_key       = "parentAssetIds"
-    write_capacity  = 10
-    read_capacity   = 10
     projection_type = "ALL"
   }
 
   global_secondary_index {
     name            = "AssetId"
     hash_key        = "assetId"
-    write_capacity  = 10
-    read_capacity   = 10
     projection_type = "ALL"
   }
 
