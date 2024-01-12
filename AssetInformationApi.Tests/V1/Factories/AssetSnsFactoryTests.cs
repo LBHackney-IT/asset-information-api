@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 using AssetInformationApi.V1.Factories;
+using Hackney.Core.DynamoDb.EntityUpdater;
 
 namespace AssetInformationApi.Tests.V1.Factories
 {

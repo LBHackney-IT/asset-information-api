@@ -4,6 +4,7 @@ using Hackney.Shared.Asset.Domain;
 using Hackney.Shared.Asset.Infrastructure;
 using System;
 using AssetInformationApi.V1.Infrastructure;
+using Hackney.Core.DynamoDb.EntityUpdater;
 
 namespace AssetInformationApi.V1.Factories
 {
