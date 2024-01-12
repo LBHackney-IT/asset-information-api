@@ -42,6 +42,8 @@ using AssetInformationApi.V1.Factories;
 using AssetInformationApi.V1.Infrastructure;
 using Hackney.Core.Middleware;
 using AssetInformationApi.V1.Gateways.Interfaces;
+using Hackney.Core.DynamoDb.EntityUpdater.Interfaces;
+using Hackney.Core.DynamoDb.EntityUpdater;
 
 namespace AssetInformationApi
 {
@@ -155,7 +157,7 @@ namespace AssetInformationApi
             RegisterGateways(services);
             RegisterUseCases(services);
 
-            services.AddSingleton<IConfiguration>(Configuration);
+            services.AddSingleton(Configuration);
             services.AddScoped<ISnsFactory, AssetSnsFactory>();
             services.AddScoped<IEntityUpdater, EntityUpdater>();
 

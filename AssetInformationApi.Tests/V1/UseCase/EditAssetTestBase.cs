@@ -1,5 +1,5 @@
-using AssetInformationApi.V1.Infrastructure;
 using AutoFixture;
+using Hackney.Core.DynamoDb.EntityUpdater;
 using Hackney.Shared.Asset.Infrastructure;
 using System.Collections.Generic;
 

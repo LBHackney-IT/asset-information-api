@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using Hackney.Shared.Asset.Domain;
 using Hackney.Shared.Asset.Infrastructure;
 using System;
-using AssetInformationApi.V1.Infrastructure;
 using Hackney.Shared.Asset.Boundary.Request;
+using Hackney.Core.DynamoDb.EntityUpdater;
 
 namespace AssetInformationApi.V1.Gateways.Interfaces
 {

@@ -18,7 +18,7 @@
     </PackageReference>
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="Hackney.Core.Authorization" Version="1.78.0" />
-    <PackageReference Include="Hackney.Core.DynamoDb" Version="1.79.0" />
+    <PackageReference Include="Hackney.Core.DynamoDb" Version="1.80.0" />
     <PackageReference Include="Hackney.Core.Http" Version="1.70.0" />
     <PackageReference Include="Hackney.Core.JWT" Version="1.72.0" />
     <PackageReference Include="Hackney.Core.Sns" Version="1.52.0" />

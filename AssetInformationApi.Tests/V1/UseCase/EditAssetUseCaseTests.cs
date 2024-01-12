@@ -4,20 +4,16 @@ using FluentAssertions;
 using Moq;
 using System;
 using System.Threading.Tasks;
-using Hackney.Shared.Asset.Domain;
 using Hackney.Shared.Asset.Factories;
 using Xunit;
 using Hackney.Core.JWT;
-using Hackney.Core.Http;
 using Hackney.Core.Sns;
 using AssetInformationApi.V1.Factories;
 using Hackney.Shared.Asset.Boundary.Request;
 using Hackney.Shared.Asset.Infrastructure;
-using AssetInformationApi.V1.Infrastructure;
-using AssetInformationApi.V1.Boundary.Request;
-using System.Collections.Generic;
 using Hackney.Shared.Asset.Boundary.Response;
 using AssetInformationApi.V1.Gateways.Interfaces;
+using Hackney.Core.DynamoDb.EntityUpdater;
 
 namespace AssetInformationApi.Tests.V1.UseCase
 {

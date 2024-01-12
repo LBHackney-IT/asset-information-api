@@ -14,6 +14,8 @@ using Hackney.Shared.Asset.Boundary.Request;
 using AssetInformationApi.V1.Helpers;
 using AssetInformationApi.V1.Factories;
 using AssetInformationApi.V1.Gateways.Interfaces;
+using Hackney.Core.DynamoDb.EntityUpdater.Interfaces;
+using Hackney.Core.DynamoDb.EntityUpdater;
 
 namespace AssetInformationApi.V1.Gateways
 {
