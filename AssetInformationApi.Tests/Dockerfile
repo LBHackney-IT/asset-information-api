@@ -14,8 +14,8 @@ ENV DynamoDb_LocalMode='true'
 WORKDIR /app
 
 # Install and run sonar cloud scanner
-RUN apt-get update && apt-get install -y openjdk-11-jdk
-RUN dotnet tool install --global dotnet-sonarscanner --version 5.6.0
+RUN apt-get update && apt-get install -y openjdk-17-jdk && apt-get clean
+RUN dotnet tool install --global dotnet-sonarscanner
 ENV PATH="$PATH:/root/.dotnet/tools"
 
 RUN dotnet sonarscanner begin /k:"LBHackney-IT_asset-information-api" /o:"lbhackney-it" /d:sonar.host.url=https://sonarcloud.io /d:sonar.login="${SONAR_TOKEN}"
