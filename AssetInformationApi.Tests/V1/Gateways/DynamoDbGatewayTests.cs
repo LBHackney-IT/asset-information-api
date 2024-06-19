@@ -12,6 +12,7 @@ using AssetInformationApi.V1.Gateways;
 using Hackney.Shared.Asset.Factories;
 using Hackney.Shared.Asset.Infrastructure;
 using AssetInformationApi.V1.Infrastructure;
+using Hackney.Core.DynamoDb.EntityUpdater.Interfaces;
 
 namespace AssetInformationApi.Tests.V1.Gateways
 {
