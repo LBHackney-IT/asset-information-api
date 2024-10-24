@@ -9,6 +9,13 @@ provider:
   vpc: ${self:custom.vpc.${opt:stage}}
   stage: ${opt:stage}
   region: eu-west-2
+  apiGateway:
+    logs:
+      restApi:
+        accessLogging: true  
+        metricsEnabled: true
+        loggingLevel: INFO
+        dataTraceEnabled: true
 
 plugins:
   - serverless-associate-waf
