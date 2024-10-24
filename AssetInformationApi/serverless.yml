@@ -11,6 +11,8 @@ provider:
   region: eu-west-2
   httpApi:
     metrics: true
+  logs:
+    httpApi: true
 
 plugins:
   - serverless-associate-waf
