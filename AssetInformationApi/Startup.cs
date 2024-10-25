@@ -42,9 +42,36 @@ using AssetInformationApi.V1.Factories;
 using AssetInformationApi.V1.Infrastructure;
 using Hackney.Core.Middleware;
 using AssetInformationApi.V1.Gateways.Interfaces;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace AssetInformationApi
 {
+
+    public class TraceLoggingMiddleware
+    {
+        private readonly RequestDelegate _next;
+        private readonly ILogger<TraceLoggingMiddleware> _logger;
+
+        public TraceLoggingMiddleware(RequestDelegate next, ILogger<TraceLoggingMiddleware> logger)
+        {
+            _next = next;
+            _logger = logger;
+        }
+
+        public async Task InvokeAsync(HttpContext context)
+        {
+            // Retrieve the trace ID from the incoming request headers
+            if (context.Request.Headers.TryGetValue("X-Amzn-Trace-Id", out var traceId))
+            {
+                _logger.LogInformation($"Incoming Trace ID: {traceId}");
+            }
+
+            // Call the next middleware in the pipeline
+            await _next(context);
+        }
+    }
+
     [ExcludeFromCodeCoverage]
     public class Startup
     {
@@ -53,6 +80,9 @@ namespace AssetInformationApi
             Configuration = configuration;
 
             AWSSDKHandler.RegisterXRayForAllServices();
+
+            AWSXRayRecorder.InitializeInstance(Configuration);
+            AWSXRayRecorder.RegisterLogger(LoggingOptions.SystemDiagnostics);
         }
 
         public IConfiguration Configuration { get; }
@@ -144,8 +174,7 @@ namespace AssetInformationApi
 
             services.ConfigureLambdaLogging(Configuration);
 
-            AWSXRayRecorder.InitializeInstance(Configuration);
-            AWSXRayRecorder.RegisterLogger(LoggingOptions.SystemDiagnostics);
+
 
             services.AddLogCallAspect();
             services.ConfigureDynamoDB();
@@ -201,10 +230,13 @@ namespace AssetInformationApi
                 app.UseHsts();
             }
 
-            app.UseCorrelationId();
-            app.UseLoggingScope();
+            app.UseMiddleware<TraceLoggingMiddleware>();
+
             app.UseCustomExceptionHandler(logger);
             app.UseXRay("asset-information-api");
+
+            app.UseCorrelationId();
+            app.UseLoggingScope();
 
             app.EnableRequestBodyRewind();
 
