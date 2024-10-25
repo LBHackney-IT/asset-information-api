@@ -257,7 +257,7 @@ workflows:
       #     filters:
       #       branches:
       #         only: master
-      # - deploy-to-development:
+      - deploy-to-development:
           context: api-nuget-token-context
           requires:
             # - terraform-apply-development
