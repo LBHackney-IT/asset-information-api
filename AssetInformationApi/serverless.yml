@@ -10,12 +10,9 @@ provider:
   stage: ${opt:stage}
   region: eu-west-2
   apiGateway:
-    logs:
-      restApi:
-        accessLogging: true  
-        metricsEnabled: true
-        loggingLevel: INFO
-        dataTraceEnabled: true
+    metrics: true
+  logs:
+    restApi: true
 
 plugins:
   - serverless-associate-waf
