@@ -62,10 +62,9 @@ namespace AssetInformationApi
         public async Task InvokeAsync(HttpContext context)
         {
             // Retrieve the trace ID from the incoming request headers
-            if (context.Request.Headers.TryGetValue("X-Amzn-Trace-Id", out var traceId))
-            {
-                _logger.LogInformation($"Incoming Trace ID: {traceId}");
-            }
+            context.Request.Headers.TryGetValue("X-Amzn-Trace-Id", out var traceId);
+
+            _logger.LogInformation($"Incoming Trace ID: {traceId}");
 
             // Call the next middleware in the pipeline
             await _next(context);
