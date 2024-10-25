@@ -229,10 +229,10 @@ namespace AssetInformationApi
                 app.UseHsts();
             }
 
-            app.UseMiddleware<TraceLoggingMiddleware>();
-
             app.UseCustomExceptionHandler(logger);
             app.UseXRay("asset-information-api");
+
+            app.UseMiddleware<TraceLoggingMiddleware>();
 
             app.UseCorrelationId();
             app.UseLoggingScope();
