@@ -4,8 +4,7 @@ provider:
   runtime: dotnet6
   memorySize: 2048
   tracing:
-    lambda:
-      active: true
+    lambda: Active
     apiGateway: true
   vpc: ${self:custom.vpc.${opt:stage}}
   stage: ${opt:stage}
