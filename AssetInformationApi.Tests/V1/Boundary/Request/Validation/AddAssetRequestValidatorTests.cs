@@ -1,7 +1,10 @@
 using AssetInformationApi.V1.Boundary.Request;
 using AssetInformationApi.V1.Boundary.Request.Validation;
+using AutoFixture;
+using FluentAssertions;
 using FluentValidation.TestHelper;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace AssetInformationApi.Tests.V1.Boundary.Request.Validation
@@ -9,6 +12,7 @@ namespace AssetInformationApi.Tests.V1.Boundary.Request.Validation
     public class AddAssetRequestValidatorTests
     {
         private readonly AddAssetRequestValidator _sut;
+        private readonly Fixture _fixture = new();
 
         public AddAssetRequestValidatorTests()
         {
@@ -31,5 +35,62 @@ namespace AssetInformationApi.Tests.V1.Boundary.Request.Validation
             result.ShouldHaveValidationErrorFor(x => x.AssetAddress.AddressLine1);
             result.ShouldHaveValidationErrorFor(x => x.AssetAddress.PostCode);
         }
+
+        #region AssetManagement
+        [Theory]
+        [InlineData(null)]
+        [InlineData(false)]
+        public void RequestShouldErrorWhenIsTemporaryAccommodationBlockIsTrueAndIsTemporaryAccomodationIsnullOrFalse(bool? isTemporaryAccommodation)
+        {
+            var assetManagement = new Hackney.Shared.Asset.Domain.AssetManagement()
+            {
+                IsTemporaryAccomodation = isTemporaryAccommodation,
+                IsTemporaryAccommodationBlock = true,
+            };
+
+            var assetAddress = _fixture.Create<Hackney.Shared.Asset.Domain.AssetAddress>();
+
+            var model = new AddAssetRequest()
+            {
+                Id = Guid.NewGuid(),
+                AssetAddress = assetAddress,
+                AssetManagement = assetManagement
+            };
+
+            var expectedErrorMessage = "IsTemporaryAccomodation must be true when IsTemporaryAccommodationBlock is set to true";
+
+            var result = _sut.TestValidate(model);
+
+            result.ShouldHaveValidationErrorFor(x => x.AssetManagement.IsTemporaryAccomodation);
+            result.Errors.Any(x => x.ErrorMessage == expectedErrorMessage).Should().BeTrue();
+        }
+
+        [Fact]
+        public void RequestShouldErrorWhenIsTemporaryAccommodationBlockIsTrueAndTemporaryAccommodationParentAssetIdIsNotNull()
+        {
+            var assetManagement = new Hackney.Shared.Asset.Domain.AssetManagement()
+            {
+                IsTemporaryAccomodation = true,
+                IsTemporaryAccommodationBlock = true,
+                TemporaryAccommodationParentAssetId = Guid.NewGuid(),
+            };
+
+            var assetAddress = _fixture.Create<Hackney.Shared.Asset.Domain.AssetAddress>();
+
+            var model = new AddAssetRequest()
+            {
+                Id = Guid.NewGuid(),
+                AssetAddress = assetAddress,
+                AssetManagement = assetManagement
+            };
+
+            var expectedErrorMessage = "Temporary accommodation block cannot have TemporaryAccommodationParentAssetId";
+
+            var result = _sut.TestValidate(model);
+
+            result.ShouldHaveValidationErrorFor(x => x.AssetManagement.TemporaryAccommodationParentAssetId);
+            result.Errors.Any(x => x.ErrorMessage == expectedErrorMessage).Should().BeTrue();
+        }
+        #endregion
     }
 }
