@@ -42,6 +42,7 @@ using AssetInformationApi.V1.Factories;
 using AssetInformationApi.V1.Infrastructure;
 using Hackney.Core.Middleware;
 using AssetInformationApi.V1.Gateways.Interfaces;
+using AssetInformationApi.V1.Middleware;
 
 namespace AssetInformationApi
 {
@@ -53,6 +54,8 @@ namespace AssetInformationApi
             Configuration = configuration;
 
             AWSSDKHandler.RegisterXRayForAllServices();
+            AWSXRayRecorder.InitializeInstance(Configuration);
+            AWSXRayRecorder.RegisterLogger(LoggingOptions.SystemDiagnostics);
         }
 
         public IConfiguration Configuration { get; }
@@ -144,8 +147,7 @@ namespace AssetInformationApi
 
             services.ConfigureLambdaLogging(Configuration);
 
-            AWSXRayRecorder.InitializeInstance(Configuration);
-            AWSXRayRecorder.RegisterLogger(LoggingOptions.SystemDiagnostics);
+
 
             services.AddLogCallAspect();
             services.ConfigureDynamoDB();
@@ -201,10 +203,13 @@ namespace AssetInformationApi
                 app.UseHsts();
             }
 
-            app.UseCorrelationId();
-            app.UseLoggingScope();
             app.UseCustomExceptionHandler(logger);
             app.UseXRay("asset-information-api");
+
+            app.UseMiddleware<TraceLoggingMiddleware>();
+
+            app.UseCorrelationId();
+            app.UseLoggingScope();
 
             app.EnableRequestBodyRewind();
 

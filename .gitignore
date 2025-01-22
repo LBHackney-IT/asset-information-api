@@ -65,3 +65,6 @@ tmp/
 .ionide
 
 testresults/
+
+#LocalStack
+.localstack

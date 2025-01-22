@@ -1,21 +1,25 @@
 service: asset-information-api
 provider:
   name: aws
-  runtime: dotnet6
+  runtime: dotnet8
   memorySize: 2048
   tracing:
-    lambda: true
+    lambda: Active
     apiGateway: true
   vpc: ${self:custom.vpc.${opt:stage}}
   stage: ${opt:stage}
   region: eu-west-2
+  apiGateway:
+    metrics: true
+  logs:
+    restApi: true
 
 plugins:
   - serverless-associate-waf
   - '@serverless/safeguards-plugin'
 
 package:
-  artifact: ./bin/release/net6.0/asset-information-api.zip
+  artifact: ./bin/release/net8.0/asset-information-api.zip
 
 functions:
   AssetInformationApi:

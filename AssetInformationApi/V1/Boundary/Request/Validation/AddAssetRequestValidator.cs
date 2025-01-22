@@ -14,6 +14,19 @@ namespace AssetInformationApi.V1.Boundary.Request.Validation
                                  .NotEmpty();
             RuleFor(x => x.AssetAddress.PostCode).NotNull()
                                  .NotEmpty();
+
+            When(x => x.AssetManagement != null, () =>
+            {
+                RuleFor(x => x.AssetManagement.IsTemporaryAccomodation)
+                    .Must(x => x == true)
+                    .When(x => x.AssetManagement.IsTemporaryAccommodationBlock == true)
+                    .WithMessage("IsTemporaryAccomodation must be true when IsTemporaryAccommodationBlock is set to true");
+
+                RuleFor(x => x.AssetManagement.TemporaryAccommodationParentAssetId)
+                    .Null()
+                    .When(x => x.AssetManagement.IsTemporaryAccommodationBlock == true)
+                    .WithMessage("Temporary accommodation block cannot have TemporaryAccommodationParentAssetId");
+            });
         }
     }
 }

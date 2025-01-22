@@ -1,14 +1,11 @@
-using Hackney.Core.Testing.DynamoDb;
-using AutoFixture;
-using System;
-using Hackney.Shared.Asset.Infrastructure;
-using Hackney.Shared.Asset.Domain;
 using Amazon.SimpleNotificationService;
-using System.Collections.Generic;
-using Amazon.DynamoDBv2.DataModel;
-using Hackney.Shared.Asset.Factories;
-using AssetInformationApi.V1.Boundary.Request;
+using AutoFixture;
+using Hackney.Core.Testing.DynamoDb;
 using Hackney.Shared.Asset.Boundary.Request;
+using Hackney.Shared.Asset.Domain;
+using Hackney.Shared.Asset.Factories;
+using Hackney.Shared.Asset.Infrastructure;
+using System;
 
 namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
 {
@@ -70,6 +67,8 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
             var asset = _fixture.Build<Asset>()
                 .With(x => x.VersionNumber, (int?) null)
                 .With(x => x.AssetId, "12345678910")
+                //stop AssetManagement validation from interfering since that property is not relevant to the test
+                .With(x => x.AssetManagement, (AssetManagement) null)
                 .Create();
             asset.Id = Guid.NewGuid();
 
