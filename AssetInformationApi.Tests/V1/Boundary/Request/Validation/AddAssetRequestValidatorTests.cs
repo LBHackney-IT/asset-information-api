@@ -9,6 +9,7 @@ using Xunit;
 
 namespace AssetInformationApi.Tests.V1.Boundary.Request.Validation
 {
+#nullable enable
     public class AddAssetRequestValidatorTests
     {
         private readonly AddAssetRequestValidator _sut;
@@ -35,6 +36,34 @@ namespace AssetInformationApi.Tests.V1.Boundary.Request.Validation
             result.ShouldHaveValidationErrorFor(x => x.AssetAddress.AddressLine1);
             result.ShouldHaveValidationErrorFor(x => x.AssetAddress.PostCode);
         }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public void RequestShouldNotErrorWhenPostcodeIsEmptyOrNullForTemporarysAccommodationAsset(string? postcode)
+        {
+            var assetmanagement = new Hackney.Shared.Asset.Domain.AssetManagement()
+            {
+                IsTemporaryAccomodation = true
+            };
+
+            var assetAddress = _fixture
+                .Build<Hackney.Shared.Asset.Domain.AssetAddress>()
+                .With(x => x.PostCode, postcode)
+                .Create();
+
+            var model = new AddAssetRequest()
+            {
+                Id = Guid.NewGuid(),
+                AssetAddress = assetAddress,
+                AssetManagement = assetmanagement
+            };
+
+            var result = _sut.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(x => x.AssetAddress.PostCode);
+        }
+
 
         #region AssetManagement
         [Theory]
