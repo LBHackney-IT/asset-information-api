@@ -86,7 +86,6 @@ namespace AssetInformationApi.Tests.V1.Boundary.Request.Validation
             result.ShouldHaveValidationErrorFor(x => x.AssetAddress.PostCode);
         }
 
-
         #region AssetManagement
         [Theory]
         [InlineData(null)]
