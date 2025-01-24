@@ -199,11 +199,38 @@ namespace AssetInformationApi.Tests.V1.Boundary.Request.Validation
         }
 
         [Fact]
-        public void RequestShouldErrorWhenTASpecificPropertiesAreSetForNonTAAsset()
+        public void RequestShouldNotHaveErrorsWhenIsTemporaryAccommodationBlockIsTrueAndIsPartOfTemporaryAccommodationBlockIsNull()
+        {
+
+            var assetManagement = new Hackney.Shared.Asset.Domain.AssetManagement()
+            {
+                IsTemporaryAccomodation = true,
+                IsTemporaryAccommodationBlock = true,
+                TemporaryAccommodationParentAssetId = null,
+            };
+
+            var assetAddress = _fixture.Create<Hackney.Shared.Asset.Domain.AssetAddress>();
+
+            var model = new AddAssetRequest()
+            {
+                Id = Guid.NewGuid(),
+                AssetAddress = assetAddress,
+                AssetManagement = assetManagement,
+            };
+
+            var result = _sut.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(x => x.AssetManagement.IsPartOfTemporaryAccommodationBlock);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(null)]
+        public void RequestShouldErrorWhenTASpecificPropertiesAreSetForNonTAAsset(bool? isTemporaryAccommodation)
         {
             var assetManagement = new Hackney.Shared.Asset.Domain.AssetManagement()
             {
-                IsTemporaryAccomodation = false,
+                IsTemporaryAccomodation = isTemporaryAccommodation,
                 IsTemporaryAccommodationBlock = true,
                 IsPartOfTemporaryAccommodationBlock = true,
                 TemporaryAccommodationParentAssetId = Guid.NewGuid(),

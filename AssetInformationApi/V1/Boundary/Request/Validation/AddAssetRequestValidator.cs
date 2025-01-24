@@ -35,11 +35,11 @@ namespace AssetInformationApi.V1.Boundary.Request.Validation
                     .WithMessage("TemporaryAccommodationParentAssetId cannot be null when IsPartOfTemporaryAccommodationBlock is true");
 
                 RuleFor(x => x.AssetManagement.IsPartOfTemporaryAccommodationBlock)
-                    .Must(x => x == false)
+                    .Must(x => x == false || x == null)
                     .When(x => x.AssetManagement.IsTemporaryAccommodationBlock == true)
                     .WithMessage("IsPartOfTemporaryAccommodationBlock cannot be true when IsTemporaryAccommodationBlock is true");
 
-                When(x => x.AssetManagement.IsTemporaryAccomodation == false, () =>
+                When(x => x.AssetManagement.IsTemporaryAccomodation == false || x.AssetManagement.IsTemporaryAccomodation == null, () =>
                 {
                     RuleFor(x => x.AssetManagement.IsTemporaryAccommodationBlock)
                         .Must(x => x == false)
