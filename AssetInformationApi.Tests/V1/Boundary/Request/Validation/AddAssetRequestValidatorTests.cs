@@ -141,6 +141,121 @@ namespace AssetInformationApi.Tests.V1.Boundary.Request.Validation
             result.ShouldHaveValidationErrorFor(x => x.AssetManagement.TemporaryAccommodationParentAssetId);
             result.Errors.Any(x => x.ErrorMessage == expectedErrorMessage).Should().BeTrue();
         }
+
+        [Fact]
+        public void RequestShouldErrorWhenIsPartOfTemporaryAccommodationBlockIsTrueAndTemporaryAccommodationParentAssetIdIsNull()
+        {
+            var assetmanagement = new Hackney.Shared.Asset.Domain.AssetManagement()
+            {
+                IsTemporaryAccomodation = true,
+                IsTemporaryAccommodationBlock = false,
+                IsPartOfTemporaryAccommodationBlock = true,
+                TemporaryAccommodationParentAssetId = null,
+            };
+
+            var assetAddress = _fixture.Create<Hackney.Shared.Asset.Domain.AssetAddress>();
+
+            var model = new AddAssetRequest()
+            {
+                Id = Guid.NewGuid(),
+                AssetAddress = assetAddress,
+                AssetManagement = assetmanagement,
+            };
+
+            var expectedErrorMessage = "TemporaryAccommodationParentAssetId cannot be null when IsPartOfTemporaryAccommodationBlock is true";
+
+            var result = _sut.TestValidate(model);
+
+            result.ShouldHaveValidationErrorFor(x => x.AssetManagement.TemporaryAccommodationParentAssetId);
+            result.Errors.Any(x => x.ErrorMessage == expectedErrorMessage).Should().BeTrue();
+        }
+
+        [Fact]
+        public void RequestShouldErrorWhenIsPartOfTemporaryAccommodationBlockIsTrueAndIsTemporaryAccommodationBlockIsTrue()
+        {
+            var assetManagement = new Hackney.Shared.Asset.Domain.AssetManagement()
+            {
+                IsTemporaryAccomodation = true,
+                IsTemporaryAccommodationBlock = true,
+                IsPartOfTemporaryAccommodationBlock = true,
+                TemporaryAccommodationParentAssetId = null,
+            };
+
+            var assetAddress = _fixture.Create<Hackney.Shared.Asset.Domain.AssetAddress>();
+
+            var model = new AddAssetRequest()
+            {
+                Id = Guid.NewGuid(),
+                AssetAddress = assetAddress,
+                AssetManagement = assetManagement,
+            };
+
+            var expectedErrorMessage = "IsPartOfTemporaryAccommodationBlock cannot be true when IsTemporaryAccommodationBlock is true";
+
+            var result = _sut.TestValidate(model);
+
+            result.ShouldHaveValidationErrorFor(x => x.AssetManagement.IsPartOfTemporaryAccommodationBlock);
+            result.Errors.Any(x => x.ErrorMessage == expectedErrorMessage).Should().BeTrue();
+        }
+
+        [Fact]
+        public void RequestShouldNotHaveErrorsWhenIsTemporaryAccommodationBlockIsTrueAndIsPartOfTemporaryAccommodationBlockIsNull()
+        {
+
+            var assetManagement = new Hackney.Shared.Asset.Domain.AssetManagement()
+            {
+                IsTemporaryAccomodation = true,
+                IsTemporaryAccommodationBlock = true,
+                TemporaryAccommodationParentAssetId = null,
+            };
+
+            var assetAddress = _fixture.Create<Hackney.Shared.Asset.Domain.AssetAddress>();
+
+            var model = new AddAssetRequest()
+            {
+                Id = Guid.NewGuid(),
+                AssetAddress = assetAddress,
+                AssetManagement = assetManagement,
+            };
+
+            var result = _sut.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(x => x.AssetManagement.IsPartOfTemporaryAccommodationBlock);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(null)]
+        public void RequestShouldErrorWhenTASpecificPropertiesAreSetForNonTAAsset(bool? isTemporaryAccommodation)
+        {
+            var assetManagement = new Hackney.Shared.Asset.Domain.AssetManagement()
+            {
+                IsTemporaryAccomodation = isTemporaryAccommodation,
+                IsTemporaryAccommodationBlock = true,
+                IsPartOfTemporaryAccommodationBlock = true,
+                TemporaryAccommodationParentAssetId = Guid.NewGuid(),
+            };
+
+            var assetAddress = _fixture.Create<Hackney.Shared.Asset.Domain.AssetAddress>();
+
+            var model = new AddAssetRequest()
+            {
+                Id = Guid.NewGuid(),
+                AssetAddress = assetAddress,
+                AssetManagement = assetManagement,
+            };
+
+            var expectedErrorMessageForIsTemporaryAccommodationBlock = "IsTemporaryAccommodationBlock cannot be true when IsTemporaryAccomodation is false";
+            var expectedErrorMessageForIsPartOfTemporaryAccommodationBlock = "IsPartOfTemporaryAccommodationBlock cannot be true when IsTemporaryAccomodation is false";
+            var expectedErrorMessageForTemporaryAccommodationParentAssetId = "TemporaryAccommodationParentAssetId must be null when IsTemporaryAccomodation is false";
+
+            var result = _sut.TestValidate(model);
+
+            result.ShouldHaveValidationErrorFor(x => x.AssetManagement.IsTemporaryAccommodationBlock);
+            result.Errors.Any(x => x.ErrorMessage == expectedErrorMessageForIsTemporaryAccommodationBlock).Should().BeTrue();
+            result.Errors.Any(x => x.ErrorMessage == expectedErrorMessageForIsPartOfTemporaryAccommodationBlock).Should().BeTrue();
+            result.Errors.Any(x => x.ErrorMessage == expectedErrorMessageForTemporaryAccommodationParentAssetId).Should().BeTrue();
+        }
         #endregion
     }
 }
