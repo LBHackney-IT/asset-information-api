@@ -209,7 +209,7 @@ namespace AssetInformationApi.V1.Controllers
             // See HPT-641 for more information
             var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(HttpContext));
             if (string.Equals(token?.Email, Environment.GetEnvironmentVariable("DISALLOWED_EMAIL"), StringComparison.OrdinalIgnoreCase))
-                if (query?.AssetId == new Guid("89453835-347d-fec5-6bae-0cbb3a5530a6"))
+                if (query?.AssetId == "89453835-347d-fec5-6bae-0cbb3a5530a6")
                     throw new UnauthorizedAccessException("Access to this tenure is restricted for this user");
         }
     }
