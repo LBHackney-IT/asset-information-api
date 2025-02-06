@@ -67,6 +67,7 @@ namespace AssetInformationApi.V1.Controllers
         [LogCall(LogLevel.Information)]
         public async Task<IActionResult> GetAssetById([FromRoute] GetAssetByIdRequest query)
         {
+            RestrictAccessToDisallowedEmail(query);
             var useCaseResult = await _getAssetByIdUseCase.ExecuteAsync(query).ConfigureAwait(false);
             if (useCaseResult == null) return NotFound(query.Id);
 
@@ -96,7 +97,6 @@ namespace AssetInformationApi.V1.Controllers
         [LogCall(LogLevel.Information)]
         public async Task<IActionResult> GetAssetByAssetId([FromRoute] GetAssetByAssetIdRequest query)
         {
-            RestrictAccessToDisallowedEmail(query);
             var result = await _getAssetByAssetIdUseCase.ExecuteAsync(query).ConfigureAwait(false);
             if (result == null) return NotFound(query.AssetId);
 
@@ -203,13 +203,13 @@ namespace AssetInformationApi.V1.Controllers
             return null;
         }
 
-        private void RestrictAccessToDisallowedEmail(GetAssetByAssetIdRequest query)
+        private void RestrictAccessToDisallowedEmail(GetAssetByIdRequest req)
         {
             // This is an exceptional case where a specific user is not allowed to access a specific asset
             // See HPT-641 for more information
             var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(HttpContext));
             if (string.Equals(token?.Email, Environment.GetEnvironmentVariable("DISALLOWED_EMAIL"), StringComparison.OrdinalIgnoreCase))
-                if (query?.AssetId == "89453835-347d-fec5-6bae-0cbb3a5530a6")
+                if (req?.Id == Guid.Parse("89453835-347d-fec5-6bae-0cbb3a5530a6"))
                     throw new UnauthorizedAccessException("Access to this tenure is restricted for this user");
         }
     }
