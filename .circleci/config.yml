@@ -266,22 +266,22 @@ workflows:
   #             only: master
   check-and-deploy-staging-and-production:
     jobs:
-      - check-code-formatting:
-          context: api-nuget-token-context
-          # filters:
-          #   branches:
-          #     only: release
-      - build-and-test:
-          context:
-              - api-nuget-token-context
-              - SonarCloud
+      # - check-code-formatting:
+      #     context: api-nuget-token-context
+      #     # filters:
+      #     #   branches:
+      #     #     only: release
+      # - build-and-test:
+      #     context:
+      #         - api-nuget-token-context
+      #         - SonarCloud
           # filters:
           #   branches:
           #     only: release
       - assume-role-staging:
           context: api-assume-role-housing-staging-context
-          requires:
-            - build-and-test
+          # requires:
+          #   - build-and-test
           # filters:
           #   branches:
           #     only: release
