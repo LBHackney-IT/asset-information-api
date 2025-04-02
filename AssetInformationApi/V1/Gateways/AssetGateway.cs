@@ -107,6 +107,11 @@ namespace AssetInformationApi.V1.Gateways
                 updaterResponse = _updater.UpdateEntity<AssetDb, EditAssetDatabase>(existingAsset, requestBody, assetRequestObject.ToDatabase());
             }
 
+            if(assetRequestObject is EditPropertyPatchRequest editPropertyPatchRequest)
+            {
+                updaterResponse = _updater.UpdateEntity<AssetDb, EditPropertyPatchDatabase>(existingAsset, requestBody, editPropertyPatchRequest.ToDatabase());
+            }
+
             if (updaterResponse.NewValues.Any())
             {
                 _logger.LogDebug($"Calling IDynamoDBContext.SaveAsync to update id {assetId}");
@@ -115,5 +120,6 @@ namespace AssetInformationApi.V1.Gateways
 
             return updaterResponse;
         }
+
     }
 }

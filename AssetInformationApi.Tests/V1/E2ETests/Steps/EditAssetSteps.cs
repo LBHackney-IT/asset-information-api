@@ -43,22 +43,28 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
         public async Task WhenEditAssetApiIsCalled(Guid id, object requestObject)
         {
             int? defaultIfMatch = 0;
-            await WhenEditAssetApiIsCalled(id, requestObject, defaultIfMatch, false).ConfigureAwait(false);
+            await WhenEditAssetApiIsCalled(id, requestObject, defaultIfMatch, false, false).ConfigureAwait(false);
         }
 
         public async Task WhenEditAssetAddressApiIsCalled(Guid id, object requestObject)
         {
             int? defaultIfMatch = 0;
-            await WhenEditAssetApiIsCalled(id, requestObject, defaultIfMatch, true).ConfigureAwait(false);
+            await WhenEditAssetApiIsCalled(id, requestObject, defaultIfMatch, true, false).ConfigureAwait(false);
         }
 
-        public async Task WhenEditAssetApiIsCalled(Guid id, object requestObject, int? ifMatch, bool addressEndpoint)
+        public async Task WhenEditPropertyPatchApiIsCalled(Guid id, object requestObject)
+        {
+            int? defaultIfMatch = 0;
+            await WhenEditAssetApiIsCalled(id, requestObject, defaultIfMatch, false, true).ConfigureAwait(false);
+        }
+
+        public async Task WhenEditAssetApiIsCalled(Guid id, object requestObject, int? ifMatch, bool addressEndpoint, bool patchEndpoint)
         {
             var token =
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMTUwMTgxMTYwOTIwOTg2NzYxMTMiLCJlbWFpbCI6ImUyZS10ZXN0aW5nQGRldmVsb3BtZW50LmNvbSIsImlzcyI6IkhhY2tuZXkiLCJuYW1lIjoiVGVzdGVyIiwiZ3JvdXBzIjpbImUyZS10ZXN0aW5nIl0sImlhdCI6MTYyMzA1ODIzMn0.SooWAr-NUZLwW8brgiGpi2jZdWjyZBwp4GJikn0PvEw";
 
             // setup request
-            var uri = new Uri($"api/v1/assets/{id}{(addressEndpoint ? "/address" : "")}", UriKind.Relative);
+            var uri = new Uri($"api/v1/assets/{id}{(addressEndpoint ? "/address" : "")}{(patchEndpoint ? "/patch" : "")}", UriKind.Relative);
             using (var message = new HttpRequestMessage(HttpMethod.Patch, uri))
             {
 
@@ -148,6 +154,8 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
             databaseResponse.AssetLocation.Should().Be(assetFixture.ExistingAsset.AssetLocation);
             databaseResponse.AssetId.Should().Be(assetFixture.ExistingAsset.AssetId);
             databaseResponse.Tenure.Should().Be(assetFixture.ExistingAsset.Tenure);
+            databaseResponse.PatchId.Should().Be(assetFixture.ExistingAsset.PatchId);
+            databaseResponse.AreaId.Should().Be(assetFixture.ExistingAsset.AreaId);
         }
 
         public async Task ThenEditAssetBadRequestIsReturned()
@@ -162,7 +170,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
             responseEntity.Error.Should().Be(StatusCodes.Status400BadRequest);
         }
 
-        public async Task TheAssetHasBeenUpdatedInTheDatabase(AssetsFixture assetFixture)
+        public async Task TheAssetHasBeenUpdatedInTheDatabase(AssetsFixture assetFixture, bool editPropertyPatch)
         {
             var databaseResponse = await _dbContext.LoadAsync<AssetDb>(assetFixture.AssetId).ConfigureAwait(false);
 
@@ -172,6 +180,11 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
             databaseResponse.ParentAssetIds.Should().Be(assetFixture.EditAsset.ParentAssetIds);
             databaseResponse.RootAsset.Should().Be(assetFixture.EditAsset.RootAsset);
             databaseResponse.AssetLocation.ToString().Should().Be(assetFixture.EditAsset.AssetLocation.ToString());
+            if (editPropertyPatch)
+            {
+                databaseResponse.PatchId.Should().Be(assetFixture.EditPropertyPatch.PatchId);
+                databaseResponse.AreaId.Should().Be(assetFixture.EditPropertyPatch.AreaId);
+            }
         }
 
         public async Task ThenTheAssetUpdatedEventIsRaised(AssetsFixture assetFixture, ISnsFixture snsFixture)
@@ -218,7 +231,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
                 throw snsVerifer.LastException;
         }
 
-        public async Task ThenTheAssetAddressUpdatedEventIsRaised(AssetsFixture assetFixture, ISnsFixture snsFixture)
+        public async Task ThenTheAssetAddressOrPropertyPatchUpdatedEventIsRaised(AssetsFixture assetFixture, ISnsFixture snsFixture)
         {
             var dbRecord = await _dbContext.LoadAsync<AssetDb>(assetFixture.Asset.Id).ConfigureAwait(false);
 
