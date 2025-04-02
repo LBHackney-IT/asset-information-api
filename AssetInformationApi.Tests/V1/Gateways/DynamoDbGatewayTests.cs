@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using Hackney.Shared.Asset.Domain;
 using Force.DeepCloner;
 using Hackney.Shared.Asset.Boundary.Request;
+using AssetInformationApi.V1.Factories;
 
 
 namespace AssetInformationApi.Tests.V1.Gateways
@@ -79,7 +80,12 @@ namespace AssetInformationApi.Tests.V1.Gateways
 
         private EditPropertyPatchRequest EditPropertyPatchRequest()
         {
-            return _fixture.Create<EditPropertyPatchRequest>();
+            var areaId = "6c805141-0e27-46b1-86ee-5d33c638ef24";
+            var patchId = "d2c3a31f-636a-4875-81ce-24a7f5362cb9";
+            return _fixture.Build<EditPropertyPatchRequest>()
+                           .With(x => x.AreaId, Guid.Parse(areaId))
+                           .With(x => x.PatchId, Guid.Parse(patchId))
+                           .Create();
         }
 
         [Fact]
@@ -190,7 +196,7 @@ namespace AssetInformationApi.Tests.V1.Gateways
             updatedAsset.AreaId = constructRequest.AreaId;
             updatedAsset.PatchId = constructRequest.PatchId;
             updatedAsset.VersionNumber = 0;
-            _updater.Setup(x => x.UpdateEntity(assetDb, RequestBody, constructRequest))
+            _updater.Setup(x => x.UpdateEntity(It.IsAny<AssetDb>(), It.IsAny<string>(), It.IsAny<EditPropertyPatchDatabase>()))
                         .Returns(new UpdateEntityResult<AssetDb>()
                         {
                             UpdatedEntity = updatedAsset.ToDatabase(),
@@ -215,15 +221,18 @@ namespace AssetInformationApi.Tests.V1.Gateways
             // Changed
             load.AreaId.Should().Be(updatedAsset.AreaId);
             load.PatchId.Should().Be(updatedAsset.PatchId);
-            
+
 
             // Not changed
             load.Should().BeEquivalentTo(updatedAsset, options => options.Excluding(x => x.AreaId)
                                                                          .Excluding(x => x.PatchId)
+                                                                         .Excluding(x => x.Tenure)
                                                                          .Excluding(x => x.VersionNumber));
 
             var expectedVersionNumber = 1;
             load.VersionNumber.Should().Be(expectedVersionNumber);
+            _logger.VerifyExact(LogLevel.Debug, $"Calling IDynamoDBContext.SaveAsync to update id {asset.Id}", Times.Once());
+
         }
 
         [Theory]

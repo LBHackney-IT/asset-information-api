@@ -102,15 +102,15 @@ namespace AssetInformationApi.V1.Gateways
                 editAddressRequest.AssetAddress.PostCode = PostcodeHelpers.NormalizePostcode(editAddressRequest.AssetAddress.PostCode);
                 updaterResponse = _updater.UpdateEntity<AssetDb, EditAssetAddressDatabase>(existingAsset, requestBody, editAddressRequest.ToDatabase());
             }
+            else if (assetRequestObject is EditPropertyPatchRequest editPropertyPatchRequest)
+            {
+                updaterResponse = _updater.UpdateEntity<AssetDb, EditPropertyPatchDatabase>(existingAsset, requestBody, editPropertyPatchRequest.ToDatabase());
+            }
             else
             {
                 updaterResponse = _updater.UpdateEntity<AssetDb, EditAssetDatabase>(existingAsset, requestBody, assetRequestObject.ToDatabase());
             }
 
-            if(assetRequestObject is EditPropertyPatchRequest editPropertyPatchRequest)
-            {
-                updaterResponse = _updater.UpdateEntity<AssetDb, EditPropertyPatchDatabase>(existingAsset, requestBody, editPropertyPatchRequest.ToDatabase());
-            }
 
             if (updaterResponse.NewValues.Any())
             {
