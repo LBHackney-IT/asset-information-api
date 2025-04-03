@@ -1,27 +1,22 @@
-using AutoFixture;
-using Hackney.Core.Testing.Sns;
-using System;
 using AssetInformationApi.Tests.V1.E2ETests.Fixtures;
 using AssetInformationApi.Tests.V1.E2ETests.Steps;
+using AutoFixture;
+using Hackney.Core.Testing.DynamoDb;
+using Hackney.Core.Testing.Sns;
+using Hackney.Shared.Asset.Boundary.Request;
+using Hackney.Shared.Asset.Domain;
+using System;
 using TestStack.BDDfy;
 using Xunit;
-using Hackney.Core.Testing.DynamoDb;
-using AssetInformationApi.V1.Boundary.Request;
-using AutoFixture.Kernel;
-using Amazon.DynamoDBv2.DataModel;
-using Amazon.DynamoDBv2;
-using Amazon.SimpleNotificationService;
-using Hackney.Shared.Asset.Domain;
-using Hackney.Shared.Asset.Boundary.Request;
 
 namespace AssetInformationApi.Tests.V1.E2ETests.Stories
 {
     [Story(
         AsA = "Service",
-        IWant = "an endpoint to edit an existing address",
-        SoThat = "it is possible to edit the address of an asset.")]
+        IWant = "an endpoint to edit an patch details",
+        SoThat = "it is possible to edit the patch of an asset.")]
     [Collection("AppTest collection")]
-    public class EditAssetAddressTests : IDisposable
+    public class EditPropertyPatchTests : IDisposable
     {
         private readonly IDynamoDbFixture _dbFixture;
         private readonly ISnsFixture _snsFixture;
@@ -29,14 +24,14 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         private readonly EditAssetSteps _steps;
         private readonly Fixture _fixture = new Fixture();
 
-        public EditAssetAddressTests(MockWebApplicationFactory<Startup> appFactory)
+        public EditPropertyPatchTests(MockWebApplicationFactory<Startup> appFactory)
         {
             _dbFixture = appFactory.DynamoDbFixture;
             _snsFixture = appFactory.SnsFixture;
             _assetFixture = new AssetsFixture(_dbFixture, _snsFixture.SimpleNotificationService);
             _steps = new EditAssetSteps(appFactory.Client, _dbFixture.DynamoDbContext);
 
-            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "e2e-testing");
+            Environment.SetEnvironmentVariable("PATCHES_ADMIN_GROUPS", "e2e-testing");
         }
 
         public void Dispose()
@@ -58,13 +53,13 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         }
 
         [Fact]
-        public void AddressEditServiceReturns204AndUpdatesDatabase()
+        public void EditPropertyPatchServiceReturns204()
         {
             this.Given(g => _assetFixture.GivenAnAssetAlreadyExists())
-                .Then(t => _assetFixture.CreateEditAssetAddressObject())
-                .When(w => _steps.WhenEditAssetAddressApiIsCalled(_assetFixture.AssetId, _assetFixture.EditAssetAddress))
+                .Then(t => _assetFixture.CreateEditPropertyPatchObject())
+                .When(w => _steps.WhenEditPropertyPatchApiIsCalled(_assetFixture.AssetId, _assetFixture.EditPropertyPatch))
                 .Then(t => _steps.ThenNoContentResponseReturned())
-                .And(a => _steps.TheAssetHasBeenUpdatedInTheDatabase(_assetFixture, false))
+                .And(a => _steps.TheAssetHasBeenUpdatedInTheDatabase(_assetFixture, true))
                 .And(t => _steps.ThenTheAssetAddressOrPropertyPatchUpdatedEventIsRaised(_assetFixture, _snsFixture))
                 .BDDfy();
         }
@@ -75,7 +70,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
             var invalidRequestObject = "bad-data";
 
             this.Given(g => _assetFixture.GivenAnAssetAlreadyExists())
-                .When(w => _steps.WhenEditAssetAddressApiIsCalled(_assetFixture.AssetId, invalidRequestObject))
+                .When(w => _steps.WhenEditPropertyPatchApiIsCalled(_assetFixture.AssetId, invalidRequestObject))
                 .Then(t => _steps.ThenBadRequestIsReturned())
                 .BDDfy();
         }
@@ -83,21 +78,13 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         [Fact]
         public void ServiceReturns400BadRequestForFailedValidation()
         {
-            var requestWithoutAddressLine1 = new EditAssetAddressRequest
+            var requestWithEmptyPatchId = new EditPropertyPatchRequest
             {
-                ParentAssetIds = Guid.NewGuid().ToString(),
-                AssetAddress = new AssetAddress
-                {
-                    Uprn = "88888098765432",
-                    AddressLine1 = "",
-                    AddressLine2 = "Example line 2",
-                    AddressLine3 = "Example line 3",
-                    PostCode = "Example postcode"
-                }
+                PatchId = Guid.Empty,
             };
 
             this.Given(g => _assetFixture.GivenAnAssetAlreadyExists())
-                .When(w => _steps.WhenEditAssetAddressApiIsCalled(_assetFixture.AssetId, requestWithoutAddressLine1))
+                .When(w => _steps.WhenEditPropertyPatchApiIsCalled(_assetFixture.AssetId, requestWithEmptyPatchId))
                 .Then(t => _steps.ThenBadRequestIsReturned())
                 .BDDfy();
         }
@@ -109,7 +96,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
             var requestObject = CreateValidRequestObject();
 
             this.Given(g => _assetFixture.GivenAnAssetThatDoesntExist())
-                .When(w => _steps.WhenEditAssetAddressApiIsCalled(randomId, requestObject))
+                .When(w => _steps.WhenEditPropertyPatchApiIsCalled(randomId, requestObject))
                 .Then(t => _steps.ThenNotFoundIsReturned())
                 .BDDfy();
 
@@ -119,20 +106,20 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
         [Fact]
         public void ServiceReturnsUnauthorizedWhenUserIsNotInAllowedGroups()
         {
-            Environment.SetEnvironmentVariable("ASSET_ADMIN_GROUPS", "unauthorized-group");
+            Environment.SetEnvironmentVariable("PATCHES_ADMIN_GROUPS", "unauthorized-group");
 
             var randomId = Guid.NewGuid();
             var requestObject = CreateValidRequestObject();
 
             this.Given(g => _assetFixture.GivenAnAssetAlreadyExists())
-                .When(w => _steps.WhenEditAssetAddressApiIsCalled(randomId, requestObject))
+                .When(w => _steps.WhenEditPropertyPatchApiIsCalled(randomId, requestObject))
                 .Then(t => _steps.ThenUnauthorizedIsReturned())
                 .BDDfy();
         }
 
-        private EditAssetAddressRequest CreateValidRequestObject()
+        private EditPropertyPatchRequest CreateValidRequestObject()
         {
-            return _fixture.Build<EditAssetAddressRequest>()
+            return _fixture.Build<EditPropertyPatchRequest>()
                 .Create();
         }
 
