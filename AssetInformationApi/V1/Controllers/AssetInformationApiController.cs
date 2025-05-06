@@ -32,6 +32,7 @@ namespace AssetInformationApi.V1.Controllers
         private readonly INewAssetUseCase _newAssetUseCase;
         private readonly IEditAssetUseCase _editAssetUseCase;
         private readonly IEditAssetAddressUseCase _editAssetAddressUseCase;
+        private readonly IEditPropertyPatchUseCase _editPropertyPatchUseCase;
         private readonly ITokenFactory _tokenFactory;
         private readonly IHttpContextWrapper _contextWrapper;
         private readonly ILogger<AssetInformationApiController> _logger;
@@ -40,6 +41,7 @@ namespace AssetInformationApi.V1.Controllers
             IGetAssetByIdUseCase getAssetByIdUseCase,
             IGetAssetByAssetIdUseCase getAssetByAssetIdUseCase, INewAssetUseCase newAssetUseCase,
             ITokenFactory tokenFactory, IHttpContextWrapper contextWrapper, IEditAssetUseCase editAssetUseCase, IEditAssetAddressUseCase editAssetAddressUseCase,
+            IEditPropertyPatchUseCase editPropertyPatchUseCase,
             ILogger<AssetInformationApiController> logger)
         {
             _getAssetByIdUseCase = getAssetByIdUseCase;
@@ -49,6 +51,7 @@ namespace AssetInformationApi.V1.Controllers
             _contextWrapper = contextWrapper;
             _editAssetUseCase = editAssetUseCase;
             _editAssetAddressUseCase = editAssetAddressUseCase;
+            _editPropertyPatchUseCase = editPropertyPatchUseCase;
             _logger = logger;
         }
 
@@ -175,6 +178,32 @@ namespace AssetInformationApi.V1.Controllers
             }
         }
 
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPatch]
+        [Route("{id}/patch")]
+        [LogCall(LogLevel.Information)]
+        [AuthorizeEndpointByGroups("PATCHES_ADMIN_GROUPS")]
+        public async Task<IActionResult> EditPropertyPatch([FromRoute] EditAssetByIdRequest query, [FromBody] EditPropertyPatchRequest asset)
+        {
+            var bodyText = await HttpContext.Request.GetRawBodyStringAsync().ConfigureAwait(false);
+            var ifMatch = GetIfMatchFromHeader();
+            var token = _tokenFactory.Create(_contextWrapper.GetContextRequestHeaders(HttpContext));
+            try
+            {
+                var result = await _editPropertyPatchUseCase.ExecuteAsync(query.Id, asset, bodyText, token, ifMatch).ConfigureAwait(false);
+
+                if (result == null) return NotFound();
+
+                return NoContent();
+            }
+            catch (VersionNumberConflictException vncErr)
+            {
+                return Conflict(vncErr.Message);
+            }
+        }
         private int? GetIfMatchFromHeader()
         {
             var header = HttpContext.Request.Headers.GetHeaderValue(HeaderConstants.IfMatch);

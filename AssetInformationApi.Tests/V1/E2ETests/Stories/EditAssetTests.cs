@@ -86,7 +86,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
                 .Then(t => _assetFixture.CreateEditAssetObject())
                 .When(w => _steps.WhenEditAssetApiIsCalled(_assetFixture.AssetId, _assetFixture.EditAsset))
                 .Then(t => _steps.ThenNoContentResponseReturned())
-                .And(a => _steps.TheAssetHasBeenUpdatedInTheDatabase(_assetFixture))
+                .And(a => _steps.TheAssetHasBeenUpdatedInTheDatabase(_assetFixture, false))
                 .And(t => _steps.ThenTheAssetUpdatedEventIsRaised(_assetFixture, _snsFixture))
                 .BDDfy();
         }
@@ -99,7 +99,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Stories
             var requestObject = CreateValidRequestObject();
 
             this.Given(g => _assetFixture.GivenAnAssetAlreadyExists())
-                .When(w => _steps.WhenEditAssetApiIsCalled(_assetFixture.AssetId, requestObject, versionNumber, false))
+                .When(w => _steps.WhenEditAssetApiIsCalled(_assetFixture.AssetId, requestObject, versionNumber, false, false))
                 .Then(t => _steps.ThenConflictIsReturned(versionNumber))
                 .BDDfy();
         }

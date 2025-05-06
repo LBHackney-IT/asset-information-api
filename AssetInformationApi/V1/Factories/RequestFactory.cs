@@ -65,5 +65,23 @@ namespace AssetInformationApi.V1.Factories
                 VersionNumber = domainEntity.VersionNumber
             };
         }
+
+        public static EditPropertyPatchDatabase ToDatabase(this EditPropertyPatchRequest domainEntity)
+        {
+            if (domainEntity == null) return null;
+
+            return new EditPropertyPatchDatabase
+            {
+                AreaId = domainEntity.AreaId,
+                PatchId = domainEntity.PatchId,
+                RootAsset = domainEntity.RootAsset,
+                ParentAssetIds = domainEntity.ParentAssetIds,
+                BoilerHouseId = domainEntity.BoilerHouseId,
+                IsActive = domainEntity.IsActive,
+                AssetLocation = domainEntity.AssetLocation,
+                AssetManagement = domainEntity.AssetManagement,
+                AssetCharacteristics = domainEntity.AssetCharacteristics.ToDatabase()
+            };
+        }
     }
 }

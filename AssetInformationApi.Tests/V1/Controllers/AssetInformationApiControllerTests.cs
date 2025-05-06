@@ -38,6 +38,7 @@ namespace AssetInformationApi.Tests.V1.Controllers
         private readonly Mock<IHttpContextWrapper> _mockContextWrapper;
         private readonly Mock<IEditAssetUseCase> _mockEditAssetUseCase;
         private readonly Mock<IEditAssetAddressUseCase> _mockEditAssetAddressUseCase;
+        private readonly Mock<IEditPropertyPatchUseCase> _mockEditPropertyPatchUseCase;
 
         private readonly Mock<HttpRequest> _mockHttpRequest;
         private readonly HeaderDictionary _requestHeaders;
@@ -56,6 +57,7 @@ namespace AssetInformationApi.Tests.V1.Controllers
             _mockContextWrapper = new Mock<IHttpContextWrapper>();
             _mockEditAssetUseCase = new Mock<IEditAssetUseCase>();
             _mockEditAssetAddressUseCase = new Mock<IEditAssetAddressUseCase>();
+            _mockEditPropertyPatchUseCase = new Mock<IEditPropertyPatchUseCase>();
 
             _mockHttpRequest = new Mock<HttpRequest>();
             _mockHttpResponse = new Mock<HttpResponse>();
@@ -68,6 +70,7 @@ namespace AssetInformationApi.Tests.V1.Controllers
                 _mockContextWrapper.Object,
                 _mockEditAssetUseCase.Object,
                 _mockEditAssetAddressUseCase.Object,
+                _mockEditPropertyPatchUseCase.Object,
                 new NullLogger<AssetInformationApiController>()
                 );
 
@@ -281,6 +284,51 @@ namespace AssetInformationApi.Tests.V1.Controllers
                 .Throws(new VersionNumberConflictException(1, 2));
 
             var response = await _classUnderTest.PatchAssetAddress(mockRequestObject, mockQuery).ConfigureAwait(false);
+
+            response.Should().BeOfType(typeof(ConflictObjectResult));
+        }
+        [Fact]
+        public async Task EditPrpertyPatchWhenValidReturns204Response()
+        {
+            var mockQuery = _fixture.Create<EditPropertyPatchRequest>();
+            var mockRequestObject = _fixture.Create<EditAssetByIdRequest>();
+            EditPropertyPatchRequest calledRequest = null;
+
+            _mockEditPropertyPatchUseCase.Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditPropertyPatchRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>()))
+                .ReturnsAsync(_fixture.Create<AssetResponseObject>())
+                .Callback<Guid, EditPropertyPatchRequest, string, Token, int?>((g, r, req, t, m) => calledRequest = r);
+
+            var response = await _classUnderTest.EditPropertyPatch(mockRequestObject, mockQuery).ConfigureAwait(false);
+
+            response.Should().BeOfType(typeof(NoContentResult));
+            calledRequest.Should().BeEquivalentTo(mockQuery);
+            _mockEditPropertyPatchUseCase.Verify(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditPropertyPatchRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>()), Times.Once);
+            _mockEditAssetUseCase.Verify(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditAssetRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task EditPropertyPatchWhenAssetDoesntExistReturns404NotFoundResponse()
+        {
+            var mockQuery = _fixture.Create<EditPropertyPatchRequest>();
+            var mockRequestObject = _fixture.Create<EditAssetByIdRequest>();
+
+            _mockEditPropertyPatchUseCase.Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditPropertyPatchRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>())).ReturnsAsync((AssetResponseObject) null);
+
+            var response = await _classUnderTest.EditPropertyPatch(mockRequestObject, mockQuery).ConfigureAwait(false);
+
+            response.Should().BeOfType(typeof(NotFoundResult));
+        }
+
+        [Fact]
+        public async Task EditPropertyPatchReturns409WhenExceptionIsThrown()
+        {
+            var mockQuery = _fixture.Create<EditPropertyPatchRequest>();
+            var mockRequestObject = _fixture.Create<EditAssetByIdRequest>();
+
+            _mockEditPropertyPatchUseCase.Setup(x => x.ExecuteAsync(It.IsAny<Guid>(), It.IsAny<EditPropertyPatchRequest>(), It.IsAny<string>(), It.IsAny<Token>(), It.IsAny<int?>()))
+                .Throws(new VersionNumberConflictException(1, 2));
+
+            var response = await _classUnderTest.EditPropertyPatch(mockRequestObject, mockQuery).ConfigureAwait(false);
 
             response.Should().BeOfType(typeof(ConflictObjectResult));
         }

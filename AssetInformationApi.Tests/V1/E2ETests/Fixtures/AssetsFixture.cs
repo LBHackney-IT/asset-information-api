@@ -28,6 +28,8 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
 
         public EditAssetAddressRequest EditAssetAddress { get; private set; }
 
+        public EditPropertyPatchRequest EditPropertyPatch { get; private set; }
+
         public AssetsFixture(IDynamoDbFixture dbFixture, IAmazonSimpleNotificationService amazonSimpleNotificationService)
         {
             _dbFixture = dbFixture;
@@ -89,6 +91,15 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Fixtures
                 .Create();
 
             EditAssetAddress = asset;
+            EditAsset = asset;
+        }
+
+        public void CreateEditPropertyPatchObject()
+        {
+            var asset = _fixture.Build<EditPropertyPatchRequest>()
+                .Create();
+
+            EditPropertyPatch = asset;
             EditAsset = asset;
         }
 
