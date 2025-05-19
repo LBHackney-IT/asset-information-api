@@ -426,14 +426,7 @@ workflows:
 
   deploy-code-pre-production:
     jobs:
-      - permit-pre-production-code-workflow:
-          type: approval
-          filters:
-            branches:
-              only: release
       - build-and-test:
-          requires:
-            - permit-pre-production-code-workflow
           context: 
             - api-nuget-token-context
             - SonarCloud
