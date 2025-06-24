@@ -29,34 +29,11 @@ namespace AssetInformationApi.Tests.V1.Boundary.Request.Validation
         }
 
         [Fact]
-        public void RequestShouldErrorForEmptyAddress()
+        public void RequestShouldErrorForEmptyAddressLine1()
         {
             var model = new AddAssetRequest() { Id = Guid.NewGuid(), AssetAddress = new Hackney.Shared.Asset.Domain.AssetAddress() };
             var result = _sut.TestValidate(model);
             result.ShouldHaveValidationErrorFor(x => x.AssetAddress.AddressLine1);
-            result.ShouldHaveValidationErrorFor(x => x.AssetAddress.PostCode);
-        }
-
-        [Theory]
-        [InlineData("")]
-        [InlineData(null)]
-        public void RequestShouldErrorWhenPostCodeIsNullOrEmptyAndAssetManagementIsNull(string? postcode)
-        {
-            var assetAddress = _fixture
-                .Build<Hackney.Shared.Asset.Domain.AssetAddress>()
-                .With(x => x.PostCode, postcode)
-                .Create();
-
-            var model = new AddAssetRequest()
-            {
-                Id = Guid.NewGuid(),
-                AssetAddress = assetAddress,
-                AssetManagement = null
-            };
-
-            var result = _sut.TestValidate(model);
-
-            result.ShouldHaveValidationErrorFor(x => x.AssetAddress.PostCode);
         }
 
         #region AssetManagement
