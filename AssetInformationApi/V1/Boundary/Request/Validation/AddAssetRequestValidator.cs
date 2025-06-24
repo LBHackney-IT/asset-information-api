@@ -12,10 +12,6 @@ namespace AssetInformationApi.V1.Boundary.Request.Validation
             RuleFor(x => x.AssetAddress).NotNull();
             RuleFor(x => x.AssetAddress.AddressLine1).NotNull()
                                  .NotEmpty();
-            RuleFor(x => x.AssetAddress.PostCode)
-                .NotNull()
-                .NotEmpty()
-                .When(x => x.AssetManagement?.IsTemporaryAccomodation != true);
 
             When(x => x.AssetManagement != null, () =>
             {
