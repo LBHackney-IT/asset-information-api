@@ -40,13 +40,8 @@ namespace AssetInformationApi.Tests.V1.Boundary.Request.Validation
         [Theory]
         [InlineData("")]
         [InlineData(null)]
-        public void RequestShouldNotErrorWhenPostcodeIsEmptyOrNullForTemporarysAccommodationAsset(string? postcode)
+        public void RequestShouldNotErrorWhenPostcodeIsEmptyOrNullWhenBypassPostcodeValidationIsTrue(string? postcode)
         {
-            var assetmanagement = new Hackney.Shared.Asset.Domain.AssetManagement()
-            {
-                IsTemporaryAccomodation = true
-            };
-
             var assetAddress = _fixture
                 .Build<Hackney.Shared.Asset.Domain.AssetAddress>()
                 .With(x => x.PostCode, postcode)
@@ -56,7 +51,7 @@ namespace AssetInformationApi.Tests.V1.Boundary.Request.Validation
             {
                 Id = Guid.NewGuid(),
                 AssetAddress = assetAddress,
-                AssetManagement = assetmanagement
+                BypassPostcodeValidation = true
             };
 
             var result = _sut.TestValidate(model);
