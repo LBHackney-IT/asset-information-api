@@ -26,6 +26,7 @@ functions:
     name: ${self:service}-${self:provider.stage}
     handler: AssetInformationApi::AssetInformationApi.LambdaEntryPoint::FunctionHandlerAsync
     role: lambdaExecutionRole
+    timeout: 60
     environment:
       ASSET_SNS_ARN: ${ssm:/sns-topic/${self:provider.stage}/asset/arn}
       ASSET_ADMIN_GROUPS: ${ssm:/ta-housing/${self:provider.stage}/asset-api-admin-allowed-groups}
