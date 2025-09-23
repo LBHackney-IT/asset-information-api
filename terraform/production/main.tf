@@ -28,9 +28,12 @@ locals {
   parameter_store = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter"
   default_tags = {
     Name              = "asset-information-api-${var.environment_name}"
-    Environment       = var.environment_name
+    Environment       = "prod"
     terraform-managed = true
     project_name      = var.project_name
+      Application = "Asset Information API"
+      TeamEmail = "developmentteam@hackney.gov.uk"
+
   }
 }
 
@@ -54,6 +57,7 @@ resource "aws_ssm_parameter" "asset_sns_arn" {
   name  = "/sns-topic/production/asset/arn"
   type  = "String"
   value = aws_sns_topic.asset.arn
+    overwrite = true
 }
 
 
