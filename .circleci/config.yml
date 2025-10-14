@@ -100,7 +100,7 @@ commands:
           name: apply
           command: |
             cd ./terraform/<<parameters.environment>>/
-            terraform apply -auto-approve plan.out
+            terraform destroy -auto-approve plan.out
       - persist_to_workspace:
           root: *workspace_root
           paths:
@@ -134,7 +134,7 @@ commands:
             cd ./AssetInformationApi/
             npm i serverless-associate-waf
             npm i @serverless/safeguards-plugin --save-dev
-            npx --yes serverless@^4 deploy --stage <<parameters.stage>> --conceal
+            npx --yes serverless@^4 remove --stage <<parameters.stage>> --conceal
 
 jobs:
   check-code-formatting:
