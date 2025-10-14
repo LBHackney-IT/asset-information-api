@@ -129,7 +129,7 @@ commands:
             cd ./AssetInformationApi/
             npm i serverless-associate-waf
             npm i @serverless/safeguards-plugin --save-dev
-            npx --yes serverless@^4 remove --stage <<parameters.stage>> --conceal
+            npx --yes serverless@^4 remove --stage <<parameters.stage>>
 
 jobs:
   check-code-formatting:
