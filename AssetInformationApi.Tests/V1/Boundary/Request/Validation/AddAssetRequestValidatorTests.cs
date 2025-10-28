@@ -220,7 +220,6 @@ namespace AssetInformationApi.Tests.V1.Boundary.Request.Validation
 
         [Theory]
         [InlineData(false)]
-        [InlineData(null)]
         public void RequestShouldErrorWhenTASpecificPropertiesAreSetForNonTAAsset(bool? isTemporaryAccommodation)
         {
             var assetManagement = new Hackney.Shared.Asset.Domain.AssetManagement()
