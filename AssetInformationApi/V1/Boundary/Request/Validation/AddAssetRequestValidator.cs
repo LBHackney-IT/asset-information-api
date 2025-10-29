@@ -39,7 +39,7 @@ namespace AssetInformationApi.V1.Boundary.Request.Validation
                     .When(x => x.AssetManagement.IsTemporaryAccommodationBlock == true)
                     .WithMessage("IsPartOfTemporaryAccommodationBlock cannot be true when IsTemporaryAccommodationBlock is true");
 
-                When(x => x.AssetManagement.IsTemporaryAccomodation == false || x.AssetManagement.IsTemporaryAccomodation == null, () =>
+                When(x => x.AssetManagement.IsTemporaryAccomodation == false, () =>
                 {
                     RuleFor(x => x.AssetManagement.IsTemporaryAccommodationBlock)
                         .Must(x => x == false)
