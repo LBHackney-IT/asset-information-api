@@ -3,6 +3,7 @@ using AssetInformationApi.V1.Boundary.Request.Validation;
 using AutoFixture;
 using FluentAssertions;
 using FluentValidation.TestHelper;
+using Hackney.Shared.Asset.Domain;
 using System;
 using System.Linq;
 using Xunit;
@@ -218,14 +219,12 @@ namespace AssetInformationApi.Tests.V1.Boundary.Request.Validation
             result.ShouldNotHaveValidationErrorFor(x => x.AssetManagement.IsPartOfTemporaryAccommodationBlock);
         }
 
-        [Theory]
-        [InlineData(false)]
-        [InlineData(null)]
-        public void RequestShouldErrorWhenTASpecificPropertiesAreSetForNonTAAsset(bool? isTemporaryAccommodation)
+        [Fact]
+        public void RequestShouldErrorWhenTASpecificPropertiesAreSetForNonTAAsset()
         {
             var assetManagement = new Hackney.Shared.Asset.Domain.AssetManagement()
             {
-                IsTemporaryAccomodation = isTemporaryAccommodation,
+                IsTemporaryAccomodation = false,
                 IsTemporaryAccommodationBlock = true,
                 IsPartOfTemporaryAccommodationBlock = true,
                 TemporaryAccommodationParentAssetId = Guid.NewGuid(),
@@ -250,6 +249,24 @@ namespace AssetInformationApi.Tests.V1.Boundary.Request.Validation
             result.Errors.Any(x => x.ErrorMessage == expectedErrorMessageForIsTemporaryAccommodationBlock).Should().BeTrue();
             result.Errors.Any(x => x.ErrorMessage == expectedErrorMessageForIsPartOfTemporaryAccommodationBlock).Should().BeTrue();
             result.Errors.Any(x => x.ErrorMessage == expectedErrorMessageForTemporaryAccommodationParentAssetId).Should().BeTrue();
+        }
+
+        [Fact]
+        public void RequestShouldNotErrorWhenIsTemporaryAccommadationIsNull()
+        {
+            var assetManagement = _fixture.Build<AssetManagement>().Without(x => x.IsTemporaryAccomodation).Create();
+
+            var assetAddress = _fixture.Create<AssetAddress>();
+
+            var model = new AddAssetRequest()
+            {
+                Id = Guid.NewGuid(),
+                AssetAddress = assetAddress,
+                AssetManagement = assetManagement,
+            };
+            var result = _sut.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(x => x.AssetManagement.IsTemporaryAccomodation);
         }
         #endregion
     }
