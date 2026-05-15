@@ -28,15 +28,18 @@ locals {
   parameter_store = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter"
   default_tags = {
     Name              = "asset-information-api-${var.environment_name}"
-    Environment       = var.environment_name
+    Environment       = "prod"
     terraform-managed = true
     project_name      = var.project_name
+      Application = "Asset Information API"
+      TeamEmail = "developmentteam@hackney.gov.uk"
+
   }
 }
 
 terraform {
   backend "s3" {
-    bucket  = "terraform-state-housing-production"
+    bucket  = "terraform-state-disaster-recovery" # ENTER THE NAME OF YOUR BUCKET
     encrypt = true
     region  = "eu-west-2"
     key     = "services/asset-information-api/state"
@@ -54,28 +57,29 @@ resource "aws_ssm_parameter" "asset_sns_arn" {
   name  = "/sns-topic/production/asset/arn"
   type  = "String"
   value = aws_sns_topic.asset.arn
+    overwrite = true
 }
 
 
-module "asset_information_api_cloudwatch_dashboard" {
-    source              = "github.com/LBHackney-IT/aws-hackney-common-terraform.git//modules/cloudwatch/dashboards/api-dashboard"
-    environment_name    = var.environment_name
-    api_name            = "asset-information-api"
-    sns_topic_name      = aws_sns_topic.asset.name
-    dynamodb_table_name = aws_dynamodb_table.assetinformationapi_dynamodb_table.name
-    include_sns_widget  = false
-}
-
-data "aws_ssm_parameter" "cloudwatch_topic_arn" {
-  name = "/housing-tl/${var.environment_name}/cloudwatch-alarms-topic-arn"
-}
-
-module "api-alarm" {
-  source           = "github.com/LBHackney-IT/aws-hackney-common-terraform.git//modules/cloudwatch/api-alarm"
-  environment_name = var.environment_name
-  api_name         = "asset-information-api"
-  alarm_period     = "300"
-  error_threshold  = "1"
-  sns_topic_arn    = data.aws_ssm_parameter.cloudwatch_topic_arn.value
-}
+# module "asset_information_api_cloudwatch_dashboard" {
+#     source              = "github.com/LBHackney-IT/aws-hackney-common-terraform.git//modules/cloudwatch/dashboards/api-dashboard"
+#     environment_name    = var.environment_name
+#     api_name            = "asset-information-api"
+#     sns_topic_name      = aws_sns_topic.asset.name
+#     dynamodb_table_name = aws_dynamodb_table.assetinformationapi_dynamodb_table.name
+#     include_sns_widget  = false
+# }
+#
+# data "aws_ssm_parameter" "cloudwatch_topic_arn" {
+#   name = "/housing-tl/${var.environment_name}/cloudwatch-alarms-topic-arn"
+# }
+#
+# module "api-alarm" {
+#   source           = "github.com/LBHackney-IT/aws-hackney-common-terraform.git//modules/cloudwatch/api-alarm"
+#   environment_name = var.environment_name
+#   api_name         = "asset-information-api"
+#   alarm_period     = "300"
+#   error_threshold  = "1"
+#   sns_topic_arn    = data.aws_ssm_parameter.cloudwatch_topic_arn.value
+# }
 
