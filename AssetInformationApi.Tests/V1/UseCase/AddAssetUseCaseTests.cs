@@ -49,7 +49,7 @@ namespace AssetInformationApi.Tests.V1.UseCase
             // Convert AssetDb into Asset object (used for response comparison)
             Asset asset = assetDb.ToDomain();
 
-            var token = new Token();
+            var token = _fixture.Create<Token>();
 
             _mockGateway.Setup(x => x.AddAsset(It.IsAny<AssetDb>())).ReturnsAsync(asset);
 
@@ -74,7 +74,7 @@ namespace AssetInformationApi.Tests.V1.UseCase
             // Convert AssetDb into Asset object (used for response comparison)
             Asset asset = assetDb.ToDomain();
 
-            var token = new Token();
+            var token = _fixture.Create<Token>();
             token.Email = "test@test.com";
             token.Name = "Test";
 
@@ -95,7 +95,7 @@ namespace AssetInformationApi.Tests.V1.UseCase
             AddAssetRequest newAssetRequest = _fixture.Create<AddAssetRequest>();
             AssetDb assetDb = newAssetRequest.ToDatabase();
             Asset asset = assetDb.ToDomain();
-            var token = new Token();
+            var token = _fixture.Create<Token>();
 
             // This will trigger the publishing of the AddRepairsContract event
             newAssetRequest.AddDefaultSorContracts = true;
@@ -121,7 +121,7 @@ namespace AssetInformationApi.Tests.V1.UseCase
             AddAssetRequest newAssetRequest = _fixture.Create<AddAssetRequest>();
             AssetDb assetDb = newAssetRequest.ToDatabase();
             Asset asset = assetDb.ToDomain();
-            var token = new Token();
+            var token = _fixture.Create<Token>();
 
             // This will NOT trigger the publishing of the AddRepairsContract event
             newAssetRequest.AddDefaultSorContracts = false;
