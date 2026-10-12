@@ -171,7 +171,7 @@ workflows:
             - terraform-compliance-development
           filters:
             branches:
-              only: master
+              only: dummy-authorization-bump-test
       - deploy-to-development:
           context:
             - api-nuget-token-context
@@ -180,4 +180,4 @@ workflows:
             - terraform-apply-development
           filters:
             branches:
-              only: master
+              only: dummy-authorization-bump-test
