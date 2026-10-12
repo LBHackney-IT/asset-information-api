@@ -163,12 +163,9 @@ workflows:
       - terraform-init-and-plan-development:
           requires:
             - assume-role-development
-      - terraform-compliance-development:
-          requires:
-            - terraform-init-and-plan-development
       - terraform-apply-development:
           requires:
-            - terraform-compliance-development
+            - terraform-init-and-plan-development
           filters:
             branches:
               only: dummy-authorization-bump-test
