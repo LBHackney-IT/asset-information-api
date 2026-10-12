@@ -19,6 +19,8 @@ using Hackney.Core.Authorization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+#pragma warning disable HACKNEY_DEPRECATED_TOKEN_CREATE
+
 namespace AssetInformationApi.V1.Controllers
 {
     [ApiController]
