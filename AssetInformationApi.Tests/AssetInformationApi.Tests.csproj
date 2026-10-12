@@ -18,10 +18,10 @@
     </PackageReference>
     <PackageReference Include="DeepCloner" Version="0.10.4" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
-    <PackageReference Include="Hackney.Core.Authorization" Version="1.78.0" />
+    <PackageReference Include="Hackney.Core.Authorization" Version="1.89.0" />
     <PackageReference Include="Hackney.Core.DynamoDb" Version="1.79.0" />
     <PackageReference Include="Hackney.Core.Http" Version="1.70.0" />
-    <PackageReference Include="Hackney.Core.JWT" Version="1.87.0" />
+    <PackageReference Include="Hackney.Core.JWT" Version="2.0.0" />
     <PackageReference Include="Hackney.Core.Sns" Version="1.52.0" />
     <PackageReference Include="Hackney.Core.Testing.DynamoDb" Version="1.57.0" />
     <PackageReference Include="Hackney.Core.Testing.Shared" Version="1.66.0" />
