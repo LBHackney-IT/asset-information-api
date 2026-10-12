@@ -19,6 +19,9 @@ using Hackney.Core.Authorization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+// Will be addressed with the release of Cognito M2M auth
+#pragma warning disable HACKNEY_DEPRECATED_TOKEN_CREATE
+
 namespace AssetInformationApi.V1.Controllers
 {
     [ApiController]
