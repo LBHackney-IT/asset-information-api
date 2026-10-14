@@ -15,6 +15,7 @@ using HeaderConstants = AssetInformationApi.V1.Infrastructure.HeaderConstants;
 using System.Net.Http.Headers;
 using AssetInformationApi.V1.Infrastructure.Exceptions;
 using Hackney.Shared.Asset.Boundary.Request;
+using Asp.Versioning;
 using Hackney.Core.Authorization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
