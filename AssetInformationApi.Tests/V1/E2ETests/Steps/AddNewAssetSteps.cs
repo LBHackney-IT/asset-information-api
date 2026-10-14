@@ -57,7 +57,7 @@ namespace AssetInformationApi.Tests.V1.E2ETests.Steps
         public async Task WhenTheAddAssetApiIsCalled(Asset asset)
         {
             var route = $"/api/v1/assets";
-            //var token = new Token();
+            //var token = _fixture.Create<Token>();
             if (asset.Id == Guid.Empty)
                 _lastResponse = new HttpResponseMessage(HttpStatusCode.BadRequest);
             else
