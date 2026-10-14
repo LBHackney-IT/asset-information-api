@@ -1,6 +1,6 @@
 using AssetInformationApi.Versioning;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 using Xunit;
 
 namespace AssetInformationApi.Tests.Versioning

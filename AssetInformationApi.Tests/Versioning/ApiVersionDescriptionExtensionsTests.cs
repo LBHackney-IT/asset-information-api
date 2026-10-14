@@ -1,7 +1,7 @@
 using AssetInformationApi.Versioning;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 using Xunit;
 
 namespace AssetInformationApi.Tests.Versioning
@@ -12,7 +12,7 @@ namespace AssetInformationApi.Tests.Versioning
         public void GetFormattedApiVersionTest()
         {
             var version = new ApiVersion(1, 1);
-            ApiVersionDescription sut = new ApiVersionDescription(version, null, false);
+            ApiVersionDescription sut = new ApiVersionDescription(version, null);
             sut.GetFormattedApiVersion().Should().Be($"v{version.ToString()}");
         }
     }
