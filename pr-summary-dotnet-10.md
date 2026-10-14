@@ -35,6 +35,7 @@ All other packages are unchanged.
 | `AssetInformationApi.Tests/Versioning/ApiVersionExtensionsTests.cs` | Same using swap as above |
 | `AssetInformationApi.Tests/Versioning/ApiVersionDescriptionExtensionsTests.cs` | Same using swap; updated `ApiVersionDescription` constructor call — in `Asp.Versioning` the third parameter changed from `bool isDeprecated` to `SunsetPolicy?`; `false` (not deprecated) maps to omitting the parameter (`null`) |
 | `AssetInformationApi/V1/Controllers/AssetInformationApiController.cs` | Added `using Asp.Versioning;` — `[ApiVersion("1.0")]` attribute uses `ApiVersion`/`ApiVersionAttribute` which moved from `Microsoft.AspNetCore.Mvc` to the `Asp.Versioning` namespace when the package was replaced |
+| `AssetInformationApi/Program.cs` | Replaced `WebHost.CreateDefaultBuilder` / `IWebHostBuilder` pattern with `Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())` — in .NET 10 `WebHost` and `IWebHostBuilder.Build()` are promoted from obsolete warnings to hard `ASPDEPR008` errors; `Startup.cs` is unchanged |
 
 ### Docker
 
