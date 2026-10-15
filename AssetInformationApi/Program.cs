@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using System.Diagnostics.CodeAnalysis;
 
 namespace AssetInformationApi
@@ -9,11 +9,17 @@ namespace AssetInformationApi
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            CreateHostBuilder(args).Build().Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .UseDefaultServiceProvider((context, options) =>
+                {
+                    // Match the previous WebHost builder: scope checks in Development, no build-time validation.
+                    options.ValidateScopes = context.HostingEnvironment.IsDevelopment();
+                    options.ValidateOnBuild = false;
+                })
+                .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
     }
 }
