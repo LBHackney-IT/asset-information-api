@@ -1,7 +1,7 @@
 service: asset-information-api
 provider:
   name: aws
-  runtime: dotnet8
+  runtime: dotnet10
   memorySize: 2048
   tracing:
     lambda: Active
@@ -19,7 +19,7 @@ plugins:
   - '@serverless/safeguards-plugin'
 
 package:
-  artifact: ./bin/release/net8.0/asset-information-api.zip
+  artifact: ./bin/release/net10.0/asset-information-api.zip
 
 functions:
   AssetInformationApi:
