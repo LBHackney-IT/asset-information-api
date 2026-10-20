@@ -52,10 +52,6 @@ namespace AssetInformationApi
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-
-            AWSSDKHandler.RegisterXRayForAllServices();
-            AWSXRayRecorder.InitializeInstance(Configuration);
-            AWSXRayRecorder.RegisterLogger(LoggingOptions.SystemDiagnostics);
         }
 
         public IConfiguration Configuration { get; }
@@ -187,8 +183,14 @@ namespace AssetInformationApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
+        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger, IConfiguration configuration)
         {
+            // Register after service configuration. The generic host constructs Startup before
+            // later ConfigureServices callbacks, and AWS clients created there must not be traced yet.
+            AWSSDKHandler.RegisterXRayForAllServices();
+            AWSXRayRecorder.InitializeInstance(configuration);
+            AWSXRayRecorder.RegisterLogger(LoggingOptions.SystemDiagnostics);
+
             app.UseCors(builder => builder
                 .AllowAnyOrigin()
                 .AllowAnyHeader()
